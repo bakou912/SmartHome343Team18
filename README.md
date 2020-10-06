@@ -22,8 +22,11 @@ mvn clean test
 #### Frontend
 
 ## Available Scripts
+To install all the dependecies make sure to run the following command in the frontend project directory `frontend`:
 
-In the project directory, you can run:
+### `npm install`
+
+In the project directory `frontend`, you can run:
 
 ### `npm start`
 
