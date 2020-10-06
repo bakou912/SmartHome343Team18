@@ -21,6 +21,18 @@ mvn clean test
 
 #### Frontend
 
+Make sure you have the latest version of Node and NPM installed on your machine.
+
+Run the following in the `frontend` directory:
+```
+npm install
+```
+
+Within the same directory, run the following to start the React app:
+```
+npm start
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
