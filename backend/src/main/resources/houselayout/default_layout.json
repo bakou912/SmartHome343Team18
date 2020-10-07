@@ -1,0 +1,36 @@
+{
+    "rows": [
+        {
+            "rooms": [
+                {
+                    "name": "Living Room",
+                    "windowsOn": ["W", "N"],
+                    "lights": 2,
+                    "doorsOn": ["E"]
+                },
+                {
+                    "name": "Kitchen",
+                    "windowsOn": ["E"],
+                    "lights": 1,
+                    "doorsOn": ["S"]
+                }
+            ]
+        },
+        {
+            "rooms": [
+                {
+                    "name": "Bathroom",
+                    "windowsOn": ["W"],
+                    "lights": 1,
+                    "doorsOn": ["E"]
+                },
+                {
+                    "name": "Bedroom",
+                    "windowsOn": ["S"],
+                    "lights": 1,
+                    "doorsOn": []
+                }
+            ]
+        }
+    ]
+}
