@@ -2,6 +2,8 @@ package com.smart.home.backend.service.mapper;
 
 import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.model.houselayout.Light;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +11,8 @@ import java.util.List;
 /**
  * Mapper class for a list of lights.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LightsMapper {
-	
-	private LightsMapper() {
-		// Hiding constructor
-	}
 	
 	/**
 	 * Maps a number of lights to lights.
@@ -26,6 +25,7 @@ public class LightsMapper {
 		for(int i = 0; i < nbLights; i++) {
 			lights.add(
 					Light.builder()
+							.id(i)
 							.state(LightState.OFF)
 							.build()
 			);

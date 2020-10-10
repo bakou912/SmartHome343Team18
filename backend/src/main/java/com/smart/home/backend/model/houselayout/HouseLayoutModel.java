@@ -3,7 +3,6 @@ package com.smart.home.backend.model.houselayout;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
-
 import java.util.List;
 
 /**
@@ -13,5 +12,7 @@ import java.util.List;
 @Setter
 @Builder
 public class HouseLayoutModel {
+	
 	private List<RoomRow> rows;
+	
 }

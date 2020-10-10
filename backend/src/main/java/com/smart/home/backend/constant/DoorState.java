@@ -1,8 +1,11 @@
 package com.smart.home.backend.constant;
 
+import lombok.Getter;
+
 /**
  * State enum for doors.
  */
+@Getter
 public enum DoorState {
 	
 	LOCKED("L"),
@@ -12,10 +15,6 @@ public enum DoorState {
 	
 	DoorState(String text) {
 		this.text = text;
-	}
-	
-	public String getText() {
-		return this.text;
 	}
 
 }

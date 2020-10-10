@@ -2,17 +2,18 @@ package com.smart.home.backend.model.houselayout;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Builder;
+import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Class for a room's door.
  */
 @Getter
 @Setter
-@Builder
-public class Door {
+@SuperBuilder
+public class Door extends ModelObject {
 	
 	private Direction direction;
 	private DoorState state;

@@ -2,7 +2,11 @@ package com.smart.home.backend.service.mapper;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
+import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.model.houselayout.Door;
+import com.smart.home.backend.model.houselayout.Room;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +14,8 @@ import java.util.List;
 /**
  * Mapper class for a list of doors.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DoorsMapper {
-	
-	private DoorsMapper() {
-		// Hiding constructor
-	}
 	
 	/**
 	 * Maps door directions to doors.
@@ -24,14 +25,17 @@ public class DoorsMapper {
 	public static List<Door> map(List<String> doorDirections) {
 		List<Door> doors = new ArrayList<>();
 		
-		doorDirections.forEach(
-				doorDirection -> doors.add(
-						Door.builder()
-								.state(DoorState.LOCKED)
-								.direction(Direction.get(doorDirection))
-								.build()
-				)
-		);
+		for (int i = 0; i < doorDirections.size(); i++) {
+			String doorDirection = doorDirections.get(i);
+			
+			doors.add(
+					Door.builder()
+							.id(i)
+							.state(DoorState.LOCKED)
+							.direction(Direction.get(doorDirection))
+							.build()
+			);
+		}
 		
 		return doors;
 	}

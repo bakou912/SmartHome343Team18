@@ -3,6 +3,8 @@ package com.smart.home.backend.service.mapper;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.model.houselayout.Window;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +12,8 @@ import java.util.List;
 /**
  * Mapper class for a list of windows.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WindowsMapper {
-	
-	private WindowsMapper() {
-		// Hiding constructor
-	}
 	
 	/**
 	 * Maps window directions to windows.
@@ -24,14 +23,17 @@ public class WindowsMapper {
 	public static List<Window> map(List<String> windowDirections) {
 		List<Window> windows = new ArrayList<>();
 		
-		windowDirections.forEach(
-				windowDirection -> windows.add(
-						Window.builder()
-								.state(WindowState.CLOSED)
-								.direction(Direction.get(windowDirection))
-								.build()
-				)
-		);
+		for (int i = 0; i < windowDirections.size(); i++) {
+			String windowDirection = windowDirections.get(i);
+			
+			windows.add(
+					Window.builder()
+							.id(i)
+							.state(WindowState.CLOSED)
+							.direction(Direction.get(windowDirection))
+							.build()
+			);
+		}
 		
 		return windows;
 	}

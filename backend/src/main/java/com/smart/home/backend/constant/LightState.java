@@ -1,8 +1,11 @@
 package com.smart.home.backend.constant;
 
+import lombok.Getter;
+
 /**
  * State enum for lights.
  */
+@Getter
 public enum LightState {
 	
 	ON("ON"),
@@ -12,10 +15,6 @@ public enum LightState {
 	
 	LightState(String text) {
 		this.text = text;
-	}
-	
-	public String getText() {
-		return this.text;
 	}
 	
 }

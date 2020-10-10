@@ -1,8 +1,11 @@
 package com.smart.home.backend.constant;
 
+import lombok.Getter;
+
 /**
  * State enum for windows.
  */
+@Getter
 public enum WindowState {
 	
 	OPEN("O"),
@@ -13,10 +16,6 @@ public enum WindowState {
 	
 	WindowState(String text) {
 		this.text = text;
-	}
-	
-	public String getText() {
-		return this.text;
 	}
 	
 }

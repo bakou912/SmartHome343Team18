@@ -1,10 +1,12 @@
 package com.smart.home.backend.constant;
 
+import lombok.Getter;
 import java.util.Arrays;
 
 /**
  * Direction enum used for room items.
  */
+@Getter
 public enum Direction {
 	
 	NORTH("N"),
@@ -16,10 +18,6 @@ public enum Direction {
 	
 	Direction(String text) {
 		this.text = text;
-	}
-	
-	public String getText() {
-		return this.text;
 	}
 	
 	/**

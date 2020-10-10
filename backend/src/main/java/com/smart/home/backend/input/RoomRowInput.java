@@ -5,11 +5,14 @@ import lombok.Setter;import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * Input class for a house layout room row.
+ */
 @Getter
 @Setter
-public class HouseLayoutRow {
+public class RoomRowInput {
 	
 	@JsonProperty("rooms")
-	private List<HouseLayoutRoom> rooms = null;
+	private List<RoomInput> rooms = null;
 	
 }
