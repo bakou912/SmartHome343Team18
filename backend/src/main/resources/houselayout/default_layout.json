@@ -27,7 +27,7 @@
                 {
                     "name": "Bedroom",
                     "windowsOn": ["S"],
-                    "lights": 1,
+                    "lights": 3,
                     "doorsOn": []
                 }
             ]
