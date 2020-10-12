@@ -1,7 +1,6 @@
 package com.smart.home.backend.controller;
 
 import com.smart.home.backend.input.HouseLayoutInput;
-import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.RoomRow;

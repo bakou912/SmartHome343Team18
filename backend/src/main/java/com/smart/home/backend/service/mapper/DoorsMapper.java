@@ -2,9 +2,7 @@ package com.smart.home.backend.service.mapper;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
-import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.model.houselayout.Door;
-import com.smart.home.backend.model.houselayout.Room;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

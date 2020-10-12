@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.houselayout;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
