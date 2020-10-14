@@ -1,6 +1,7 @@
 package com.smart.home.backend.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jdk.tools.jlink.internal.plugins.StripNativeCommandsPlugin;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,14 +12,27 @@ import lombok.Setter;
 @Setter
 public class ParametersInput {
     @JsonProperty("outside")
-    private String outsideTemp;
+    private Double outsideTemp;
 
     @JsonProperty("insideTemp")
-    private String insideTemp;
+    private Double insideTemp;
 
     @JsonProperty("location")
     private String location;
 
-    @JsonProperty("date")
-    private String date;
+    @JsonProperty("day")
+    private String day;
+
+    @JsonProperty("month")
+    private String month;
+
+    @JsonProperty("year")
+    private Integer year;
+
+    @JsonProperty("hour")
+    private Integer hour;
+
+    @JsonProperty("minutes")
+    private Integer minutes;
+
 }

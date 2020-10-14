@@ -11,17 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProfileInput {
-//    @JsonProperty("name")
-//    private String name;
-
     @JsonProperty("role")
     private Role role;
-    @JsonProperty("location")
-    private String location;
-
-//    @JsonProperty("username")
-//    private String username;
-//
-//    @JsonProperty("password")
-//    private String password;
 }

@@ -12,6 +12,5 @@ import java.util.Date;
 public class SystemParameters {
     private double outsideTemp;
     private double insideTemp;
-    private String location;
     private Date date;
 }
