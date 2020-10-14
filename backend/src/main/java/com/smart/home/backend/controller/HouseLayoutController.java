@@ -104,14 +104,14 @@ public class HouseLayoutController {
 		
 		List<Light> lights = room.getLights();
 		
-		boolean response = lights.add(
+		boolean validRemoval = lights.add(
 				Light.builder()
 						.id(lights.size())
 						.state(LightState.OFF)
 						.build()
 		);
 
-		if(response == false){
+		if(validRemoval == false){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
@@ -137,9 +137,9 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		boolean response = targetRoom.getLights().removeIf(light -> light.getId() == lightId);
+		boolean validRemoval = targetRoom.getLights().removeIf(light -> light.getId() == lightId);
 
-		if(response == false){
+		if(validRemoval == false){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
@@ -366,9 +366,9 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		boolean response = targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
+		boolean validRemoval = targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
 
-		if(response == false){
+		if(validRemoval == false){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
