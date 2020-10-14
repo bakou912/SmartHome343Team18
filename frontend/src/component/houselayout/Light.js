@@ -17,7 +17,7 @@ export default class Light extends React.Component {
     getImagePath() {
         let path = "/light";
 
-        if (this.state.state !== "ON") {
+        if (this.state.state === "ON") {
             path += "-on"
         }
 

@@ -1,9 +1,8 @@
-package com.smart.home.backend.model.houselayout;
+package com.smart.home.backend.model.houselayout.directional;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import com.smart.home.backend.model.ModelObject;
-import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 import lombok.experimental.SuperBuilder;
 
@@ -13,9 +12,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-public class Door extends ModelObject {
+public class Door extends DirectionalObject {
 	
-	private Direction direction;
+	@NonNull
 	private DoorState state;
 	
 }

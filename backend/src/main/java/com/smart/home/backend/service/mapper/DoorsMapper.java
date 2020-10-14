@@ -2,7 +2,7 @@ package com.smart.home.backend.service.mapper;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
-import com.smart.home.backend.model.houselayout.Door;
+import com.smart.home.backend.model.houselayout.directional.Door;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -20,17 +20,17 @@ public class DoorsMapper {
 	 * @param doorDirections List of door directions
 	 * @return Mapped doors
 	 */
-	public static List<Door> map(List<String> doorDirections) {
+	public static List<Door> map(List<Direction> doorDirections) {
 		List<Door> doors = new ArrayList<>();
 		
 		for (int i = 0; i < doorDirections.size(); i++) {
-			String doorDirection = doorDirections.get(i);
+			Direction doorDirection = doorDirections.get(i);
 			
 			doors.add(
 					Door.builder()
 							.id(i)
 							.state(DoorState.LOCKED)
-							.direction(Direction.get(doorDirection))
+							.direction(doorDirection)
 							.build()
 			);
 		}

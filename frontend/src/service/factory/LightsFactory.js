@@ -19,8 +19,6 @@ export default class LightsFactory {
             );
         }
 
-        console.log("nb lights:" + lightComponents.length);
-
         const svgWidth = lightComponents.length * Light.dimension;
 
         return (

@@ -20,9 +20,9 @@ export default class HouseLayout extends React.Component {
     async componentDidMount() {
         this.layoutModel = (await houseLayoutService.getLayout()).data;
 
-        console.log(this.layoutModel);
-
-        this.setState(this.createRooms());
+        if (this.layoutModel && Array.isArray(this.layoutModel.rows)) {
+            this.setState(this.createRooms());
+        }
     }
 
     createRooms() {

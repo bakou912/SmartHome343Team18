@@ -1,5 +1,6 @@
 package com.smart.home.backend.constant;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import java.util.Arrays;
 
@@ -25,7 +26,16 @@ public enum Direction {
 	 * @param directionValue direction value
 	 * @return Retrieved enum object
 	 */
+	@JsonCreator
 	public static Direction get(String directionValue) {
-		return Arrays.stream(Direction.values()).filter(d -> d.getText().equals(directionValue)).findFirst().get();
+		return Arrays.stream(Direction.values())
+				.filter(d -> d.getText().equals(directionValue))
+				.findFirst()
+				.orElse(null);
+	}
+	
+	@Override
+	public String toString() {
+		return text;
 	}
 }
