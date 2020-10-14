@@ -16,4 +16,23 @@ public class RoomRow extends ModelObject {
 	
 	private List<Room> rooms;
 	
+	/**
+	 * Finds a room with the corresponding id.
+	 * @param roomId Searched room's id
+	 * @return Found room
+	 */
+	public Room findRoom(int roomId) {
+		Room foundRoom = null;
+		
+		if (this.getRooms() != null && !this.getRooms().isEmpty()) {
+			foundRoom = this.getRooms()
+					.stream()
+					.filter(roomRow -> roomRow.getId() == roomId)
+					.findFirst()
+					.orElse(null);
+		}
+		
+		return foundRoom;
+	}
+	
 }
