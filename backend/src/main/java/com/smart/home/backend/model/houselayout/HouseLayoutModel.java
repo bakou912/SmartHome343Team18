@@ -2,7 +2,10 @@ package com.smart.home.backend.model.houselayout;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.smart.home.backend.constant.Direction;
 
 /**
  * Model for the house layout.
@@ -106,4 +109,32 @@ public class HouseLayoutModel {
 		return foundWindow;
 	}
 	
+	/**
+	 * Checks to see if the direction is available in room.
+	 * 
+	 * @param rowId Row id
+	 * @param roomId Room id
+	 * @param direction direction of placement within room
+	 * @return True if that direction is available. False otherwise.
+	 */
+	public Boolean availableDirection(int rowId, int roomId, Direction direction){
+		List<Direction> availableDirections = new ArrayList<>();
+
+		Room room = this.findRoom(rowId, roomId);
+
+		//get direction for doors and windows
+		for(Door door : room.getDoors()){
+			availableDirections.add(door.getDirection());
+		}
+		
+		for(Window window : room.getWindows()){
+			availableDirections.add(window.getDirection());
+		}
+
+		if(availableDirections.contains(direction)){
+			return false;
+		}
+
+		return true;
+	} 
 }
