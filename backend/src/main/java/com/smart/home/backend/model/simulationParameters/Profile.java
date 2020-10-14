@@ -10,8 +10,9 @@ import lombok.Setter;
 @Setter
 @SuperBuilder
 public class Profile extends ModelObject{
-    private String name;
-    private String username;
-    private String password;
+//    private String name;
+//    private String username;
+//    private String password;
     private Role role;
+    private String location;
 }
