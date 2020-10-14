@@ -104,13 +104,16 @@ public class HouseLayoutController {
 		
 		List<Light> lights = room.getLights();
 		
-		lights.add(
+		boolean response = lights.add(
 				Light.builder()
 						.id(lights.size())
 						.state(LightState.OFF)
 						.build()
 		);
 
+		if(response == false){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
@@ -134,8 +137,12 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetRoom.getLights().removeIf(light -> light.getId() == lightId);
-		
+		boolean response = targetRoom.getLights().removeIf(light -> light.getId() == lightId);
+
+		if(response == false){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
@@ -214,7 +221,11 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetRow.getRooms().removeIf(room -> room.getId() == roomId);
+		boolean response  = targetRow.getRooms().removeIf(room -> room.getId() == roomId);
+
+		if(response == false){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -267,8 +278,12 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
+		boolean response  = targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
 		
+		if(response == false){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
@@ -351,7 +366,11 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
+		boolean response = targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
+
+		if(response == false){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
