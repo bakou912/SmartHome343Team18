@@ -221,9 +221,9 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		boolean response  = targetRow.getRooms().removeIf(room -> room.getId() == roomId);
+		boolean validRemoval =  targetRow.getRooms().removeIf(room -> room.getId() == roomId);
 
-		if(response == false){
+		if(validRemoval == false){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
@@ -278,9 +278,9 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		boolean response  = targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
+		boolean validRemoval =  targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
 		
-		if(response == false){
+		if(validRemoval == false){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
