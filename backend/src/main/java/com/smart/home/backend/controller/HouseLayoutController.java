@@ -8,11 +8,11 @@ import com.smart.home.backend.input.LightInput;
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.input.WindowInput;
-import com.smart.home.backend.model.houselayout.Door;
+import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Light;
 import com.smart.home.backend.model.houselayout.RoomRow;
-import com.smart.home.backend.model.houselayout.Window;
+import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.service.mapper.DoorsMapper;
 import com.smart.home.backend.service.mapper.LightsMapper;
 import com.smart.home.backend.service.mapper.RoomsMapper;
@@ -96,16 +96,20 @@ public class HouseLayoutController {
 	 */
 	@PostMapping("layout/rows/{rowId}/rooms/{roomId}/lights")
 	public ResponseEntity<HouseLayoutModel> addLight(@PathVariable int rowId, @PathVariable int roomId) {
-
-		List<Light> lights = houseLayoutModel.findRoom(rowId, roomId).getLights();
-		int newId = lights.size();
-
-		Light newLight = Light.builder()
-				.id(newId)
-				.state(LightState.OFF)
-				.build();
-
-		houseLayoutModel.findRoom(rowId, roomId).getLights().add(newLight);
+		Room room = this.getHouseLayoutModel().findRoom(rowId, roomId);
+		
+		if (room == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Light> lights = room.getLights();
+		
+		lights.add(
+				Light.builder()
+						.id(lights.size())
+						.state(LightState.OFF)
+						.build()
+		);
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -119,12 +123,19 @@ public class HouseLayoutController {
 	 * @return updated house layout. returns null if the room, row or light does not exist
 	 */
 	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{lightId}")
-	public ResponseEntity<HouseLayoutModel>  removeLight(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId, @PathVariable(value = "lightId") int lightId) {
-
-		houseLayoutModel.findRoom(rowId, roomId).getLights().remove(lightId);
-
-
-
+	public ResponseEntity<HouseLayoutModel> removeLight(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@PathVariable(value = "lightId") int lightId
+	) {
+		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
+		
+		if (targetRoom == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetRoom.getLights().removeIf(light -> light.getId() == lightId);
+		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
@@ -137,9 +148,19 @@ public class HouseLayoutController {
 	 * @return updated house layout with updated state of light. returns null if the room does not exist
 	 */
 	@PutMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{lightId}")
-	public ResponseEntity<HouseLayoutModel> setLayoutLight(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId, @PathVariable int lightId, @RequestBody LightInput lighInput) {
-
-		houseLayoutModel.findLight(rowId, roomId, lightId).setState(lighInput.getState());
+	public ResponseEntity<HouseLayoutModel> setLayoutLight(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@PathVariable int lightId,
+			@RequestBody LightInput lightInput
+	) {
+		Light light = houseLayoutModel.findLight(rowId, roomId, lightId);
+		
+		if (light == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		light.setState(lightInput.getState());
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -155,16 +176,21 @@ public class HouseLayoutController {
 	public ResponseEntity<HouseLayoutModel> addRooms(@PathVariable(value = "rowId") int rowId, @RequestBody RoomRowInput newRoomInputs) {
 
 		RoomRow targetRow = houseLayoutModel.findRow(rowId);
-
-		for(RoomInput room : newRoomInputs.getRooms()){
-			int newId = targetRow.getRooms().size();
-			targetRow.getRooms().add(
+		
+		if (targetRow == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Room> rooms = targetRow.getRooms();
+		
+		for(RoomInput roomInput : newRoomInputs.getRooms()) {
+			rooms.add(
 				Room.builder()
-						.id(newId)
-						.name(room.getName())
-						.doors(DoorsMapper.map(room.getDoorsOn()))
-						.windows(WindowsMapper.map(room.getWindowsOn()))
-						.lights(LightsMapper.map(room.getLights()))
+						.id(rooms.size())
+						.name(roomInput.getName())
+						.doors(DoorsMapper.map(roomInput.getDoorsOn()))
+						.windows(WindowsMapper.map(roomInput.getWindowsOn()))
+						.lights(LightsMapper.map(roomInput.getLights()))
 						.build()
 			);
 		}
@@ -181,8 +207,14 @@ public class HouseLayoutController {
 	 */
 	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}")
 	public ResponseEntity<HouseLayoutModel> removeRoom(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId) {
-
-		houseLayoutModel.findRow(rowId).getRooms().remove(roomId);
+		
+		RoomRow targetRow = this.getHouseLayoutModel().findRow(rowId);
+		
+		if (targetRow == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetRow.getRooms().removeIf(room -> room.getId() == roomId);
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -197,26 +229,25 @@ public class HouseLayoutController {
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/door")
 	public ResponseEntity<HouseLayoutModel> addDoor(@PathVariable(value = "rowId") int rowId , @PathVariable(value="roomId") int roomId, @RequestBody DoorInput newDoor ){
-
-		if( houseLayoutModel.availableDirection(rowId, roomId, newDoor.getDirection()) == true){
-			Room room =  houseLayoutModel.findRoom(rowId, roomId);
-			int newId = room.getDoors().size();
-
-			room.getDoors().add(
-				Door.builder()
-					.id(newId)
-					.direction(newDoor.getDirection())
-					.state(newDoor.getState())
-					.build()
-			);
-		}else{
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		Room room = this.getHouseLayoutModel().findRoom(rowId, roomId);
+		
+		if (room == null || !this.getHouseLayoutModel().isDirectionAvailable(room, newDoor.getDirection())) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+		
+		List<Door> doors = room.getDoors();
+		
+		doors.add(
+			Door.builder()
+				.id(doors.size())
+				.direction(newDoor.getDirection())
+				.state(newDoor.getState())
+				.build()
+		);
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
-
-
+	
 	/**
 	 * remove a door within the given room
 	 * 
@@ -225,11 +256,19 @@ public class HouseLayoutController {
 	 * @return updated houseLayout. returns null if the door, room, row does not exist
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/door/{doorId}")
-	public ResponseEntity<HouseLayoutModel> removeDoor(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId, @PathVariable(value = "doorId") int doorId){
-
-		houseLayoutModel.findRoom(rowId, roomId).getDoors().remove(doorId);
-
-
+	public ResponseEntity<HouseLayoutModel> removeDoor(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@PathVariable(value = "doorId") int doorId
+	){
+		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
+		
+		if (targetRoom == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
+		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
@@ -242,11 +281,20 @@ public class HouseLayoutController {
 	 * @return updated houseLayout. returns null if door, room, row does not exist/
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/door/{doorId}")
-	public ResponseEntity<HouseLayoutModel> changeDoorState(@PathVariable("rowId") int rowId, @PathVariable("roomId") int roomId, @PathVariable("doorId") int doorId, @RequestBody DoorInput doorInput){
+	public ResponseEntity<HouseLayoutModel> changeDoorState(
+			@PathVariable("rowId") int rowId,
+			@PathVariable("roomId") int roomId,
+			@PathVariable("doorId") int doorId,
+			@RequestBody DoorInput doorInput
+	) {
+		Door targetDoor = this.getHouseLayoutModel().findDoor(rowId, roomId, doorId);
 		
-		houseLayoutModel.findDoor(rowId, roomId, doorId).setDirection(doorInput.getDirection());
-		houseLayoutModel.findDoor(rowId, roomId, doorId).setState(doorInput.getState());
-
+		if (targetDoor == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetDoor.setDirection(doorInput.getDirection());
+		targetDoor.setState(doorInput.getState());
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -259,24 +307,30 @@ public class HouseLayoutController {
 	 * @return update houseLayout. Returns null if no space for window or if room, row does not exist
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/window")
-	public ResponseEntity<HouseLayoutModel> addWindow(@PathVariable(value = "rowId") int rowId,@PathVariable(value = "roomId") int roomId, @RequestBody WindowInput newWindow){
+	public ResponseEntity<HouseLayoutModel> addWindow(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@RequestBody WindowInput newWindow
+	) {
+		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
 		
-		Room room =  houseLayoutModel.findRoom(rowId, roomId);
-		int newId = room.getDoors().size();
-
-		room.getWindows().add(
+		if (targetRoom == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Window> windows = targetRoom.getWindows();
+		
+		windows.add(
 			Window.builder()
-				.id(newId)
+				.id(windows.size())
 				.direction(newWindow.getDirection())
 				.state(newWindow.getState())
 				.build()
 		);
-
-
+		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
-
-
+	
 	/**
 	 * remove Window in a room
 	 * 
@@ -286,9 +340,18 @@ public class HouseLayoutController {
 	 * @return updated houseLayout. returns null if  window, room, or row does not exist.
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}")
-	public ResponseEntity<HouseLayoutModel> removeWindow(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId, @PathVariable(value = "windowId") int windowId){
-
-		houseLayoutModel.findRoom(rowId, roomId).getWindows().remove(windowId);
+	public ResponseEntity<HouseLayoutModel> removeWindow(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@PathVariable(value = "windowId") int windowId
+	) {
+		Room targetRoom = houseLayoutModel.findRoom(rowId, roomId);
+		
+		if (targetRoom == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -304,11 +367,16 @@ public class HouseLayoutController {
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}")
 	public ResponseEntity<HouseLayoutModel> changeWindowState(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId, @PathVariable(value = "windowId") int windowId, @RequestBody WindowInput windowInput){
-
-		houseLayoutModel.findWindow(rowId, roomId, windowId).setDirection(windowInput.getDirection());
-		houseLayoutModel.findWindow(rowId, roomId, windowId).setState(windowInput.getState());
-
-
+		Window targetWindow = this.getHouseLayoutModel().findWindow(rowId, roomId, windowId);
+		
+		if (targetWindow == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		targetWindow.setDirection(windowInput.getDirection());
+		targetWindow.setState(windowInput.getState());
+		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
+	
 }

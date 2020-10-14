@@ -1,6 +1,7 @@
 package com.smart.home.backend.model.houselayout;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.constant.LightState;
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Light extends ModelObject {
 	
+	@NonNull
 	private LightState state;
 	
 }

@@ -1,5 +1,6 @@
 package com.smart.home.backend.input;
 
+import com.smart.home.backend.constant.Direction;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
@@ -16,12 +17,12 @@ public class RoomInput {
 	private String name;
 	
 	@JsonProperty("windowsOn")
-	private List<String> windowsOn = null;
+	private List<Direction> windowsOn = null;
 	
 	@JsonProperty("lights")
 	private Integer lights;
 	
 	@JsonProperty("doorsOn")
-	private List<String> doorsOn = null;
+	private List<Direction> doorsOn = null;
 	
 }
