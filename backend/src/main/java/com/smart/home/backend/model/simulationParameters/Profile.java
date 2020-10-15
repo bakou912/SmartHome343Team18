@@ -8,7 +8,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@SuperBuilder
-public class Profile extends ModelObject{
+public class Profile{
     private Role role;
+
+    public Profile(Role role){
+        this.role = role;
+    }
 }
