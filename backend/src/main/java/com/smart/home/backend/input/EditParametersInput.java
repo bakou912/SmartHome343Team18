@@ -12,8 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 public class EditParametersInput {
-    @JsonProperty("profileInputs")
-    private ProfileInput profileInputs;
+    @JsonProperty("profileInput")
+    private ProfileInput profileInput;
 
     @JsonProperty("parametersInput")
     private ParametersInput parametersInput;
