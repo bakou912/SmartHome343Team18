@@ -2,6 +2,7 @@ import './App.css';
 import React, { Suspense, lazy } from "react";
 import Container from "react-bootstrap/Container";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import SimulationParameters from "./view/SimulationParameters";
 
 const HouseLayout = lazy(() => import("./view/HouseLayout"));
 const HouseLayoutUpload = lazy(() => import("./component/houselayout/HouseLayoutUpload"));
@@ -17,6 +18,7 @@ function App() {
                     <Switch>
                         <Route exact path="/layout" component={HouseLayout} />
                         <Route exact path="/layoutUpload" component={HouseLayoutUpload} />
+                        <Route path="/parameters" component={SimulationParameters}/>
                     </Switch>
                 </Suspense>
             </Router>
