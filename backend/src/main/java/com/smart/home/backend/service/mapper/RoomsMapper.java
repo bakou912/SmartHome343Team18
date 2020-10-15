@@ -23,19 +23,22 @@ public class RoomsMapper {
 		List<Room> rooms = new ArrayList<>();
 		
 		for (int i = 0; i < roomInputs.size(); i++) {
-			RoomInput room = roomInputs.get(i);
+			RoomInput roomInput = roomInputs.get(i);
 			
-			rooms.add(
-					Room.builder()
-							.id(i)
-							.name(room.getName())
-							.doors(DoorsMapper.map(room.getDoorsOn()))
-							.windows(WindowsMapper.map(room.getWindowsOn()))
-							.lights(LightsMapper.map(room.getLights()))
-							.build()
-			);
+			Room room = Room.builder()
+					.id(i)
+					.name(roomInput.getName())
+					.doors(DoorsMapper.map(roomInput.getDoorsOn()))
+					.windows(WindowsMapper.map(roomInput.getWindowsOn()))
+					.lights(LightsMapper.map(roomInput.getLights()))
+					.build();
+			
+			room.getDoorId().setLastId(room.getDoors().size());
+			room.getWindowId().setLastId(room.getWindows().size());
+			room.getLightId().setLastId(room.getLights().size());
+			
+			rooms.add(room);
 		}
-
 		
 		return rooms;
 	}

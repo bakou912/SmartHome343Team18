@@ -1,5 +1,11 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.input.RoomInput;
+import com.smart.home.backend.service.mapper.DoorsMapper;
+import com.smart.home.backend.service.mapper.LightsMapper;
+import com.smart.home.backend.service.mapper.WindowsMapper;
+import com.smart.home.backend.service.util.IdUtil;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,6 +25,8 @@ public class RoomRow extends ModelObject {
 	@NonNull
 	private List<Room> rooms;
 	
+	private final IdUtil roomId = new IdUtil();
+	
 	/**
 	 * Finds a room with the corresponding id.
 	 * @param roomId Searched room's id
@@ -31,6 +39,18 @@ public class RoomRow extends ModelObject {
 				.filter(roomRow -> roomRow.getId() == roomId)
 				.findFirst()
 				.orElse(null);
+	}
+	
+	public void addRoom(RoomInput roomInput) {
+		this.getRooms().add(
+				Room.builder()
+						.name(roomInput.getName())
+						.doors(DoorsMapper.map(roomInput.getDoorsOn()))
+						.windows(WindowsMapper.map(roomInput.getWindowsOn()))
+						.lights(LightsMapper.map(roomInput.getLights()))
+						.id(this.getRoomId().newId())
+						.build()
+		);
 	}
 	
 }

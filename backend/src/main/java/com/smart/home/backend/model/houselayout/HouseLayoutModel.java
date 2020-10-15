@@ -129,11 +129,11 @@ public class HouseLayoutModel {
 		List<Direction> availableDirections = new ArrayList<>();
 		
 		//get direction for doors and windows
-		for(Door door : room.getDoors()) {
+		for (Door door : room.getDoors()) {
 			availableDirections.add(door.getDirection());
 		}
 		
-		for(Window window : room.getWindows()) {
+		for (Window window : room.getWindows()) {
 			availableDirections.add(window.getDirection());
 		}
 		

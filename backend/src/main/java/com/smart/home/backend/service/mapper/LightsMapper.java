@@ -22,7 +22,7 @@ public class LightsMapper {
 	public static List<Light> map(Integer nbLights) {
 		List<Light> lights = new ArrayList<>();
 		
-		for(int i = 0; i < nbLights; i++) {
+		for (int i = 0; i < nbLights; i++) {
 			lights.add(
 					Light.builder()
 							.id(i)
