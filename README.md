@@ -21,6 +21,8 @@ mvn clean test
 
 #### Frontend
 
+First make sure you have a recent version of `Nodejs` installed on your machine.
+
 ## Available Scripts
 To install all the dependecies make sure to run the following command in the frontend project directory `frontend`:
 
