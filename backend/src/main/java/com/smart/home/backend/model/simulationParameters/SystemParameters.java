@@ -8,6 +8,9 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+/**
+ * System Parameters Model
+ */
 @Getter
 @Setter
 public class SystemParameters {
@@ -15,6 +18,12 @@ public class SystemParameters {
     private double insideTemp;
     private LocalDateTime date;
 
+    /**
+     * Constructor
+     * @param outsideTemp temperature
+     * @param insideTemp
+     * @param date date and time
+     */
     public SystemParameters(double outsideTemp, double insideTemp, LocalDateTime date) {
         this.outsideTemp = outsideTemp;
         this.insideTemp = insideTemp;

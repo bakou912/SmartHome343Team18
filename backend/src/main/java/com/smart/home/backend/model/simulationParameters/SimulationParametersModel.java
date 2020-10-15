@@ -23,6 +23,11 @@ public class SimulationParametersModel{
     private Profile profile;
     private SystemParameters sysParams;
 
+    /**
+     * Constructor
+     * @param profile
+     * @param sysParams
+     */
     public SimulationParametersModel(Profile profile, SystemParameters sysParams) {
         this.profile = profile;
         this.sysParams = sysParams;

@@ -16,6 +16,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.LocalDateTime;
 
+/**
+ * Simulation Parameters Controller
+ */
 @Getter
 @Setter
 @CrossOrigin
@@ -23,19 +26,19 @@ import java.time.LocalDateTime;
 public class SimulationParametersController {
     private SimulationParametersModel model;
 
+    /**
+     * Creates a Simulation Parameters Model and validates the incoming data
+     * @param parameters input to construct the simulation parameters model
+     * @return SimulationParameterModel created
+     */
     @PostMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> editSimulationParameters(@RequestBody EditParametersInput parameters){
-        final Logger logger = LoggerFactory.getLogger(SimulationParametersController.class);
-        logger.info("{}",parameters.getProfileInput().getRole());
-        logger.info("{}",parameters.getParametersInput().getInsideTemp());
-        logger.info("{}",parameters.getParametersInput().getOutsideTemp());
-        logger.info("{}",parameters.getParametersInput().getDate());
-        Role role=parameters.getProfileInput().getRole();
-        Double insideTemp=parameters.getParametersInput().getInsideTemp();
-        Double outsideTemp=parameters.getParametersInput().getOutsideTemp();
-        LocalDateTime date=parameters.getParametersInput().getDate();
-        if (insideTemp!=null && outsideTemp!=null && role!=null && date!=null){
-            if (insideTemp>-20 && insideTemp<=30 && outsideTemp>-60 && outsideTemp<50){
+        Role role = parameters.getProfileInput().getRole();
+        Double insideTemp = parameters.getParametersInput().getInsideTemp();
+        Double outsideTemp = parameters.getParametersInput().getOutsideTemp();
+        LocalDateTime date = parameters.getParametersInput().getDate();
+        if (insideTemp != null && outsideTemp != null && role != null && date != null){
+            if (insideTemp >- 20 && insideTemp <= 30 && outsideTemp >-60 && outsideTemp < 50){
                 model = SimulationParametersModel.builder()
                         .profile(new Profile(role))
                         .sysParams(new SystemParameters(outsideTemp,insideTemp,date))
@@ -46,7 +49,7 @@ public class SimulationParametersController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     /**
-     *
+     *  Fetching the existing Simulation Parameters Model
      * @return System parameters model
      */
     @GetMapping("/parameters")

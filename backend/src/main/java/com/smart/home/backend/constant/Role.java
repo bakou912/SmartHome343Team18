@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- Role for Profile
+ Role enum for Profile
  */
 @Getter
 public enum Role{

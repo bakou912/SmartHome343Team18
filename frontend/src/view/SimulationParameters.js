@@ -3,7 +3,7 @@ import ParametersService from '../service/ParametersService';
 import "../component/css/SimulationParametersView.css";
 import {Redirect} from 'react-router-dom';
 
-export default class HouseLayout extends React.Component {
+export default class SimulationParameters extends React.Component {
 
     time = undefined;
     date = undefined;
@@ -29,11 +29,6 @@ export default class HouseLayout extends React.Component {
         this.onTimeSelected = this.onTimeSelected.bind(this);
     }
 
-//    async componentDidMount() {
-//        await this.setState({
-//            parametersModel:(await ParametersService.getParams()).data,
-//        });
-//    }
     async onSelectedUser(evt){
         this.setState({
             profileInput:{
@@ -43,15 +38,14 @@ export default class HouseLayout extends React.Component {
         console.log("changed profile");
     }
     async tempChangeHandler(evt){
-        const value  =  evt.target.value;
+        const value = evt.target.value;
         this.parametersInput[evt.target.name] = value;
-        console.log(this.state.insideTemp)
     }
     async saveParametersChanges(){
         this.parametersInput.dateTime  =  this.date+"T"+this.time+":00";
         this.state.parametersInput = this.parametersInput;
         await ParametersService.saveParams(this.state)
-        .then((_)=>{
+        .then(()=>{
             this.setState({redirect:true});
         })
         .catch((error)=>{
@@ -59,52 +53,50 @@ export default class HouseLayout extends React.Component {
         })
     }
     async onDateSelected(evt){
-        this.date  =  evt.target.value;
-        console.log(this.date);
+        this.date = evt.target.value;
     }
     async onTimeSelected(evt){
         this.time = evt.target.value;
-        console.log(this.time);
     }
 
     render() {
         return (
-                <div className = "simulationParametersView">
-                      {this.state.redirect ? <Redirect path="http://localhost:3000//dashboard"/> :null}
-                      <div className = "simulationParametersView_center">
-                        <div className = "simulationParametersView_profile">
+                <div className="simulationParametersView">
+                      {this.state.redirect ? <Redirect path="http://localhost:3000//dashboard"/> : null}
+                      <div className="simulationParametersView_center">
+                        <div className="simulationParametersView_profile">
                           <h2>Profile Information</h2>
-                          <div className = "profile">
+                          <div className="profile">
                             <img src = "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt = "profile pic"
-                            width = "150"/>
+                            width="150"/>
                             <br/>
-                            <select onChange = {this.onSelectedUser}>
-                              <option selected = {this.state?.profile  ===  "PARENT" ? "selected":""}>PARENT</option>
-                              <option selected = {this.state?.profile  ===  "CHILD" ? "selected":""}>CHILD</option>
-                              <option selected = {this.state?.profile  ===  "VISITOR" ? "selected":""}>VISITOR</option>
-                              <option selected = {this.state?.profile  ===  "STRANGER" ? "selected":""}>STRANGER</option>
+                            <select onChange={this.onSelectedUser}>
+                              <option selected="selected">PARENT</option>
+                              <option>CHILD</option>
+                              <option>VISITOR</option>
+                              <option>STRANGER</option>
                             </select>
                           </div>
                         </div>
-                        <div className = "simulationParametersView_simulationParameters">
+                        <div className="simulationParametersView_simulationParameters">
                           <h2>System Parameters</h2>
-                          <div className = "systemParameters">
+                          <div className="systemParameters">
                             <label>Outside Temperature
-                                <input type = "number" name = "insideTemp" onChange = {this.tempChangeHandler} />&deg;C</label>
+                                <input type="number" name="insideTemp" onChange={this.tempChangeHandler} />&deg;C</label>
                             <br/>
-                            <label>Inside Temperature<input type = "number" name = "outsideTemp" onChange = {this.tempChangeHandler} />&deg;C</label>
-                            <div className = "systemParameters_date">
-                                <input type = "date" onChange = {this.onDateSelected}/>
+                            <label>Inside Temperature<input type ="number" name="outsideTemp" onChange={this.tempChangeHandler} />&deg;C</label>
+                            <div className="systemParameters_date">
+                                <input type="date" onChange={this.onDateSelected}/>
                             </div>
-                            <div className = "systemParameters_time">
-                              <input type = "time" onChange = {this.onTimeSelected}/>
+                            <div className="systemParameters_time">
+                              <input type="time" onChange={this.onTimeSelected}/>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className = "simulationParametersView_buttons">
-                        <button className = "simulationParametersView_buttons_skip">Cancel</button>
-                        <button className = "simulationParametersView_buttons_apply" onClick = {this.saveParametersChanges}>Apply</button>
+                      <div className="simulationParametersView_buttons">
+                        <button className="simulationParametersView_buttons_skip">Cancel</button>
+                        <button className="simulationParametersView_buttons_apply" onClick={this.saveParametersChanges}>Apply</button>
                       </div>
                 </div>
         );

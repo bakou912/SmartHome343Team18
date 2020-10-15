@@ -6,6 +6,9 @@ import lombok.experimental.SuperBuilder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Model class for the Profile
+ */
 @Getter
 @Setter
 public class Profile{
