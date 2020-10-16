@@ -12,7 +12,9 @@ export default class Door extends RoomItem {
         let path = "/door";
 
         if (this.state.state === "LOCKED") {
-            path += "-locked"
+            path += "-locked";
+        } else if (this.state.state === "OPEN") {
+            path += "-open";
         }
 
         return path + ".png";

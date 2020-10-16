@@ -4,16 +4,23 @@ import DoorsFactory from "../service/factory/DoorsFactory";
 import houseLayoutService from "../service/HouseLayoutService";
 import WindowsFactory from "../service/factory/WindowsFactory";
 import LightsFactory from "../service/factory/LightsFactory";
+import {Container} from "react-bootstrap";
+import "../style/HouseLayoutView.css";
 
 export default class HouseLayout extends React.Component {
 
     layoutModel = undefined;
+    roomDimensions = { width: 150, height: 75 }
 
     constructor(props) {
         super(props);
         this.state = {
-            layoutModel: null,
-            rooms: []
+            rooms: [],
+            doors: [],
+            lights: [],
+            windows: [],
+            layoutWidth: 1,
+            layoutHeight: 1
         };
     }
 
@@ -31,14 +38,15 @@ export default class HouseLayout extends React.Component {
         let doors = [];
         let lights = [];
         let windows = [];
+        let layoutHeight = this.layoutModel.rows.length * this.roomDimensions.height;
+        let nbRoomsMax = 0;
 
         for(let i = 0; i < rows.length; i++) {
             const rowRooms = rows[i].rooms;
 
             for(let j = 0; j < rowRooms.length; j++) {
                 const room = rowRooms[j];
-                const roomDimensions = { width: 150, height: 75 };
-                const startPosition = { x: j * roomDimensions.width + 50, y: i * roomDimensions.height + 50 };
+                const startPosition = { x: j * this.roomDimensions.width, y: i * this.roomDimensions.height};
 
                 rooms.push(
                     <Room
@@ -46,14 +54,18 @@ export default class HouseLayout extends React.Component {
                         x={startPosition.x}
                         y={startPosition.y}
                         room={room}
-                        width={roomDimensions.width}
-                        height={roomDimensions.height}
+                        width={this.roomDimensions.width}
+                        height={this.roomDimensions.height}
                     />
                 );
-                doors = doors.concat(DoorsFactory.create(room, startPosition, roomDimensions, i));
-                windows = windows.concat(WindowsFactory.create(room, startPosition, roomDimensions, i));
-                lights = lights.concat(LightsFactory.create(room, startPosition, roomDimensions, i));
 
+                doors = doors.concat(DoorsFactory.create(room, startPosition, this.roomDimensions, i));
+                windows = windows.concat(WindowsFactory.create(room, startPosition, this.roomDimensions, i));
+                lights = lights.concat(LightsFactory.create(room, startPosition, this.roomDimensions, i));
+
+                if (j >= nbRoomsMax) {
+                    nbRoomsMax++;
+                }
             }
         }
 
@@ -61,18 +73,24 @@ export default class HouseLayout extends React.Component {
             rooms: rooms,
             doors: doors,
             lights: lights,
-            windows: windows
+            windows: windows,
+            layoutWidth: nbRoomsMax * this.roomDimensions.width,
+            layoutHeight: layoutHeight
         };
     }
 
     render() {
         return (
-            <svg width="500" height="500">
-                {this.state.rooms}
-                {this.state.doors}
-                {this.state.windows}
-                {this.state.lights}
-            </svg>
+            <Container className="houseLayoutContainer">
+                <svg className="houseLayoutRepresentation">
+                    <g transform={`translate(${375 - this.state.layoutWidth / 2}, ${250 - this.state.layoutHeight / 2})`}>
+                        {this.state.rooms}
+                        {this.state.doors}
+                        {this.state.windows}
+                        {this.state.lights}
+                    </g>
+                </svg>
+            </Container>
         );
     }
 

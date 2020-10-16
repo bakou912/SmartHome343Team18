@@ -1,10 +1,17 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.input.DoorInput;
+import com.smart.home.backend.input.LightInput;
+import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
+
+import com.smart.home.backend.service.util.IdUtil;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 import com.smart.home.backend.model.ModelObject;
 import lombok.experimental.SuperBuilder;
@@ -14,18 +21,24 @@ import org.springframework.lang.Nullable;
  * Class for a room.
  */
 @Getter
-@Setter
 @SuperBuilder
 public class Room extends ModelObject {
 	
-	@NonNull
+	@Setter
 	private String name;
-	@NonNull
-	private List<Light> lights;
-	@NonNull
-	private List<Window> windows;
-	@NonNull
-	private List<Door> doors;
+	@Setter
+	@Builder.Default
+	private List<Light> lights = new ArrayList<>();
+	@Setter
+	@Builder.Default
+	private List<Window> windows = new ArrayList<>();
+	@Setter
+	@Builder.Default
+	private List<Door> doors = new ArrayList<>();
+	
+	private final IdUtil lightId = new IdUtil();
+	private final IdUtil doorId = new IdUtil();
+	private final IdUtil windowId = new IdUtil();
 	
 	/**
 	 * Finds a light with the corresponding id.
@@ -67,6 +80,47 @@ public class Room extends ModelObject {
 				.filter(window -> window.getId() == id)
 				.findFirst()
 				.orElse(null);
+	}
+	
+	/**
+	 * Adds a door to the door list
+	 * @param doorInput door input
+	 */
+	public void addDoor(DoorInput doorInput) {
+		this.getDoors().add(
+				Door.builder()
+						.direction(doorInput.getDirection())
+						.state(doorInput.getState())
+						.id(this.getDoorId().newId())
+						.build()
+		);
+	}
+	
+	/**
+	 * Adds a window to the window list
+	 * @param windowInput window input
+	 */
+	public void addWindow(WindowInput windowInput) {
+		this.getWindows().add(
+				Window.builder()
+						.direction(windowInput.getDirection())
+						.state(windowInput.getState())
+						.id(this.getWindowId().newId())
+						.build()
+		);
+	}
+	
+	/**
+	 * Adds a light to the light list
+	 * @param lightInput light input
+	 */
+	public void addLight(LightInput lightInput) {
+		this.getLights().add(
+				Light.builder()
+						.state(lightInput.getState())
+						.id(this.getLightId().newId())
+						.build()
+		);
 	}
 
 }

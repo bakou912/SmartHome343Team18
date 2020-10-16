@@ -3,6 +3,8 @@ package com.smart.home.backend.input;
 import com.smart.home.backend.constant.Direction;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,12 +19,12 @@ public class RoomInput {
 	private String name;
 	
 	@JsonProperty("windowsOn")
-	private List<Direction> windowsOn = null;
+	private List<Direction> windowsOn = new ArrayList<>();
 	
 	@JsonProperty("lights")
 	private Integer lights;
 	
 	@JsonProperty("doorsOn")
-	private List<Direction> doorsOn = null;
+	private List<Direction> doorsOn = new ArrayList<>();
 	
 }
