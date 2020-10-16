@@ -2,7 +2,7 @@ import React from "react";
 
 export default class Light extends React.Component {
 
-    static dimension = 20;
+    static dimension = 15;
 
     constructor(props) {
         super(props);

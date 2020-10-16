@@ -5,7 +5,7 @@ export default class RoomItem extends React.Component {
     roomWidth = undefined;
     roomHeight = undefined;
 
-    static dimension = 20;
+    static dimension = 15;
 
     constructor(props) {
         super(props);

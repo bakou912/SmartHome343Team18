@@ -6,11 +6,13 @@ import WindowsFactory from "../service/factory/WindowsFactory";
 import LightsFactory from "../service/factory/LightsFactory";
 import {Container} from "react-bootstrap";
 import "../style/HouseLayoutView.css";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 
 export default class HouseLayout extends React.Component {
 
     layoutModel = undefined;
-    roomDimensions = { width: 150, height: 75 }
+    roomDimensions = { width: 120, height: 60 }
 
     constructor(props) {
         super(props);
@@ -82,14 +84,18 @@ export default class HouseLayout extends React.Component {
     render() {
         return (
             <Container className="houseLayoutContainer">
-                <svg className="houseLayoutRepresentation">
-                    <g transform={`translate(${375 - this.state.layoutWidth / 2}, ${250 - this.state.layoutHeight / 2})`}>
-                        {this.state.rooms}
-                        {this.state.doors}
-                        {this.state.windows}
-                        {this.state.lights}
-                    </g>
-                </svg>
+                <TransformWrapper>
+                    <TransformComponent>
+                        <svg className="houseLayoutRepresentation">
+                            <g transform={`translate(${300 - this.state.layoutWidth / 2}, ${200 - this.state.layoutHeight / 2})`}>
+                                {this.state.rooms}
+                                {this.state.doors}
+                                {this.state.windows}
+                                {this.state.lights}
+                            </g>
+                        </svg>
+                    </TransformComponent>
+                </TransformWrapper>
             </Container>
         );
     }

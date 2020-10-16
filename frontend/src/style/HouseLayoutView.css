@@ -1,16 +1,16 @@
 .houseLayoutContainer {
-  width: 750px;
-  height: 500px;
+  width: 600px;
+  height: 400px;
   position: relative;
-  top: 200px;
+  top: 100px;
   float: right;
   border-style: solid;
   border-color: black;
 }
 
 .houseLayoutRepresentation {
-  width: 750px;
-  height: 500px;
+  width: 600px;
+  height: 400px;
   position: relative;
 }
 
