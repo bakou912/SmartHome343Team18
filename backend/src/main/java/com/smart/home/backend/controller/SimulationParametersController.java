@@ -38,7 +38,7 @@ public class SimulationParametersController {
         Double outsideTemp = parameters.getParametersInput().getOutsideTemp();
         LocalDateTime date = parameters.getParametersInput().getDate();
         if (insideTemp != null && outsideTemp != null && role != null && date != null){
-            if (insideTemp >- 20 && insideTemp <= 30 && outsideTemp >-60 && outsideTemp < 50){
+            if (insideTemp > -20 && insideTemp <= 30 && outsideTemp > -60 && outsideTemp < 50){
                 model = SimulationParametersModel.builder()
                         .profile(new Profile(role))
                         .sysParams(new SystemParameters(outsideTemp,insideTemp,date))
