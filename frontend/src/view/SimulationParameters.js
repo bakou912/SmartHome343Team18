@@ -45,10 +45,10 @@ export default class SimulationParameters extends React.Component {
         this.parametersInput.dateTime  =  this.date+"T"+this.time+":00";
         this.state.parametersInput = this.parametersInput;
         await ParametersService.saveParams(this.state)
-        .then(()=>{
+        .then(() => {
             this.setState({redirect:true});
         })
-        .catch((error)=>{
+        .catch((error) => {
             alert("One or more system parameters were inappropriate");
         })
     }
