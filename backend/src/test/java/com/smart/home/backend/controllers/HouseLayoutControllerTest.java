@@ -2,26 +2,19 @@ package com.smart.home.backend.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.controller.HouseLayoutController;
-import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.houselayout.directional.Door;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-
-
 @ExtendWith(MockitoExtension.class)
 public class HouseLayoutControllerTest {
     
@@ -32,16 +25,24 @@ public class HouseLayoutControllerTest {
 
         ResponseEntity<HouseLayoutModel> loadResponse = houseLayoutController.loadLayout(instantiateLayout());
         assertEquals( 3 , loadResponse.getBody().getRows().size());
-        
-        //coverage report
+        assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
+        assertEquals( 3 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
+        assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
     }
 
+    /**
+     * Test for Use Case 3.1.1
+     * 
+     */
     @Test
     public void getLayout(){
 
         houseLayoutController.loadLayout(instantiateLayout());
         ResponseEntity<HouseLayoutModel> getResponse = houseLayoutController.getLayout();
         assertEquals( 3 , getResponse.getBody().getRows().size());
+        assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
+        assertEquals( 3 , getResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
+        assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
 
     }
 
