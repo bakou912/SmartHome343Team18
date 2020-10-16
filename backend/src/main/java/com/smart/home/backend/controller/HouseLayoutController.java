@@ -1,7 +1,9 @@
 package com.smart.home.backend.controller;
 
-
+import com.smart.home.backend.constant.Direction;
+import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.constant.LightState;
+import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.LightInput;
@@ -160,7 +162,11 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		light.setState(lightInput.getState());
+		LightState lightState = lightInput.getState();
+		
+		if (lightState != null) {
+			light.setState(lightState);
+		}
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -286,8 +292,17 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetDoor.setDirection(doorInput.getDirection());
-		targetDoor.setState(doorInput.getState());
+		Direction direction = doorInput.getDirection();
+		DoorState state = doorInput.getState();
+		
+		if (direction != null) {
+			targetDoor.setDirection(direction);
+		}
+		
+		if (state != null) {
+			targetDoor.setState(state);
+		}
+		
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -368,8 +383,16 @@ public class HouseLayoutController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		targetWindow.setDirection(windowInput.getDirection());
-		targetWindow.setState(windowInput.getState());
+		Direction direction = windowInput.getDirection();
+		WindowState state = windowInput.getState();
+		
+		if (direction != null) {
+			targetWindow.setDirection(direction);
+		}
+		
+		if (state != null) {
+			targetWindow.setState(state);
+		}
 		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}

@@ -1,11 +1,11 @@
-import './App.css';
-import React, { Suspense, lazy } from "react";
+import './style/App.css';
+import React, { Suspense } from "react";
 import Container from "react-bootstrap/Container";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Dashboard from "./view/Dashboard";
+import HouseLayout from "./view/HouseLayout";
 import SimulationParameters from "./view/SimulationParameters";
-
-const HouseLayout = lazy(() => import("./view/HouseLayout"));
-const HouseLayoutUpload = lazy(() => import("./component/houselayout/HouseLayoutUpload"));
+import HouseLayoutUpload from "./component/houselayout/HouseLayoutUpload";
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
             <Router>
                 <Suspense fallback={<div>Loading...</div>}>
                     <Switch>
+                        <Route exact path="/dashboard" component={Dashboard} />
                         <Route exact path="/layout" component={HouseLayout} />
                         <Route exact path="/layoutUpload" component={HouseLayoutUpload} />
                         <Route path="/parameters" component={SimulationParameters}/>
