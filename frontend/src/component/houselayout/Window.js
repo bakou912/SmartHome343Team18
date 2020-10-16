@@ -6,7 +6,7 @@ export default class Window extends RoomItem {
     roomWidth = undefined;
     roomHeight = undefined;
 
-    static dimension = 20;
+    static dimension = 15;
 
     getImagePath() {
         let path = "/window";
