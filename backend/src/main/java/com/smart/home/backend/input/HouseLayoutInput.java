@@ -13,6 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class HouseLayoutInput {
 	
 	@JsonProperty("rows")
-	public List<RoomRowInput> rows = null;
+	private List<RoomRowInput> rows = null;
 	
 }
