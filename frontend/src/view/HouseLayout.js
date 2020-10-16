@@ -7,7 +7,7 @@ import LightsFactory from "../service/factory/LightsFactory";
 
 export default class HouseLayout extends React.Component {
 
-    layoutModel = undefined
+    layoutModel = undefined;
 
     constructor(props) {
         super(props);
