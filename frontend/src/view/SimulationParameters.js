@@ -62,7 +62,7 @@ export default class SimulationParameters extends React.Component {
     render() {
         return (
                 <div className="simulationParametersView">
-                      {this.state.redirect ? <Redirect path="http://localhost:3000//dashboard"/> : null}
+                      {this.state.redirect ? <Redirect path="http://localhost:3000/dashboard"/> : null}
                       <div className="simulationParametersView_center">
                         <div className="simulationParametersView_profile">
                           <h2>Profile Information</h2>
