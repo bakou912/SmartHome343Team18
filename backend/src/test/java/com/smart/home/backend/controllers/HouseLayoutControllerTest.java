@@ -46,7 +46,7 @@ public class HouseLayoutControllerTest {
     }
 
     /**
-     * Helper class to initate layout
+     * Helper method to instantiate a house layout
      * 
      * @return a House Layout
      */
