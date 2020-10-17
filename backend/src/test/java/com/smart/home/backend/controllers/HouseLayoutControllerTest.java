@@ -15,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+/**
+ * Test for Use Case 3.1.1
+ * 
+ */
 @ExtendWith(MockitoExtension.class)
 public class HouseLayoutControllerTest {
     
@@ -30,10 +34,7 @@ public class HouseLayoutControllerTest {
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
     }
 
-    /**
-     * Test for Use Case 3.1.1
-     * 
-     */
+
     @Test
     public void getLayout(){
 
