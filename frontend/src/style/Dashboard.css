@@ -1,5 +1,43 @@
-.header {
+.Header {
+
   font-family: 'Open Sans', sans-serif;
 }
 
+.Dashboard {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
 
+.SimulationContextContainer {
+  display: inline-block;
+  height: 500px;
+  width: 15%;
+  border-right: 4px solid grey;
+}
+
+.ModulesContainer {
+  display: inline-block;
+  height: 500px;
+  width: 35%;
+  border-right: 4px solid grey;
+}
+
+.HouseLayoutContainer {
+  width: 25%;
+  height: 500px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.HouseLayoutImage {
+  display: inline-block;
+  margin-left: 50px;
+}
+
+.SectionHeader {
+  color: white;
+  border-radius: 15px;
+  padding: 15px;
+  background-color: #282c34;
+}

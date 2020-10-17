@@ -25,18 +25,18 @@ export default class SimulationParameters extends React.Component {
         this.onTimeSelected = this.onTimeSelected.bind(this);
     }
 
-    onSelectedUser(evt){
+    onSelectedUser(evt) {
         this.setState({
             profileInput:{
                 role:evt.target.value
             }
         });
     }
-    tempChangeHandler(evt){
+    tempChangeHandler(evt) {
         this.parametersInput[evt.target.name] = evt.target.value;
     }
 
-    async saveParametersChanges(){
+    async saveParametersChanges() {
         this.parametersInput.dateTime = this.date+"T"+this.time+":00";
         this.state.parametersInput = this.parametersInput;
 
@@ -58,12 +58,12 @@ export default class SimulationParameters extends React.Component {
 
     render() {
         return (
-                <div className="simulationParametersView">
-                    <div className="simulationParametersView_center">
-                        <div className="simulationParametersView_profile">
+                <div className="SimulationParametersView">
+                    <div className="SimulationParametersView_center">
+                        <div className="SimulationParametersView_profile">
                             <h2>Profile Information</h2>
                             <div className="profile">
-                                <img src="https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="profile pic" width="150"/>
+                                <img src="/user" alt="profile pic" width="150"/>
                                 <br/>
                                 <select onChange={this.onSelectedUser}>
                                     <option selected="selected">PARENT</option>
@@ -73,11 +73,12 @@ export default class SimulationParameters extends React.Component {
                                 </select>
                             </div>
                         </div>
-                        <div className="simulationParametersView_simulationParameters">
+                        <div className="SimulationParametersView_simulationParameters">
                             <h2>System Parameters</h2>
                             <div className="systemParameters">
                                 <label>Outside Temperature
-                                    <input type="number" name="insideTemp" onChange={this.tempChangeHandler} />&deg;C</label>
+                                    <input type="number" name="insideTemp" onChange={this.tempChangeHandler} />&deg;C
+                                </label>
                                 <br/>
                                 <label>Inside Temperature<input type ="number" name="outsideTemp" onChange={this.tempChangeHandler} />&deg;C</label>
                                 <div className="systemParameters_date">
@@ -89,9 +90,9 @@ export default class SimulationParameters extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className="simulationParametersView_buttons">
-                        <button className="simulationParametersView_buttons_skip">Cancel</button>
-                        <button className="simulationParametersView_buttons_apply" onClick={this.saveParametersChanges}>Apply</button>
+                    <div className="SimulationParametersView_buttons">
+                        <button className="SimulationParametersView_buttons_skip">Cancel</button>
+                        <button className="SimulationParametersView_buttons_apply" onClick={this.saveParametersChanges}>Apply</button>
                     </div>
                 </div>
         );

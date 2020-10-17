@@ -1,31 +1,37 @@
-.simulationParametersView{
+.SimulationParametersView {
   position: absolute;
   top: 150px;
   width: 100%;
 }
-.simulationParametersView_center{
+
+.SimulationParametersView_center {
   display: flex;
 }
-.simulationParametersView_profile{
+
+.SimulationParametersView_profile {
+  border-radius: unset;
   border-right: 4px solid grey;
   height: 500px;
+  width: 50%;
+}
+
+.SimulationParametersView_simulationParameters {
   width:50%;
 }
-.simulationParametersView_simulationParameters{
-  border-left: 4px solid grey;
-  width:50%;
-}
-.simulationParametersView_buttons{
+
+.SimulationParametersView_buttons {
   position:absolute;;
   right: 100px;
 }
-.simulationParametersView_buttons_skip{
+
+.SimulationParametersView_buttons_skip {
   width: 90px;
   background: #7d8991;
   height: 25px;
   margin: 2px;
 }
-.simulationParametersView_buttons_apply{
+
+.SimulationParametersView_buttons_apply {
   width: 100px;
   background: #3279a8;
   height: 25px;
