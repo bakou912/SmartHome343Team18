@@ -1,10 +1,8 @@
 import React from "react";
 import ParametersService from '../service/ParametersService';
 import "../style/SimulationParametersView.css";
-import HouseLayoutUpload from "../component/houselayout/HouseLayoutUpload.js";
 import HouseLayout from "./HouseLayout";
-import { Container, Row, Col} from 'reactstrap';
-import {Button} from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import httpLayoutService from "../service/HouseLayoutService";
 
 export default class SimulationParameters extends React.Component {
@@ -12,20 +10,21 @@ export default class SimulationParameters extends React.Component {
     time = undefined;
     date = undefined;
     parametersInput = {};
+    layoutKey = 0;
 
     constructor(props) {
         super(props);
         this.state  =  {
             parametersInput:{
-                insideTemp:null,
-                outsideTemp:null,
-                dateTime:null,
+                insideTemp: null,
+                outsideTemp: null,
+                dateTime: null,
             },
             profileInput: {
-                role:"PARENT",
+                role: "PARENT",
             },
-            file:null,
-            uploadedFile:false,
+            file: null,
+            uploadedFile: localStorage.getItem( "uploadedFile") | false
         };
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
         this.saveParametersChanges = this.saveParametersChanges.bind(this);
@@ -34,6 +33,17 @@ export default class SimulationParameters extends React.Component {
         this.onTimeSelected = this.onTimeSelected.bind(this);
         this.fileChangedHandler = this.fileChangedHandler.bind(this);
         this.fileUploadHandler = this.fileUploadHandler.bind(this);
+        this.getHouseLayout = this.getHouseLayout.bind(this);
+    }
+
+    componentDidMount() {
+        this.setState({
+            houseLayout: this.getHouseLayout()
+        })
+    }
+
+    getHouseLayout() {
+        return (<HouseLayout key={this.layoutKey++}/>);
     }
 
     onSelectedUser(evt) {
@@ -43,6 +53,7 @@ export default class SimulationParameters extends React.Component {
             }
         });
     }
+
     tempChangeHandler(evt) {
         this.parametersInput[evt.target.name] = evt.target.value;
     }
@@ -50,6 +61,11 @@ export default class SimulationParameters extends React.Component {
     async saveParametersChanges() {
         this.parametersInput.dateTime = this.date+"T"+this.time+":00";
         this.state.parametersInput = this.parametersInput;
+
+        if (this.state.uploadedFile === false) {
+            alert("A layout must be uploaded");
+            return;
+        }
 
         await ParametersService.saveParams(this.state)
         .then(() => {
@@ -63,30 +79,31 @@ export default class SimulationParameters extends React.Component {
     async onDateSelected(evt){
         this.date = evt.target.value;
     }
+
     async onTimeSelected(evt){
         this.time = evt.target.value;
     }
+
     async fileChangedHandler(event) {
         this.setState({
             file: event.target.files[0]
         });
     }
+
     async fileUploadHandler() {
         await httpLayoutService.createLayout(this.state.file)
-        .then(() =>{
-          /*For now I'll just refresh the page*/
-          window.location.reload(false);
-          this.setState({
-            uploadedFile:true,
-          });
-        })
-        .catch(() =>{
-          alert("Invalid File");
-          this.setState({
-            uploadedFile:false,
-          });
-        });
+            .then(() => {
+                localStorage.setItem("uploadedFile", true);
+                this.setState({
+                    uploadedFile: true,
+                    houseLayout: this.getHouseLayout()
+                });
+            })
+            .catch(() =>{
+                alert("Invalid File");
+            });
     }
+
     render() {
         return (
             <Container fluid className="SimulationParameters">
@@ -156,14 +173,11 @@ export default class SimulationParameters extends React.Component {
                   </Container>
                 </Col>
                 <Col>
-                  <Container className="SimulationParameters_HouseLayout_Container">
-                    <Row>
-                      <Col lg={10}>
-                        <HouseLayout/>
-                      </Col>
+                  <Container fluid className="SimulationParameters_HouseLayout_Container">
+                    <Row className="SimulationParameters_HouseLayout_Image">
+                        {this.state.houseLayout}
                     </Row>
                     <Row>
-                      <Col>
                         <Container>
                             <p>Please enter a valid House Layout initialization file:</p>
                             <input
@@ -176,7 +190,6 @@ export default class SimulationParameters extends React.Component {
                                 Create Layout
                             </Button>
                         </Container>
-                      </Col>
                     </Row>
                   </Container>
                 </Col>
