@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 import Container from "react-bootstrap/Container";
 import { Button } from "react-bootstrap";
 import httpLayoutService from "../../service/HouseLayoutService";
@@ -47,3 +47,4 @@ export default class HouseLayoutUpload extends React.Component {
         )
     }
 }
+*/

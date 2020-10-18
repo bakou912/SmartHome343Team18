@@ -15,7 +15,7 @@ export default function App() {
                 <Switch>
                     <Route exact path="/dashboard" component={Dashboard} />
                     <Route exact path="/layout" component={HouseLayout} />
-                    <Route exact path="/layoutUpload" component={HouseLayoutUpload} />
+                    {/*<Route exact path="/layoutUpload" component={HouseLayoutUpload} />*/}
                     <Route exact path="/parameters" component={SimulationParameters}/>
                 </Switch>
             </Suspense>

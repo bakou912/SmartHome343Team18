@@ -5,6 +5,7 @@ import HouseLayoutUpload from "../component/houselayout/HouseLayoutUpload.js";
 import HouseLayout from "./HouseLayout";
 import { Container, Row, Col} from 'reactstrap';
 import {Button} from 'react-bootstrap';
+import httpLayoutService from "../service/HouseLayoutService";
 
 export default class SimulationParameters extends React.Component {
 
@@ -22,13 +23,17 @@ export default class SimulationParameters extends React.Component {
             },
             profileInput: {
                 role:"PARENT",
-            }
+            },
+            file:null,
+            uploadedFile:false,
         };
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
         this.saveParametersChanges = this.saveParametersChanges.bind(this);
         this.onSelectedUser = this.onSelectedUser.bind(this);
         this.onDateSelected = this.onDateSelected.bind(this);
         this.onTimeSelected = this.onTimeSelected.bind(this);
+        this.fileChangedHandler = this.fileChangedHandler.bind(this);
+        this.fileUploadHandler = this.fileUploadHandler.bind(this);
     }
 
     onSelectedUser(evt) {
@@ -61,7 +66,27 @@ export default class SimulationParameters extends React.Component {
     async onTimeSelected(evt){
         this.time = evt.target.value;
     }
-
+    async fileChangedHandler(event) {
+        this.setState({
+            file: event.target.files[0]
+        });
+    }
+    async fileUploadHandler() {
+        await httpLayoutService.createLayout(this.state.file)
+        .then(() =>{
+          /*For now I'll just refresh the page*/
+          window.location.reload(false);
+          this.setState({
+            uploadedFile:true,
+          });
+        })
+        .catch(() =>{
+          alert("Invalid File");
+          this.setState({
+            uploadedFile:false,
+          });
+        });
+    }
     render() {
         return (
             <Container fluid className="SimulationParameters">
@@ -139,7 +164,18 @@ export default class SimulationParameters extends React.Component {
                     </Row>
                     <Row>
                       <Col>
-                        <HouseLayoutUpload/>
+                        <Container>
+                            <p>Please enter a valid House Layout initialization file:</p>
+                            <input
+                                type="file"
+                                name="file"
+                                onChange={this.fileChangedHandler}
+                            />
+                            <br/><br/>
+                            <Button onClick={this.fileUploadHandler}>
+                                Create Layout
+                            </Button>
+                        </Container>
                       </Col>
                     </Row>
                   </Container>
