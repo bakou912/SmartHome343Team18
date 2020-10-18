@@ -1,6 +1,10 @@
 import React from "react";
 import ParametersService from '../service/ParametersService';
 import "../style/SimulationParametersView.css";
+import HouseLayoutUpload from "../component/houselayout/HouseLayoutUpload.js";
+import HouseLayout from "./HouseLayout";
+import { Container, Row, Col} from 'reactstrap';
+import {Button} from 'react-bootstrap';
 
 export default class SimulationParameters extends React.Component {
 
@@ -16,7 +20,9 @@ export default class SimulationParameters extends React.Component {
                 outsideTemp:null,
                 dateTime:null,
             },
-            profileInput: {}
+            profileInput: {
+                role:"PARENT",
+            }
         };
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
         this.saveParametersChanges = this.saveParametersChanges.bind(this);
@@ -58,43 +64,72 @@ export default class SimulationParameters extends React.Component {
 
     render() {
         return (
-                <div className="SimulationParametersView">
-                    <div className="SimulationParametersView_center">
-                        <div className="SimulationParametersView_profile">
-                            <h2>Profile Information</h2>
-                            <div className="profile">
-                                <img src="/user" alt="profile pic" width="150"/>
-                                <br/>
-                                <select onChange={this.onSelectedUser}>
-                                    <option selected="selected">PARENT</option>
-                                    <option>CHILD</option>
-                                    <option>VISITOR</option>
-                                    <option>STRANGER</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="SimulationParametersView_simulationParameters">
-                            <h2>System Parameters</h2>
-                            <div className="systemParameters">
+            <Container className="SimulationParameters_Container">
+              <Row>
+                <h1 className="SimulationParameters_Title">Simulation Parameters</h1>
+              </Row>
+              <Row className="SimulationParameters_Container_Row_Two">
+                <Col>
+                  <Container className="SimulationParameters_Profile_System_Container">
+                    <Row>
+                      <Container className="SimulationsParameters_Parameters_Container">
+                        <Row>
+                          <Col className="SimulationsParameters_Parameters_Container_Profile_Container">
+                            <Row>
+                              <img src="/user.png" alt="profile pic" width="150"/>
+                            </Row>
+                            <Row>
+                              <select className="SimulationParameters_User_Select" onChange={this.onSelectedUser} defaultValue="PARENT">
+                                <option value="PARENT">Parent</option>
+                                <option value="CHILD">Child</option>
+                                <option value="VISITOR">Visitor</option>
+                                <option value="STRANGER">Stranger</option>
+                              </select>
+                            </Row>
+                          </Col>
+                          <Col>
+                            <Container className="SimulationParameters_System_Parameters_Container">
+                              <Row>
                                 <label>Outside Temperature
-                                    <input type="number" name="insideTemp" onChange={this.tempChangeHandler} />&deg;C
+                                  <input id="outsideTemp" name="outsideTemp" type="number"/>
                                 </label>
-                                <br/>
-                                <label>Inside Temperature<input type ="number" name="outsideTemp" onChange={this.tempChangeHandler} />&deg;C</label>
-                                <div className="systemParameters_date">
-                                    <input type="date" onChange={this.onDateSelected}/>
-                                </div>
-                                <div className="systemParameters_time">
-                                    <input type="time" onChange={this.onTimeSelected}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="SimulationParametersView_buttons">
-                        <button className="SimulationParametersView_buttons_skip">Cancel</button>
-                        <button className="SimulationParametersView_buttons_apply" onClick={this.saveParametersChanges}>Apply</button>
-                    </div>
-                </div>
+                              </Row>
+                              <Row>
+                                <label>Inside Temperature
+                                  <input id="insideTemp" name="insideTemp" type="number"/>
+                                </label>
+                              </Row>
+                              <Row>
+                                <span>Date</span>
+                                  <input type="date" name="date" onChange={this.onDateSelected}/>
+                              </Row>
+                              <Row>
+                                <span>Time</span>
+                                  <input type="time" name="time" onChange={this.onTimeSelected}/>
+                              </Row>
+                            </Container>
+                          </Col>
+                        </Row>
+                      </Container>
+                    </Row>
+                  </Container>
+                </Col>
+                <Col>
+                  <Container className="SimulationParameters_HouseLayout_Container">
+                    <Row>
+                      <HouseLayout/>
+                    </Row>
+                    <Row>
+                      <HouseLayoutUpload/>
+                    </Row>
+                  </Container>
+                </Col>
+              </Row>
+              <Row className="SimulationParameters_Buttons_Row">
+                <Button variant="secondary" size="sm">Cancel</Button>
+                <Button onClick={this.saveParametersChanges} variant="primary" size="lg">Apply</Button>
+              </Row>
+            </Container>
         );
     }
 
