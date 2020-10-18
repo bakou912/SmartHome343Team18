@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.LocalDateTime;
 
@@ -44,6 +43,14 @@ public class SimulationParametersController {
                         .sysParams(new SystemParameters(outsideTemp,insideTemp,date))
                         .build();
                 return new ResponseEntity<>(model, HttpStatus.OK);
+            }
+            else{
+                if(insideTemp <= -20 || insideTemp > 30){
+                    insideTemp=null;
+                }
+                else if(outsideTemp <= -60 || outsideTemp > 50){
+                    outsideTemp = null;
+                }
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
