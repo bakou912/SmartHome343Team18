@@ -24,7 +24,10 @@ export default class HouseLayoutUpload extends React.Component {
     }
 
     async fileUploadHandler() {
-        await httpLayoutService.createLayout(this.state.file);
+        await httpLayoutService.createLayout(this.state.file)
+        .catch(() =>{
+          alert("Invalid File");
+        });
     }
 
     render() {

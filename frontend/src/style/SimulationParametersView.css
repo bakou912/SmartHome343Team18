@@ -1,7 +1,40 @@
+/* .container{
+  background: blue;
+}
+.Row{
+  background: green;
+}
+.col{
+  background: brown;
+} */
+.SimulationParameters{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.SimulationParameters_Parameters_Container{
+  margin-top: 150px;
+}
 .SimulationParameters_Title{
+  text-align: left;
+}
+.SimulationParameters_Parameters_Col_Two{
+  text-align: left;
+}
+.SimulationParameters_HouseLayout_Container{
+  margin-top: 100px;
+}
+.SimulationParameters_Buttons_Row{
+  margin-top: 150px;
+  margin-right: 10px;
+  text-align: right;
+}
+.SimulationParameters_Buttons{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+/* .SimulationParameters_Title{
   margin-top: 20px;
 }
-
 .SimulationsParameters_Parameters_Container{
   width: 100%;
   height: 100%;
@@ -36,3 +69,6 @@
   position: relative;
   top: 100px;
 }
+.SimulationParameters_Buttons{
+  margin: 5px;
+} */

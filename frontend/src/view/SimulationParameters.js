@@ -64,70 +64,92 @@ export default class SimulationParameters extends React.Component {
 
     render() {
         return (
-            <Container className="SimulationParameters_Container">
+            <Container fluid className="SimulationParameters">
               <Row>
-                <h1 className="SimulationParameters_Title">Simulation Parameters</h1>
-              </Row>
-              <Row className="SimulationParameters_Container_Row_Two">
                 <Col>
-                  <Container className="SimulationParameters_Profile_System_Container">
+                  <Container fluid>
                     <Row>
-                      <Container className="SimulationsParameters_Parameters_Container">
-                        <Row>
-                          <Col className="SimulationsParameters_Parameters_Container_Profile_Container">
-                            <Row>
+                      <Col className="SimulationParameters_Title" sm={12}>
+                        <h1>Simulation Parameters</h1>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <Container className="SimulationParameters_Parameters_Container">
+                          <Row>
+                            <Col lg={6}>
                               <img src="/user.png" alt="profile pic" width="150"/>
-                            </Row>
-                            <Row>
+                              <br/>
                               <select className="SimulationParameters_User_Select" onChange={this.onSelectedUser} defaultValue="PARENT">
                                 <option value="PARENT">Parent</option>
                                 <option value="CHILD">Child</option>
                                 <option value="VISITOR">Visitor</option>
                                 <option value="STRANGER">Stranger</option>
                               </select>
-                            </Row>
-                          </Col>
-                          <Col>
-                            <Container className="SimulationParameters_System_Parameters_Container">
-                              <Row>
-                                <label>Outside Temperature
-                                  <input id="outsideTemp" name="outsideTemp" type="number"/>
-                                </label>
-                              </Row>
-                              <Row>
-                                <label>Inside Temperature
-                                  <input id="insideTemp" name="insideTemp" type="number"/>
-                                </label>
-                              </Row>
-                              <Row>
-                                <span>Date</span>
-                                  <input type="date" name="date" onChange={this.onDateSelected}/>
-                              </Row>
-                              <Row>
-                                <span>Time</span>
-                                  <input type="time" name="time" onChange={this.onTimeSelected}/>
-                              </Row>
-                            </Container>
-                          </Col>
-                        </Row>
-                      </Container>
+                            </Col>
+                            <Col lg={6} className="SimulationParameters_Parameters_Col_Two">
+                              <Container>
+                                <Row>
+                                  <Col>
+                                    <label>Outside Temperature</label>
+                                  </Col>
+                                  <Col>
+                                    <input name="outsideTemp" type="number" onChange={this.tempChangeHandler} style={{width:"120px"}}/>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col>
+                                    <label>Inside Temperature</label>
+                                  </Col>
+                                  <Col>
+                                    <input name="insideTemp" type="number" onChange={this.tempChangeHandler} style={{width:"120px"}}/>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col>
+                                    <label>Date</label><br/>
+                                    <input type="date" name="date" onChange={this.onDateSelected}/>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col>
+                                    <label>Time</label><br/>
+                                    <input type="time" name="time" onChange={this.onTimeSelected}/>
+                                  </Col>
+                                </Row>
+                              </Container>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col sm={2}>
+                            </Col>
+                          </Row>
+                        </Container>
+                      </Col>
+
                     </Row>
                   </Container>
                 </Col>
                 <Col>
                   <Container className="SimulationParameters_HouseLayout_Container">
                     <Row>
-                      <HouseLayout/>
+                      <Col lg={10}>
+                        <HouseLayout/>
+                      </Col>
                     </Row>
                     <Row>
-                      <HouseLayoutUpload/>
+                      <Col>
+                        <HouseLayoutUpload/>
+                      </Col>
                     </Row>
                   </Container>
                 </Col>
               </Row>
-              <Row className="SimulationParameters_Buttons_Row">
-                <Button variant="secondary" size="sm">Cancel</Button>
-                <Button onClick={this.saveParametersChanges} variant="primary" size="lg">Apply</Button>
+              <Row>
+                <Col className="SimulationParameters_Buttons_Row">
+                  <Button className="SimulationParameters_Buttons" variant="secondary" size="sm">Cancel</Button>
+                  <Button className="SimulationParameters_Buttons" onClick={this.saveParametersChanges} variant="primary" size="lg">Apply</Button>
+                </Col>
               </Row>
             </Container>
         );
