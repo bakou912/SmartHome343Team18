@@ -1,5 +1,12 @@
-.Header {
+.HeaderText {
   font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+}
+
+.HeaderResetButton {
+  left: 0;
+  top: 5px;
+  position: absolute;
 }
 
 .Dashboard {

@@ -3,7 +3,7 @@ import ParametersService from '../service/ParametersService';
 import "../style/SimulationParametersView.css";
 import HouseLayout from "./HouseLayout";
 import { Button, Container, Row, Col } from 'react-bootstrap';
-import httpLayoutService from "../service/HouseLayoutService";
+import HouseLayoutService from "../service/HouseLayoutService";
 
 export default class SimulationParameters extends React.Component {
 
@@ -26,6 +26,7 @@ export default class SimulationParameters extends React.Component {
             file: null,
             uploadedFile: localStorage.getItem( "uploadedFile") | false
         };
+
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
         this.saveParametersChanges = this.saveParametersChanges.bind(this);
         this.onSelectedUser = this.onSelectedUser.bind(this);
@@ -37,6 +38,10 @@ export default class SimulationParameters extends React.Component {
     }
 
     componentDidMount() {
+        if (localStorage.getItem( "parametersSet") === "true") {
+            this.redirectToDashboard();
+        }
+
         this.setState({
             houseLayout: this.getHouseLayout()
         })
@@ -49,7 +54,7 @@ export default class SimulationParameters extends React.Component {
     onSelectedUser(evt) {
         this.setState({
             profileInput:{
-                role:evt.target.value
+                role: evt.target.value
             }
         });
     }
@@ -69,31 +74,39 @@ export default class SimulationParameters extends React.Component {
 
         await ParametersService.saveParams(this.state)
         .then(() => {
-            window.location = "http://localhost:3000/dashboard";
+            localStorage.setItem("parametersSet", "true");
+            this.setState({
+                parametersSet: true
+            });
+            this.redirectToDashboard();
         })
         .catch(() => {
             alert("One or more system parameters were inappropriate");
         })
     }
 
-    async onDateSelected(evt){
+    redirectToDashboard() {
+        window.location = "http://localhost:3000/dashboard";
+    }
+
+    onDateSelected(evt){
         this.date = evt.target.value;
     }
 
-    async onTimeSelected(evt){
+    onTimeSelected(evt){
         this.time = evt.target.value;
     }
 
-    async fileChangedHandler(event) {
+    fileChangedHandler(event) {
         this.setState({
             file: event.target.files[0]
         });
     }
 
     async fileUploadHandler() {
-        await httpLayoutService.createLayout(this.state.file)
+        await HouseLayoutService.createLayout(this.state.file)
             .then(() => {
-                localStorage.setItem("uploadedFile", true);
+                localStorage.setItem("uploadedFile", "true");
                 this.setState({
                     uploadedFile: true,
                     houseLayout: this.getHouseLayout()

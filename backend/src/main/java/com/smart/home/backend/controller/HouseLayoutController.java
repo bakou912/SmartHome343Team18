@@ -45,8 +45,7 @@ public class HouseLayoutController {
 	}
 	
 	/**
-	 * Creates a house layout model.
-	 * 
+	 * Creating a house layout model.
 	 * @param houseLayoutInput Input to construct a house layout
 	 * @return Created house layout model
 	 */
@@ -86,13 +85,21 @@ public class HouseLayoutController {
 	}
 	
 	/**
-	 *
-	 * Add new light to a room.
-	 * 
+	 * Resetting the house layout model.
+	 * @return Response status code
+	 */
+	@DeleteMapping("/layout")
+	public ResponseEntity<HouseLayoutModel> resetLayout() {
+		this.setHouseLayoutModel(new HouseLayoutModel());
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	/**
+	 * Adding a light to a room.
 	 * @param rowId row number in house layout
 	 * @param roomId room number of row
 	 * @param lightInput new light to add
-	 * @return update house layout with new light in room. returns null if the room or row cannot be found.
+	 * @return Updated house layout with new light in room. returns null if the room or row cannot be found.
 	 */
 	@PostMapping("layout/rows/{rowId}/rooms/{roomId}/lights")
 	public ResponseEntity<HouseLayoutModel> addLight(
@@ -112,12 +119,11 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Delete a light in a room
-	 * 
+	 * Removing a light from a room.
 	 * @param rowId row number in house layout
 	 * @param roomId room number in row
 	 * @param lightId id of light
-	 * @return updated house layout. returns null if the room, row or light does not exist
+	 * @return Updated house layout. returns null if the room, row or light does not exist
 	 */
 	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{lightId}")
 	public ResponseEntity<HouseLayoutModel> removeLight(
@@ -142,12 +148,11 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Change the state of a light
-	 * 
+	 * Changing a light's state.
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param lightId light id
-	 * @return updated house layout with updated state of light. returns null if the room does not exist
+	 * @return Updated house layout with updated state of light. returns null if the room does not exist
 	 */
 	@PutMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{lightId}")
 	public ResponseEntity<HouseLayoutModel> setLayoutLight(
@@ -172,11 +177,10 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Add a new room to the house layout
-	 * 
+	 * Adding a room to a row.
 	 * @param rowId row number
 	 * @param roomInput new room to add
-	 * @return updated house layout. returns null if the room or row does not exist
+	 * @return Updated house layout. returns null if the room or row does not exist
 	 */
 	@PostMapping("layout/rows/{rowId}/rooms")
 	public ResponseEntity<HouseLayoutModel> addRoom(@PathVariable(value = "rowId") int rowId, @RequestBody RoomInput roomInput) {
@@ -193,11 +197,10 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Delete room from house layout
-	 * 
+	 * Deleting a room from a row.
 	 * @param rowId row number
 	 * @param roomId room number
-	 * @return updated house layout. returns null if room or row does not exist
+	 * @return Updated house layout. returns null if room or row does not exist
 	 */
 	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}")
 	public ResponseEntity<HouseLayoutModel> removeRoom(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId) {
@@ -218,12 +221,11 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * add a door within the given room
-	 * 
+	 * Adding a door in a room.
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param doorInput new door to be added
-	 * @return updated house layout where a door was added to new room. returns null if no available space in room or if the room, row does not exist.
+	 * @return Updated house layout where a door was added to new room. returns null if no available space in room or if the room, row does not exist.
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/doors")
 	public ResponseEntity<HouseLayoutModel> addDoor(
@@ -243,11 +245,10 @@ public class HouseLayoutController {
 	}
 	
 	/**
-	 * remove a door within the given room
-	 * 
+	 * Removing a door from a room.
 	 * @param rowId row number
 	 * @param roomId room number
-	 * @return updated houseLayout. returns null if the door, room, row does not exist
+	 * @return Updated houseLayout. returns null if the door, room, row does not exist
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/doors/{doorId}")
 	public ResponseEntity<HouseLayoutModel> removeDoor(
@@ -272,12 +273,11 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Change door state.
-	 * 
+	 * Changing a door's state.
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param doorInput door input to change state
-	 * @return updated houseLayout. returns null if door, room, row does not exist/
+	 * @return Updated houseLayout. returns null if door, room, row does not exist/
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/doors/{doorId}")
 	public ResponseEntity<HouseLayoutModel> changeDoorState(
@@ -308,11 +308,11 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Add new Window to room.
+	 * Adding a window to a room.
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param windowInput new window to be added
-	 * @return update houseLayout. Returns null if no space for window or if room, row does not exist
+	 * @return Updated houseLayout. Returns null if no space for window or if room, row does not exist
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/windows")
 	public ResponseEntity<HouseLayoutModel> addWindow(
@@ -332,12 +332,11 @@ public class HouseLayoutController {
 	}
 	
 	/**
-	 * remove Window in a room
-	 * 
+	 * Removing a window from a room.
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param windowId id of window to be removed
-	 * @return updated houseLayout. returns null if  window, room, or row does not exist.
+	 * @return Updated houseLayout. returns null if  window, room, or row does not exist.
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}")
 	public ResponseEntity<HouseLayoutModel> removeWindow(
@@ -362,13 +361,12 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 *  changes state of window
-	 * 
+	 * Changing a window's state
 	 * @param rowId row number
 	 * @param roomId room number
 	 * @param windowId id of window
 	 * @param windowInput window input
-	 * @return updated houseLayout. returns null if  window, room, or row does not exist.
+	 * @return Updated houseLayout. returns null if  window, room, or row does not exist.
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}")
 	public ResponseEntity<HouseLayoutModel> changeWindowState(

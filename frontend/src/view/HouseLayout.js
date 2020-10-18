@@ -2,11 +2,11 @@ import "../style/HouseLayoutView.css";
 import React from "react";
 import Room from "../component/houselayout/Room";
 import DoorsFactory from "../service/factory/DoorsFactory";
-import houseLayoutService from "../service/HouseLayoutService";
+import HouseLayoutService from "../service/HouseLayoutService";
 import WindowsFactory from "../service/factory/WindowsFactory";
 import LightsFactory from "../service/factory/LightsFactory";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 
 export default class HouseLayout extends React.Component {
@@ -28,7 +28,7 @@ export default class HouseLayout extends React.Component {
     }
 
     async componentDidMount() {
-        this.layoutModel = (await houseLayoutService.getLayout()).data;
+        this.layoutModel = (await HouseLayoutService.getLayout()).data;
 
         if (this.layoutModel && Array.isArray(this.layoutModel.rows)) {
             this.setState(this.createRooms());

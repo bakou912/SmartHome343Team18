@@ -138,5 +138,5 @@ public class HouseLayoutModel {
 		}
 		
 		return !availableDirections.contains(direction);
-	} 
+	}
 }

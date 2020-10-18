@@ -2,15 +2,19 @@
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
 .SimulationParameters_Parameters_Container {
   margin-top: 150px;
 }
+
 .SimulationParameters_Title {
   text-align: left;
 }
+
 .SimulationParameters_Parameters_Col_Two {
   text-align: left;
 }
+
 .SimulationParameters_HouseLayout_Container {
   margin-top: 100px;
   display: inline-block;
@@ -18,17 +22,20 @@
   max-height: 400px;
   margin-bottom: 15px;
 }
+
 .SimulationParameters_HouseLayout_Image {
   display: inline-block;
   width: 630px;
   height: 400px;
   margin-bottom: 15px;
 }
+
 .SimulationParameters_Buttons_Row {
   margin-top: 150px;
   margin-right: 10px;
   text-align: right;
 }
+
 .SimulationParameters_Buttons {
   margin-left: 10px;
   margin-right: 10px;

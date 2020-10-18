@@ -10,6 +10,10 @@ class HouseLayoutService {
         return httpClient.get("layout");
     }
 
+    async resetLayout() {
+        return httpClient.delete("layout");
+    }
+
 }
 
 export default new HouseLayoutService();
