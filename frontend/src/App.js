@@ -9,7 +9,7 @@ import HouseLayoutUpload from "./component/houselayout/HouseLayoutUpload";
 
 export default function App() {
   return (
-    <Container>
+    <Container className="MainContainer">
         <Router>
             <Suspense fallback={<div>Loading...</div>}>
                 <Switch>
