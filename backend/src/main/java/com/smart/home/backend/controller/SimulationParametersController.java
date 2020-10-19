@@ -2,11 +2,10 @@ package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.Role;
 import com.smart.home.backend.input.EditParametersInput;
-import com.smart.home.backend.model.simulationParameters.Profile;
-import com.smart.home.backend.model.simulationParameters.SimulationParametersModel;
-import com.smart.home.backend.model.simulationParameters.SystemParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.smart.home.backend.model.simulationparameters.Profile;
+import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,13 @@ import java.time.LocalDateTime;
 @CrossOrigin
 @RestController
 public class SimulationParametersController {
+    
     private SimulationParametersModel model;
+    
+    @Autowired
+    public SimulationParametersController(SimulationParametersModel model) {
+        this.model = model;
+    }
 
     /**
      * Creates a Simulation Parameters Model and validates the incoming data
@@ -38,10 +43,9 @@ public class SimulationParametersController {
         LocalDateTime date = parameters.getParametersInput().getDate();
         if (insideTemp != null && outsideTemp != null && role != null && date != null){
             if (insideTemp > -20 && insideTemp <= 30 && outsideTemp > -60 && outsideTemp < 50){
-                model = SimulationParametersModel.builder()
-                        .profile(new Profile(role))
-                        .sysParams(new SystemParameters(outsideTemp,insideTemp,date))
-                        .build();
+                this.getModel().setProfile(new Profile(role));
+                this.getModel().setSysParams(new SystemParameters(outsideTemp,insideTemp,date));
+                
                 return new ResponseEntity<>(model, HttpStatus.OK);
             }
         }

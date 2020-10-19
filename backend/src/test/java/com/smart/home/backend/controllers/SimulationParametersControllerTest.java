@@ -5,7 +5,7 @@ import com.smart.home.backend.controller.SimulationParametersController;
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
 import com.smart.home.backend.input.ProfileInput;
-import com.smart.home.backend.model.simulationParameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SimulationParametersControllerTest {
 
-    SimulationParametersController controller = new SimulationParametersController();
+    SimulationParametersController controller = new SimulationParametersController(new SimulationParametersModel());
 
     /**
      * Method Test for valid Inside Temperatures

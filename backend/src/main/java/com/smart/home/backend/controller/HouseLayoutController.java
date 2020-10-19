@@ -67,11 +67,7 @@ public class HouseLayoutController {
 			roomRows.add(roomRow);
 		}
 		
-		this.setHouseLayoutModel(
-				HouseLayoutModel.builder()
-						.rows(roomRows)
-						.build()
-		);
+		this.getHouseLayoutModel().setRows(roomRows);
 		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
@@ -125,16 +121,9 @@ public class HouseLayoutController {
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "lightId") int lightId
 	) {
-		boolean badRequest = false;
 		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
 		
-		if (targetRoom == null) {
-			badRequest = true;
-		}
-		
-		badRequest = badRequest || !targetRoom.getLights().removeIf(light -> light.getId() == lightId);
-
-		if (badRequest){
+		if (targetRoom == null || !targetRoom.getLights().removeIf(light -> light.getId() == lightId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
@@ -201,16 +190,9 @@ public class HouseLayoutController {
 	 */
 	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}")
 	public ResponseEntity<HouseLayoutModel> removeRoom(@PathVariable(value = "rowId") int rowId, @PathVariable(value = "roomId") int roomId) {
-		boolean badRequest = false;
 		RoomRow targetRow = this.getHouseLayoutModel().findRow(rowId);
-		
-		if (targetRow == null) {
-			badRequest = true;
-		}
-		
-		badRequest = badRequest || !targetRow.getRooms().removeIf(room -> room.getId() == roomId);
 
-		if (badRequest) {
+		if (targetRow == null || !targetRow.getRooms().removeIf(room -> room.getId() == roomId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
@@ -255,16 +237,9 @@ public class HouseLayoutController {
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "doorId") int doorId
 	) {
-		boolean badRequest = false;
 		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
-		
-		if (targetRoom == null) {
-			badRequest = true;
-		}
-		
-		badRequest = badRequest || !targetRoom.getDoors().removeIf(door -> door.getId() == doorId);
-		
-		if (badRequest) {
+
+		if (targetRoom == null || !targetRoom.getDoors().removeIf(door -> door.getId() == doorId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
@@ -345,16 +320,9 @@ public class HouseLayoutController {
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "windowId") int windowId
 	) {
-		boolean badRequest = false;
 		Room targetRoom = houseLayoutModel.findRoom(rowId, roomId);
-		
-		if (targetRoom == null) {
-			badRequest = true;
-		}
-		
-		badRequest = badRequest || !targetRoom.getWindows().removeIf(window -> window.getId() == windowId);
 
-		if (badRequest) {
+		if (targetRoom == null || !targetRoom.getWindows().removeIf(window -> window.getId() == windowId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
