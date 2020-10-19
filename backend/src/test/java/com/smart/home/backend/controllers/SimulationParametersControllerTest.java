@@ -199,7 +199,7 @@ public class SimulationParametersControllerTest {
     }
 
     /**
-     * Helper class to instantiate the Simulation Parameters input
+     * Helper method to instantiate the Simulation Parameters input
      */
     public EditParametersInput instantiateSimulationParameters(Role role,double insideTemp,double outsideTemp,LocalDateTime date){
         EditParametersInput parameters = Mockito.mock(EditParametersInput.class);
