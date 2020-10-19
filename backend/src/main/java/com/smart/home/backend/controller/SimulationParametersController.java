@@ -44,14 +44,6 @@ public class SimulationParametersController {
                         .build();
                 return new ResponseEntity<>(model, HttpStatus.OK);
             }
-            else{
-                if(insideTemp <= -20 || insideTemp > 30){
-                    insideTemp=null;
-                }
-                else if(outsideTemp <= -60 || outsideTemp > 50){
-                    outsideTemp = null;
-                }
-            }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
