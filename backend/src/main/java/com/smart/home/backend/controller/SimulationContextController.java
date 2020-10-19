@@ -45,8 +45,8 @@ public class SimulationContextController {
 	 */
 	@PostMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons")
 	public ResponseEntity<SimulationContextModel> addPerson(
-			@PathVariable int roomId,
-			@PathVariable int rowId,
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
 			@RequestBody PersonInput personInput
 	) {
 		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
@@ -73,16 +73,9 @@ public class SimulationContextController {
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "personId") int personId
 	) {
-		boolean badRequest = false;
 		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
 		
-		if(targetRoom == null) {
-			badRequest = true;
-		}
-		
-		badRequest = badRequest || !targetRoom.getPersons().removeIf(person -> person.getId() == personId);
-		
-		if(badRequest) {
+		if (targetRoom == null || !targetRoom.getPersons().removeIf(person -> person.getId() == personId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
