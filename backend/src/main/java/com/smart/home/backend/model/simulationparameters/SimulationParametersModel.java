@@ -1,17 +1,10 @@
-package com.smart.home.backend.model.simulationParameters;
+package com.smart.home.backend.model.simulationparameters;
 
-import com.smart.home.backend.constant.Role;
-import com.smart.home.backend.model.simulationParameters.Profile;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * Model for the SimulationParameters
@@ -19,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@Component
 public class SimulationParametersModel{
     private Profile profile;
     private SystemParameters sysParams;
