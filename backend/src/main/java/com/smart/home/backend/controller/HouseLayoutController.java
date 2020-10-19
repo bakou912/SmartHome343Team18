@@ -40,7 +40,7 @@ public class HouseLayoutController {
 	private HouseLayoutModel houseLayoutModel;
 	
 	@Autowired
-	HouseLayoutController(HouseLayoutModel houseLayoutModel) {
+	public HouseLayoutController(HouseLayoutModel houseLayoutModel) {
 		this.houseLayoutModel = houseLayoutModel;
 	}
 	
@@ -52,7 +52,7 @@ public class HouseLayoutController {
 	 */
 	@PostMapping("/layout")
 	public ResponseEntity<HouseLayoutModel> loadLayout(@RequestBody HouseLayoutInput houseLayoutInput) {
-		List<RoomRowInput> roomRowInputs = houseLayoutInput.rows;
+		List<RoomRowInput> roomRowInputs = houseLayoutInput.getRows();
 		List<RoomRow> roomRows = new ArrayList<>();
 		
 		for (int i = 0; i < roomRowInputs.size(); i++) {

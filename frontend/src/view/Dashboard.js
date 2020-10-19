@@ -1,6 +1,7 @@
 import React from "react";
-import {Container} from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import HouseLayout from "./HouseLayout";
+import "../style/App.css";
 import "../style/Dashboard.css";
 
 export default class Dashboard extends React.Component {
@@ -20,13 +21,29 @@ export default class Dashboard extends React.Component {
 
     render() {
         return (
-            <Container>
-                <header className="header">
-                    <h1>
+            <Container fluid className="Dashboard">
+                <header>
+                    <h1 className="Header">
                         Smart Home Simulator
                     </h1>
                 </header>
-                <HouseLayout/>
+                <br/><br/><br/>
+                <Row>
+                    <Col className="SimulationContextContainer">
+
+                    </Col>
+                    <Col className="ModulesContainer">
+
+                    </Col>
+                    <Col className="HouseLayoutContainer">
+                        <Container className="HouseLayoutImage">
+                            <h2 className="SectionHeader">
+                                House Layout
+                            </h2>
+                            <HouseLayout/>
+                        </Container>
+                    </Col>
+                </Row>
             </Container>
         );
     }
