@@ -8,12 +8,12 @@ import com.smart.home.backend.input.ProfileInput;
 import com.smart.home.backend.model.simulationParameters.SimulationParametersModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -24,49 +24,171 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 public class SimulationParametersControllerTest {
-    @Mock
+
     SimulationParametersController controller = new SimulationParametersController();
 
+    /**
+     * Method Test for valid Inside Temperatures
+     */
     @Test
-    public void editSimulationParametersTest(){
+    public void validInsideTempTest(){
         ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,33.0,LocalDateTime.parse("2020-04-08T12:30")));
-        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp(),"Inside Temperature does not match");
-        assertEquals(33.0,editSimulationParameters.getBody().getSysParams().getOutsideTemp(),"Outside Temperature does not match");
-        assertNotNull(editSimulationParameters.getBody().getSysParams().getDate(),"Date should not be null");
-        assertNotNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should not be null");
-        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate(),"Dates don't match");
-        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole(),"Roles don't match");
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.0,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
 
-        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.STRANGER,80,33.0,LocalDateTime.parse("2020-04-08T04:20:05")));
-        assertNull(editSimulationParameters.getBody().getSysParams().getInsideTemp(),"Inside Temperature should be null");
-        assertNotNull(editSimulationParameters.getBody().getSysParams().getOutsideTemp(),"Outside Temperature should be null");
-        assertNotNull(editSimulationParameters.getBody().getSysParams().getDate(),"Dates should not be null");
-        assertNotNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should not be null");
-        assertEquals(LocalDateTime.parse("2020-04-08T04:20:05"),editSimulationParameters.getBody().getSysParams().getDate(),"Dates don't match");
-        assertEquals(Role.STRANGER,editSimulationParameters.getBody().getProfile().getRole(),"Roles don't match");
+        editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,-15,33.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(-15,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.0,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
 
-        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.VISITOR,5,-30,LocalDateTime.parse("2020-04-08P12:30")));
-        assertEquals(5,editSimulationParameters.getBody().getSysParams().getInsideTemp(),"Inside Temperature do not match");
-        assertEquals(-30,editSimulationParameters.getBody().getSysParams().getOutsideTemp(),"Outside should do not match");
-        assertNull(editSimulationParameters.getBody().getSysParams().getDate(),"Dates should be null");
-        assertNotNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should not be null");
-        assertEquals(Role.VISITOR,editSimulationParameters.getBody().getProfile().getRole(),"Roles don't match");
+        editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,0,33.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(0,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.0,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+    }
 
-        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.PARENT,5,-70,LocalDateTime.parse("2020-04-08T12:30")));
-        assertEquals(5,editSimulationParameters.getBody().getSysParams().getInsideTemp(),"Inside Temperature does not match");
-        assertNull(editSimulationParameters.getBody().getSysParams().getOutsideTemp(),"Outside Temperature should be null");
-        assertNotNull(editSimulationParameters.getBody().getSysParams().getDate(),"Date should not be null");
-        assertNotNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should not be null");
-        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate(),"Dates don't match");
-        assertEquals(Role.PARENT,editSimulationParameters.getBody().getProfile().getRole(),"Roles don't match");
+    /**
+     * Method test for invalid inside Temperatures
+     */
+    @Test
+    public void invalidInsideTempTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,233.5,33.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNull(editSimulationParameters.getBody());
 
-        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(null,5,-7,LocalDateTime.parse("2020-04-08T12:30")));
-        assertEquals(5,editSimulationParameters.getBody().getSysParams().getInsideTemp(),"Inside Temperature does not match");
-        assertEquals(-7,editSimulationParameters.getBody().getSysParams().getOutsideTemp(),"Outside Temperature does not match");
-        assertNotNull(editSimulationParameters.getBody().getSysParams().getDate(),"Date should not be null");
-        assertNotNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should not be null");
-        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate(),"Dates don't match");
-        assertNull(editSimulationParameters.getBody().getProfile().getRole(),"Role should be null");
+        editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,-90,33.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNull(editSimulationParameters.getBody());
+    }
+
+    /**
+     * Method test for valid outside temperature
+     */
+    @Test
+    public void validOutsideTempTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+
+        editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,-25,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(-25,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+    }
+
+    /**
+     * Method test for invalid outside temperatures
+     */
+    @Test
+    public void invalidOutsideTempTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,330.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNull(editSimulationParameters.getBody());
+
+        editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,-233.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNull(editSimulationParameters.getBody());
+    }
+
+    /**
+     * Method test for valid roles
+     */
+    @Test
+    public void validRoleTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.PARENT,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.PARENT,editSimulationParameters.getBody().getProfile().getRole());
+
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.VISITOR,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.VISITOR,editSimulationParameters.getBody().getProfile().getRole());
+
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.STRANGER,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.STRANGER,editSimulationParameters.getBody().getProfile().getRole());
+    }
+
+    /**
+     * Method Test for invalid roles
+     */
+    @Test
+    public void invalidRolesTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(null,23.5,330.0,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNull(editSimulationParameters.getBody());
+    }
+
+    /**
+     * Method test for valid dates
+     */
+    @Test
+    public void validDatesTest(){
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,33.6,LocalDateTime.parse("2020-04-08T12:30")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T12:30"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.CHILD,23.5,33.6,LocalDateTime.parse("2020-04-08T04:25:05")));
+        assertNotNull(editSimulationParameters.getBody());
+        assertEquals(23.5,editSimulationParameters.getBody().getSysParams().getInsideTemp());
+        assertEquals(33.6,editSimulationParameters.getBody().getSysParams().getOutsideTemp());
+        assertEquals(LocalDateTime.parse("2020-04-08T04:25:05"),editSimulationParameters.getBody().getSysParams().getDate());
+        assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
+    }
+
+    @Test
+    public void invalidDatesTest(){
+        LocalDateTime date;
+        try{
+            date=LocalDateTime.parse("2020-04-08T90:30");
+        }
+        catch (DateTimeParseException e){
+            date=null;
+        }
+        ResponseEntity<SimulationParametersModel> editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.PARENT,23.5,330.0,date));
+        assertNull(editSimulationParameters.getBody());
+
+        try{
+            date=LocalDateTime.parse("2020-15-15T10:30");
+        }
+        catch (DateTimeParseException e){
+            date=null;
+        }
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.PARENT,23.5,0.0,date));
+        assertNull(editSimulationParameters.getBody());
+        try{
+            date=LocalDateTime.parse("");
+        }
+        catch (DateTimeParseException e){
+            date=null;
+        }
+        editSimulationParameters= controller.editSimulationParameters(instantiateSimulationParameters(Role.PARENT,23.5,0.0,date));
+        assertNull(editSimulationParameters.getBody());
     }
     @Test
     public void getSimulationParametersTest(){
