@@ -8,7 +8,6 @@ import LightsFactory from "../service/factory/LightsFactory";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Container } from "react-bootstrap";
 
-
 export default class HouseLayout extends React.Component {
 
     layoutModel = undefined;
@@ -17,6 +16,7 @@ export default class HouseLayout extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             rooms: [],
             doors: [],
