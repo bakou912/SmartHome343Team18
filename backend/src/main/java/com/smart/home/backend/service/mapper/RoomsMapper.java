@@ -31,12 +31,13 @@ public class RoomsMapper {
 					.doors(DoorsMapper.map(roomInput.getDoorsOn()))
 					.windows(WindowsMapper.map(roomInput.getWindowsOn()))
 					.lights(LightsMapper.map(roomInput.getLights()))
+					.persons(PersonsMapper.map(roomInput.getPerson()))
 					.build();
 			
 			room.getDoorId().setLastId(room.getDoors().size());
 			room.getWindowId().setLastId(room.getWindows().size());
 			room.getLightId().setLastId(room.getLights().size());
-			
+			room.getPersonId().setLastId(room.getPersons().size());
 			rooms.add(room);
 		}
 		
