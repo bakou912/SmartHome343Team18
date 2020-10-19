@@ -161,6 +161,9 @@ public class SimulationParametersControllerTest {
         assertEquals(Role.CHILD,editSimulationParameters.getBody().getProfile().getRole());
     }
 
+    /**
+     * Method Test for invalid Dates
+     */
     @Test
     public void invalidDatesTest(){
         LocalDateTime date;
@@ -192,7 +195,7 @@ public class SimulationParametersControllerTest {
     }
     @Test
     public void getSimulationParametersTest(){
-        /**
+        /*
          * get not implemented so just a pass test for now
          */
         assertEquals(1,1,"Will always pass");
