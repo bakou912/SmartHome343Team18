@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import lombok.*;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 /**
  * Model for the house layout.
@@ -18,10 +20,11 @@ import org.springframework.lang.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HouseLayoutModel {
+@Component
+public class HouseLayoutModel implements BaseModel {
 	
-	@NonNull
-	private List<RoomRow> rows;
+	@Builder.Default
+	private List<RoomRow> rows = new ArrayList<>();
 	
 	/**
 	 * Finds a row with the corresponding id.
@@ -138,5 +141,10 @@ public class HouseLayoutModel {
 		}
 		
 		return !availableDirections.contains(direction);
+	}
+	
+	@Override
+	public void reset() {
+		this.setRows(new ArrayList<>());
 	}
 }

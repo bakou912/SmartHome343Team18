@@ -5,6 +5,7 @@ import HouseLayout from "./HouseLayout";
 import {Button, Container, Row, Col} from 'react-bootstrap';
 import HouseLayoutService from "../service/HouseLayoutService";
 import Select from 'react-select'
+import SimulationContextService from "../service/SimulationContextService";
 
 export default class SimulationParameters extends React.Component {
 
@@ -13,23 +14,33 @@ export default class SimulationParameters extends React.Component {
     parametersInput = {};
     layoutKey = 0;
 
+    roles = [
+        { value: "PARENT", label: "Parent"},
+        { value: "CHILD", label: "Child"},
+        { value: "VISITOR", label: "Visitor"},
+        { value: "STRANGER", label: "Stranger"}
+    ]
+
     constructor(props) {
         super(props);
         this.state = {
             parametersInput: {
                 insideTemp: null,
                 outsideTemp: null,
-                dateTime: null,
+                dateTime: null
             },
             profileInput: {
                 role: "PARENT",
             },
             file: null,
             uploadedFile: localStorage.getItem("uploadedFile") === "true" | false,
-            rooms: []
+            rooms: [],
+            userLocation: null,
+            userName: null
         };
 
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
+        this.userNameHandler = this.userNameHandler.bind(this);
         this.saveParametersChanges = this.saveParametersChanges.bind(this);
         this.onSelectedUser = this.onSelectedUser.bind(this);
         this.onSelectedLocation = this.onSelectedLocation.bind(this);
@@ -77,7 +88,7 @@ export default class SimulationParameters extends React.Component {
     async onSelectedUser(evt) {
         await this.setState({
             profileInput: {
-                role: evt.target.value
+                role: evt.value
             }
         });
     }
@@ -92,17 +103,33 @@ export default class SimulationParameters extends React.Component {
         this.parametersInput[evt.target.name] = evt.target.value;
     }
 
+    userNameHandler(evt) {
+        this.state.userName = evt.target.value;
+    }
+
     async saveParametersChanges() {
         this.parametersInput.dateTime = this.date + "T" + this.time + ":00";
         this.state.parametersInput = this.parametersInput;
+
+        if (this.state.userName === null) {
+            alert("A name for the user must be set");
+            return;
+        }
 
         if (this.state.uploadedFile === false) {
             alert("A layout must be uploaded");
             return;
         }
 
+        if (this.state.userLocation === null) {
+            alert("A location for the user must be chosen");
+            return;
+        }
+
         await ParametersService.saveParams(this.state)
             .then(async () => {
+                const { rowId, roomId } = this.state.userLocation;
+                await SimulationContextService.addPersonToRoom(rowId, roomId, { name: this.state.userName })
                 localStorage.setItem("parametersSet", "true");
                 await this.setState({
                     parametersSet: true
@@ -159,19 +186,56 @@ export default class SimulationParameters extends React.Component {
                             </Row>
                             <Row>
                                 <Col lg={12}>
-                                    <Container className="SimulationParameters_Parameters_Container">
+                                    <Container fluid className="SimulationParameters_Parameters_Container">
                                         <Row>
-                                            <Col lg={6}>
+                                            <Col lg={6} className="SimulationParameters_Parameters_Col_One">
+                                                <h2>User</h2>
+                                                <br/>
                                                 <img src="/user.png" alt="profile pic" width="150"/>
                                                 <br/>
-                                                <select className="SimulationParameters_User_Select" onChange={this.onSelectedUser} defaultValue="PARENT">
-                                                    <option value="PARENT">Parent</option>
-                                                    <option value="CHILD">Child</option>
-                                                    <option value="VISITOR">Visitor</option>
-                                                    <option value="STRANGER">Stranger</option>
-                                                </select>
+                                                <br/>
+
+                                                <Row>
+                                                    <Col lg={2}>
+                                                        <label>Name</label>
+                                                    </Col>
+                                                    <Col>
+                                                        <input name="name" type="text" onChange={this.userNameHandler} style={{width: "120px"}}/>
+                                                    </Col>
+                                                </Row>
+                                                <br/>
+                                                Role
+                                                <Container className="SimulationParameters_Parameters_Select">
+                                                    <Select
+                                                            styles={{
+                                                                option: provided => ({...provided, width: 200}),
+                                                                menu: provided => ({...provided, width: 200}),
+                                                                control: provided => ({...provided, width: 200}),
+                                                                singleValue: provided => provided
+                                                            }}
+                                                            options={this.roles}
+                                                            onChange={this.onSelectedUser}
+                                                            defaultValue={this.roles[0]}
+                                                    />
+                                                </Container>
+                                                <br/>
+                                                Location
+                                                <Container className="SimulationParameters_Parameters_Select">
+                                                    <Select
+                                                        styles={{
+                                                            option: provided => ({...provided, width: 200}),
+                                                            menu: provided => ({...provided, width: 200}),
+                                                            control: provided => ({...provided, width: 200}),
+                                                            singleValue: provided => provided
+                                                        }}
+                                                        options={this.state.rooms}
+                                                        onChange={this.onSelectedLocation}
+                                                    />
+                                                </Container>
                                             </Col>
                                             <Col lg={6} className="SimulationParameters_Parameters_Col_Two">
+                                                <h2>Parameters</h2>
+                                                <br/>
                                                 <Container>
                                                     <Row>
                                                         <Col>
@@ -191,21 +255,23 @@ export default class SimulationParameters extends React.Component {
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            <label>Date</label><br/>
+                                                            <label>Date</label>
+                                                        </Col>
+                                                        <Col>
                                                             <input type="date" name="date" onChange={this.onDateSelected}/>
                                                         </Col>
                                                     </Row>
                                                     <Row>
                                                         <Col>
-                                                            <label>Time</label><br/>
+                                                            <label>Time</label>
+                                                        </Col>
+                                                        <Col>
                                                             <input type="time" name="time" onChange={this.onTimeSelected}/>
                                                         </Col>
                                                     </Row>
                                                     <Row className="SimulationParameters_LocationChoiceRow">
                                                         <Col>
-                                                            Choose user's location:
 
-                                                            <Select options={this.state.rooms} onChange={this.onSelectedLocation}/>
                                                         </Col>
                                                     </Row>
                                                 </Container>

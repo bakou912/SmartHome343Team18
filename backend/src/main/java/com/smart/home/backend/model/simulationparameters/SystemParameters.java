@@ -1,14 +1,10 @@
-package com.smart.home.backend.model.simulationParameters;
+package com.smart.home.backend.model.simulationparameters;
 
-import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * System Parameters Model

@@ -5,6 +5,7 @@ import "../style/App.css";
 import "../style/Dashboard.css";
 import HouseLayoutService from "../service/HouseLayoutService";
 import ParametersService from "../service/ParametersService";
+import SimulationContextService from "../service/SimulationContextService";
 
 export default class Dashboard extends React.Component {
 
@@ -28,8 +29,7 @@ export default class Dashboard extends React.Component {
     }
 
     async resetSimulator() {
-        await HouseLayoutService.resetLayout();
-        await ParametersService.resetParams();
+        await SimulationContextService.resetContext();
 
         localStorage.setItem("uploadedFile", "false");
         localStorage.setItem("parametersSet", "false");

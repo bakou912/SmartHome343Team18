@@ -3,9 +3,10 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.Role;
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.simulationParameters.Profile;
-import com.smart.home.backend.model.simulationParameters.SimulationParametersModel;
-import com.smart.home.backend.model.simulationParameters.SystemParameters;
+import com.smart.home.backend.model.simulationparameters.Profile;
+import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,11 @@ import java.time.LocalDateTime;
 public class SimulationParametersController {
     
     private SimulationParametersModel model;
+    
+    @Autowired
+    public SimulationParametersController(SimulationParametersModel model) {
+        this.model = model;
+    }
 
     /**
      * Creating a simulation parameters model.
@@ -33,10 +39,8 @@ public class SimulationParametersController {
     @PostMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> editSimulationParameters(@RequestBody EditParametersInput parameters){
         if (this.areParametersValid(parameters)){
-            model = SimulationParametersModel.builder()
-                    .profile(new Profile(parameters.getProfileInput().getRole()))
-                    .sysParams(new SystemParameters(parameters.getParametersInput()))
-                    .build();
+            this.getModel().setProfile(new Profile(parameters.getProfileInput().getRole()));
+            this.getModel().setSysParams(new SystemParameters(parameters.getParametersInput()));
             return new ResponseEntity<>(model, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -57,7 +61,7 @@ public class SimulationParametersController {
      */
     @DeleteMapping("/parameters")
     public ResponseEntity<HouseLayoutModel> resetLayout() {
-        this.setModel(null);
+        this.getModel().reset();
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
