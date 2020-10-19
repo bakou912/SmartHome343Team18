@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class SystemParameters {
-    private double outsideTemp;
-    private double insideTemp;
+    private Double outsideTemp;
+    private Double insideTemp;
     private LocalDateTime date;
 
     /**
@@ -21,7 +21,7 @@ public class SystemParameters {
      * @param insideTemp
      * @param date date and time
      */
-    public SystemParameters(double outsideTemp, double insideTemp, LocalDateTime date) {
+    public SystemParameters(Double outsideTemp, Double insideTemp, LocalDateTime date) {
         this.outsideTemp = outsideTemp;
         this.insideTemp = insideTemp;
         this.date = date;
