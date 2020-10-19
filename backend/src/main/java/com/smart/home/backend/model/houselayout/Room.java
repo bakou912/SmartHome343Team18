@@ -2,6 +2,7 @@ package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.LightInput;
+import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
@@ -42,7 +43,7 @@ public class Room extends ModelObject {
 	private final IdUtil lightId = new IdUtil();
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
-	private final IdUtil PersonId = new IdUtil();
+	private final IdUtil personId = new IdUtil();
 	/**
 	 * Finds a light with the corresponding id.
 	 * @param id Searched light's id
@@ -135,15 +136,16 @@ public class Room extends ModelObject {
 						.build()
 		);
 	}
-
-		/**
+	
+	/**
 	 * Adds a person to the person list
 	 * @param personInput person input
 	 */
-	public void addPerson() {
+	public void addPerson(PersonInput personInput) {
 		this.getPersons().add(
 				Person.builder()
 						.id(this.getPersonId().newId())
+						.name(personInput.getName())
 						.build()
 		);
 	}

@@ -31,7 +31,6 @@ public class RoomsMapper {
 					.doors(DoorsMapper.map(roomInput.getDoorsOn()))
 					.windows(WindowsMapper.map(roomInput.getWindowsOn()))
 					.lights(LightsMapper.map(roomInput.getLights()))
-					.persons(PersonsMapper.map(roomInput.getPerson()))
 					.build();
 			
 			room.getDoorId().setLastId(room.getDoors().size());

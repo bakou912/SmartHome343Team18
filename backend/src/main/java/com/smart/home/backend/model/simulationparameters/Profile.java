@@ -1,8 +1,6 @@
-package com.smart.home.backend.model.simulationParameters;
+package com.smart.home.backend.model.simulationparameters;
 
-import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.constant.Role;
-import lombok.experimental.SuperBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

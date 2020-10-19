@@ -1,25 +1,15 @@
 package com.smart.home.backend.controller;
 
-import com.smart.home.backend.constant.Role;
-import com.smart.home.backend.input.EditParametersInput;
-import com.smart.home.backend.input.RoomInput;
-import com.smart.home.backend.model.houselayout.HouseLayoutModel;
+import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.model.houselayout.Room;
-import com.smart.home.backend.model.simulationContext.SimulationContextModel;
-import com.smart.home.backend.model.simulationParameters.Profile;
-import com.smart.home.backend.model.simulationParameters.SimulationParametersModel;
-import com.smart.home.backend.model.simulationParameters.SystemParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import java.time.LocalDateTime;
-import com.smart.home.backend.model.simulationContext.SimulationContextModel;
 
 /**
  * Simulation Context Controller
@@ -29,71 +19,74 @@ import com.smart.home.backend.model.simulationContext.SimulationContextModel;
 @CrossOrigin
 @RestController
 public class SimulationContextController {
-
-    private SimulationContextModel simulationContextModel;
-    
-    private HouseLayoutModel houseLayoutModel;
-
-    @Autowired
-	SimulationContextController(HouseLayoutModel houseLayoutModel, SimulationContextModel simulationContextModel ) {
-        this.houseLayoutModel = houseLayoutModel;
-        this.simulationContextModel = simulationContextModel;
-    }
-    
-    /**
-	 *
-	 * Add new person to a room.
-	 * 
-	 * @param rowId row number in house layout
-	 * @param roomId room number of row
-	 * @return update house layout with new light in room. returns null if the room or row cannot be found.
+	
+	private SimulationContextModel simulationContextModel;
+	
+	@Autowired
+	SimulationContextController(SimulationContextModel simulationContextModel) {
+		this.simulationContextModel = simulationContextModel;
+	}
+	
+	/**
+	 * Fetching the actual simulation context model.
+	 * @return Existing simulation context model
 	 */
-    @PostMapping("simulation/rows/{rowId}/rooms/{roomId}/addPerson")
+	@GetMapping("/context")
+	public ResponseEntity<SimulationContextModel> getContext() {
+		return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
+	}
+	
+	/**
+	 * Add a person to a room.
+	 *
+	 * @param rowId  row number in house layout
+	 * @param roomId room number of row
+	 * @return Updated simulation context
+	 */
+	@PostMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons")
 	public ResponseEntity<SimulationContextModel> addPerson(
-            @PathVariable int roomId,
-            @PathVariable int rowId,
-			@RequestBody RoomInput roomInput
+			@PathVariable int roomId,
+			@PathVariable int rowId,
+			@RequestBody PersonInput personInput
 	) {
-        Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
-        int personId = roomInput.getPerson();
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
 		
-		if (targetRoom == null) {
+		if(targetRoom == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-        
-        targetRoom.addPerson();
 		
-        return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
-    }
-
-// /**
-// 	 * Delete a person in a room
-// 	 * 
-// 	 * @param rowId row number in house layout
-// 	 * @param roomId room number in row
-// 	 * @param PersonId id of light
-// 	 * @return updated house layout. returns null if the room, row or person does not exist
-// 	 */
-// 	@DeleteMapping("simulation/rows/{rowId}/rooms/{roomId}/person/{personid}")
-// 	public ResponseEntity<SimulationContextModel> removePerson(
-//         @PathVariable int roomId,
-//         @PathVariable int rowId,
-//         @RequestBody RoomInput roomInput
-// 	) {
-// 		boolean badRequest = false;
-// 		Room targetRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
+		targetRoom.addPerson(personInput);
 		
-// 		if (targetRoom == null) {
-// 			badRequest = true;
-// 		}
+		return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
+	}
+	
+	/**
+	 * Removing a light from a room.
+	 * @param rowId row number in house layout
+	 * @param roomId room number in row
+	 * @param personId person id
+	 * @return updated house layout. returns null if the room, row or light does not exist
+	 */
+	@DeleteMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{personId}")
+	public ResponseEntity<SimulationContextModel> removePerson(
+			@PathVariable(value = "rowId") int rowId,
+			@PathVariable(value = "roomId") int roomId,
+			@PathVariable(value = "personId") int personId
+	) {
+		boolean badRequest = false;
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
 		
-// 		badRequest = badRequest || !targetRoom.getLights().removeIf(light -> light.getId() == lightId);
-
-// 		if (badRequest){
-// 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-// 		}
-
-// 		return new ResponseEntity<SimulationContextModel>(this.getSimulationContextModel(), HttpStatus.OK);
-// 	}
-
+		if(targetRoom == null) {
+			badRequest = true;
+		}
+		
+		badRequest = badRequest || !targetRoom.getPersons().removeIf(person -> person.getId() == personId);
+		
+		if(badRequest) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
+	}
+	
 }

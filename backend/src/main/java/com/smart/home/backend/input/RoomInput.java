@@ -27,7 +27,4 @@ public class RoomInput {
 	@JsonProperty("doorsOn")
 	private List<Direction> doorsOn = new ArrayList<>();
 	
-	@JsonProperty("person")
-	private Integer person;
-	
 }

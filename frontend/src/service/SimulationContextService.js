@@ -2,9 +2,14 @@ import httpClient from "./HttpClient";
 
 class SimulationContextService {
 
-    async addPersonToRoom(personId,roomId) {
-        let url = "simulation/rows/rooms/" + roomId + "/addPerson"
-        return httpClient.post(url, {personId:personId});
+    async addPersonToRoom(rowId, roomId, person) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/persons`
+        return httpClient.post(path, { name: person.name });
+    }
+
+    async removePerson(rowId, roomId, personId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/persons/${personId}`
+        return httpClient.delete(path);
     }
 
 }

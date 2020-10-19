@@ -67,11 +67,7 @@ public class HouseLayoutController {
 			roomRows.add(roomRow);
 		}
 		
-		this.setHouseLayoutModel(
-				HouseLayoutModel.builder()
-						.rows(roomRows)
-						.build()
-		);
+		this.getHouseLayoutModel().setRows(roomRows);
 		
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}

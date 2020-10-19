@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 /**
  * Model for the house layout.
@@ -18,10 +19,11 @@ import org.springframework.lang.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Component
 public class HouseLayoutModel {
 	
-	@NonNull
-	private List<RoomRow> rows;
+	@Builder.Default
+	private List<RoomRow> rows = new ArrayList<>();
 	
 	/**
 	 * Finds a row with the corresponding id.
