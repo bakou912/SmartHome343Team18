@@ -85,6 +85,10 @@ export default class SimulationParameters extends React.Component {
     }
 
     async onSelectedLocation(evt) {
+        if (evt.label === "Outside") {
+            evt.value.name = "Outside";
+        }
+
         await this.setState({
             userLocation: evt.value,
             userInput: {
