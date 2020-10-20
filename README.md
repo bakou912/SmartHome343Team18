@@ -19,6 +19,12 @@ To run tests, run the following command in the `backend` directory:
 mvn clean test
 ```
 
+To start the app, write the following command in the `backend` directory:
+```
+mvn clean spring-boot:run
+```
+Once started, the app will be exposed on `http://localhost:8080`.
+
 #### Frontend
 
 First make sure you have the latest version of `Nodejs` installed on your machine.
