@@ -38,7 +38,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br />
 You will also see any lint errors in the console.
 
-#### `npm startAll`
+#### `npm run startAll`
 
 Runs the app (includes the `start` script) and also runs the required backend.
 
