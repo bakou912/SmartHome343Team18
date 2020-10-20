@@ -10,12 +10,12 @@ class HouseLayoutService {
         return httpClient.get("layout");
     }
 
-    async getAllRooms(existingLayout) {
+    async getAllLocations(existingLayout) {
         const layout = existingLayout || (await this.getLayout()).data;
-        let rooms = [];
+        let locations = [];
 
         layout.rows.forEach(row => {
-            rooms = rooms.concat(row.rooms.map(room => {
+            locations = locations.concat(row.rooms.map(room => {
                 return {
                     value: {
                         ...room,
@@ -27,7 +27,12 @@ class HouseLayoutService {
             }));
         })
 
-        return rooms;
+        locations.push({
+            value: layout.outside,
+            label: "Outside"
+        })
+
+        return locations;
     }
 
     async resetLayout() {

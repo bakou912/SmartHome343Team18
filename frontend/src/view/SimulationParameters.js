@@ -66,7 +66,7 @@ export default class SimulationParameters extends React.Component {
         let selectRooms = [];
 
         if (this.state.uploadedFile === true) {
-            selectRooms = await HouseLayoutService.getAllRooms();
+            selectRooms = await HouseLayoutService.getAllLocations();
         }
 
         await this.setState({
@@ -85,6 +85,10 @@ export default class SimulationParameters extends React.Component {
     }
 
     async onSelectedLocation(evt) {
+        if (evt.label === "Outside") {
+            evt.value.name = "Outside";
+        }
+
         await this.setState({
             userLocation: evt.value,
             userInput: {
@@ -300,7 +304,6 @@ export default class SimulationParameters extends React.Component {
                 </Row>
                 <Row>
                     <Col className="SimulationParameters_Buttons_Row">
-                        <Button className="SimulationParameters_Buttons" variant="secondary" size="sm">Cancel</Button>
                         <Button
                             className="SimulationParameters_Buttons"
                             onClick={this.saveParametersChanges}

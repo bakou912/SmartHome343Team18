@@ -40,7 +40,7 @@ export default class SimulationContext extends React.Component {
             simulationState: this.contextModel.state,
             date: this.dateTime.toISOString().substring(0, 10),
             time: this.dateTime.toISOString().substring(11, 19),
-            rooms: await HouseLayoutService.getAllRooms(this.contextModel.layout)
+            rooms: await HouseLayoutService.getAllLocations(this.contextModel.layout)
         });
 
         await this.setState({
@@ -65,6 +65,10 @@ export default class SimulationContext extends React.Component {
     }
 
     async onSelectedLocation(evt) {
+        if (evt.label === "Outside") {
+            evt.value.name = "Outside";
+        }
+
         await this.setState({
             user: {
                 ...this.state.user,

@@ -11,7 +11,7 @@ export default class ContextModule extends React.Component {
         super(props);
 
         this.state = {
-            rooms: [],
+            locations: [],
             loaded: false,
             addingPerson: false,
             personUpdateKey: 0
@@ -27,8 +27,8 @@ export default class ContextModule extends React.Component {
 
     async componentDidMount() {
         await this.setState({
-            rooms: await HouseLayoutService.getAllRooms(),
-            selectedRoom: null,
+            locations: await HouseLayoutService.getAllLocations(),
+            selectedLocation: null,
             selectedWindow: null,
             loaded: true
         });
@@ -36,20 +36,22 @@ export default class ContextModule extends React.Component {
 
     async onSelectedLocation(evt) {
         await this.setState({
-            rooms: await HouseLayoutService.getAllRooms(),
-            selectedRoom: null,
+            locations: await HouseLayoutService.getAllLocations(),
+            selectedLocation: null,
             selectedWindow: null,
             loaded: true
+        });
+
+        const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
+            return { value: w, label: w.direction };
         });
 
         await this.setState({
             persons: evt.value.persons.map(p => {
                 return { value: p, label: p.name };
             }),
-            windows: evt.value.windows.map(w => {
-                return { value: w, label: w.direction };
-            }),
-            selectedRoom: { rowId: evt.value.rowId, roomId: evt.value.roomId },
+            windows: windows,
+            selectedLocation: { rowId: evt.value.rowId, roomId: evt.value.roomId, label: evt.label },
             selectedWindow: null,
             selectedPerson: null,
             personName: ""
@@ -69,9 +71,13 @@ export default class ContextModule extends React.Component {
     }
 
     async addPerson() {
+        const id = this.state.selectedLocation.label === "Outside" ? (await SimulationContextService.addPersonOutside({ name:this.state.personName })).data
+                :
+                (await SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { name:this.state.personName })).data;
+
         const person = {
             value: {
-                id: (await SimulationContextService.addPersonToRoom(this.state.selectedRoom.rowId, this.state.selectedRoom.roomId, { name:this.state.personName })).data,
+                id: id,
                 name: this.state.personName
             },
             label: this.state.personName
@@ -110,7 +116,7 @@ export default class ContextModule extends React.Component {
                     }
                 }
             });
-            await SimulationContextService.blockWindow(this.state.selectedRoom.rowId, this.state.selectedRoom.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.blockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
         } else {
             this.setState({
                 selectedWindow: {
@@ -121,7 +127,7 @@ export default class ContextModule extends React.Component {
                     }
                 }
             });
-            await SimulationContextService.unblockWindow(this.state.selectedRoom.rowId, this.state.selectedRoom.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
         }
 
         window.dispatchEvent(new Event("updateLayout"));
@@ -134,7 +140,7 @@ export default class ContextModule extends React.Component {
                     this.state.loaded ?
                         <div className="Module">
                             <br/>
-                            Rooms
+                            Locations
                             <Select
                                 styles={{
                                     option: provided => ({...provided, width: "100%"}),
@@ -142,40 +148,44 @@ export default class ContextModule extends React.Component {
                                     control: provided => ({...provided, width: "50%"}),
                                     singleValue: provided => provided
                                 }}
-                                options={this.state.rooms}
+                                options={this.state.locations}
                                 onChange={this.onSelectedLocation}
                             />
                             <br/>
                             <br/>
                             {
-                                this.state.selectedRoom !== null ?
+                                this.state.selectedLocation !== null ?
                                     <Row>
-                                        <Col>
-                                            Windows
-                                            <Select
-                                                styles={{
-                                                    option: provided => ({...provided, width: "50%"}),
-                                                    menu: provided => ({...provided, width: "50%"}),
-                                                    control: provided => ({...provided, width: "50%"}),
-                                                    singleValue: provided => provided
-                                                }}
-                                                options={this.state.windows}
-                                                value={this.state.selectedWindow}
-                                                onChange={this.onSelectedWindow}
-                                            />
-                                            {
-                                                this.state.selectedWindow !== null ?
-                                                    <div>
-                                                        {
-                                                            this.state.selectedWindow.value.state === "BLOCKED" ?
-                                                                <Button onClick={() => this.blockWindow(false)} variant="secondary" size="sm">Unobstruct</Button>
-                                                                :
-                                                                <Button onClick={() => this.blockWindow(true)} variant="secondary" size="sm">Obstruct</Button>
-                                                        }
-                                                    </div>
-                                                    : null
-                                            }
-                                        </Col>
+                                        {
+                                            this.state.selectedLocation.label !== "Outside" ?
+                                                <Col>
+                                                    Windows
+                                                    <Select
+                                                        styles={{
+                                                            option: provided => ({...provided, width: "50%"}),
+                                                            menu: provided => ({...provided, width: "50%"}),
+                                                            control: provided => ({...provided, width: "50%"}),
+                                                            singleValue: provided => provided
+                                                        }}
+                                                        options={this.state.windows}
+                                                        value={this.state.selectedWindow}
+                                                        onChange={this.onSelectedWindow}
+                                                    />
+                                                    {
+                                                        this.state.selectedWindow !== null ?
+                                                            <div>
+                                                                {
+                                                                    this.state.selectedWindow.value.state === "BLOCKED" ?
+                                                                        <Button onClick={() => this.blockWindow(false)} variant="secondary" size="sm">Unobstruct</Button>
+                                                                        :
+                                                                        <Button onClick={() => this.blockWindow(true)} variant="secondary" size="sm">Obstruct</Button>
+                                                                }
+                                                            </div>
+                                                            : null
+                                                    }
+                                                </Col>
+                                                : null
+                                        }
                                         <Col>
                                             Persons
                                             <Select

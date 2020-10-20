@@ -86,6 +86,11 @@ public class Room extends ModelObject {
 				.orElse(null);
 	}
 	
+	/**
+	 * Finds a person with the corresponding id.
+	 * @param id Searched person's id
+	 * @return Found person
+	 */
 	@Nullable
 	public Person findPerson(int id) {
 		return this.getPersons()

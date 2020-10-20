@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HouseLayoutModel implements BaseModel {
 	
-	@Builder.Default
 	private List<RoomRow> rows = new ArrayList<>();
+	private Outside outside = new Outside();
 	
 	/**
 	 * Finds a row with the corresponding id.
@@ -145,5 +145,6 @@ public class HouseLayoutModel implements BaseModel {
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());
+		this.setOutside(new Outside());
 	}
 }
