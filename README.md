@@ -23,7 +23,7 @@ To start the app, write the following command in the `backend` directory:
 ```
 mvn clean spring-boot:run
 ```
-Once started, open [http://localhost:8080](http://localhost:8080) to see in your browser.
+Once started, the app will be exposed on `http://localhost:8080`.
 
 #### Frontend
 
