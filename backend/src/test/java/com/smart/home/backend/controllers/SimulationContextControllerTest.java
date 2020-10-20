@@ -8,6 +8,7 @@ import com.smart.home.backend.controller.HouseLayoutController;
 import com.smart.home.backend.controller.SimulationContextController;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
+import com.smart.home.backend.model.houselayout.Outside;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
@@ -178,21 +179,37 @@ class SimulationContextControllerTest {
         }
     
         /**
-         * Test for adding a person with valid input
+         * Test for adding a person to a room with valid input
          */
         @Test
-        void validAddPerson() {
+        void validAddPersonToRoom() {
             Room foundRoom = Room.builder().id(0).build();
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(0, 0)).thenReturn(foundRoom);
             
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            assertEquals(0, simulationContextController.addPerson(0, 0, personInput).getBody());
-            assertEquals(1, simulationContextController.addPerson(0, 0, personInput).getBody());
-            assertEquals(2, simulationContextController.addPerson(0, 0, personInput).getBody());
+            assertEquals(0, simulationContextController.addPersonToRoom(0, 0, personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonToRoom(0, 0, personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonToRoom(0, 0, personInput).getBody());
         }
     
+        /**
+         * Test for adding a person outside with valid input
+         */
+        @Test
+        void validAddPersonOutside() {
+            Outside outside = new Outside();
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutside()).thenReturn(outside);
+        
+            PersonInput personInput = new PersonInput();
+            personInput.setName("personname");
+        
+            assertEquals(0, simulationContextController.addPersonOutside(personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonOutside(personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonOutside(personInput).getBody());
+        }
+        
         /**
          * Test for adding a person when room is not set
          */
@@ -203,7 +220,7 @@ class SimulationContextControllerTest {
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            ResponseEntity<Integer> responseEntity = simulationContextController.addPerson(0, 0, personInput);
+            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(0, 0, personInput);
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

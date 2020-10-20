@@ -120,7 +120,7 @@ public class SimulationContextController {
 	 * @return Person's id
 	 */
 	@PostMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons")
-	public ResponseEntity<Integer> addPerson(
+	public ResponseEntity<Integer> addPersonToRoom(
 			@PathVariable(value = "rowId") int rowId,
 			@PathVariable(value = "roomId") int roomId,
 			@RequestBody PersonInput personInput
@@ -132,6 +132,16 @@ public class SimulationContextController {
 		}
 		
 		return new ResponseEntity<>(targetRoom.addPerson(personInput), HttpStatus.OK);
+	}
+	
+	/**
+	 * Adding a person outside the house.
+	 * @param personInput Person input
+	 * @return Person's id
+	 */
+	@PostMapping("context/layout/outside/persons")
+	public ResponseEntity<Integer> addPersonOutside(@RequestBody PersonInput personInput) {
+		return new ResponseEntity<>(this.getSimulationContextModel().getHouseLayoutModel().getOutside().addPerson(personInput), HttpStatus.OK);
 	}
 	
 	/**
