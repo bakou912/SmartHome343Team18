@@ -3,9 +3,9 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.*;
-import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.User;
@@ -28,7 +28,7 @@ public class SimulationContextController {
 	private HouseLayoutController houseLayoutController;
 	
 	@Autowired
-	SimulationContextController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
+	public SimulationContextController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
 		this.simulationContextModel = simulationContextModel;
 		this.houseLayoutController = houseLayoutController;
 	}
@@ -199,7 +199,7 @@ public class SimulationContextController {
      * @return Updated simulation context. returns null if window, room, or row does not exist.
     */
     @PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}/block")
-    public ResponseEntity<SimulationContextModel> blockWindow(
+    public ResponseEntity<Window> blockWindow(
     		@PathVariable(value = "rowId") int rowId,
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "windowId") int windowId
@@ -218,7 +218,7 @@ public class SimulationContextController {
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
 	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}/unblock")
-	public ResponseEntity<SimulationContextModel> unBlockWindow(
+	public ResponseEntity<Window> unBlockWindow(
 			@PathVariable(value = "rowId") int rowId,
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "windowId") int windowId
@@ -236,14 +236,14 @@ public class SimulationContextController {
 	 * @param windowId id of window
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
-	private ResponseEntity<SimulationContextModel> getChangeWindowStateResponse(int rowId, int roomId, int windowId, WindowInput windowInput) {
-		ResponseEntity<HouseLayoutModel> layoutResponse = this.getHouseLayoutController().changeWindowState(rowId, roomId, windowId, windowInput);
+	private ResponseEntity<Window> getChangeWindowStateResponse(int rowId, int roomId, int windowId, WindowInput windowInput) {
+		ResponseEntity<Window> layoutResponse = this.getHouseLayoutController().changeWindowState(rowId, roomId, windowId, windowInput);
 		
 		if (!layoutResponse.getStatusCode().equals(HttpStatus.OK)) {
 			return new ResponseEntity<>(layoutResponse.getStatusCode());
 		}
 		
-		return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
+		return new ResponseEntity<>(layoutResponse.getBody(), HttpStatus.OK);
 	}
 	
 }

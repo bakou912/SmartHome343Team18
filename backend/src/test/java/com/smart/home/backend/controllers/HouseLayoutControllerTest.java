@@ -1,6 +1,7 @@
 package com.smart.home.backend.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Test for Use Case 3.1.1
+ * Tests for Use Case 3.1.1: upload house layout
  */
 class HouseLayoutControllerTest {
     
@@ -30,6 +31,7 @@ class HouseLayoutControllerTest {
     @Test
     void loadLayout(){
         ResponseEntity<HouseLayoutModel> loadResponse = houseLayoutController.loadLayout(this.mockValidLayout());
+        assertNotNull(loadResponse.getBody());
         assertEquals( 3 , loadResponse.getBody().getRows().size());
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
         assertEquals( 3 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
@@ -40,6 +42,7 @@ class HouseLayoutControllerTest {
     void getLayout(){
         houseLayoutController.loadLayout(this.mockValidLayout());
         ResponseEntity<HouseLayoutModel> getResponse = houseLayoutController.getLayout();
+        assertNotNull(getResponse.getBody());
         assertEquals( 3 , getResponse.getBody().getRows().size());
         assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
         assertEquals( 3 , getResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());

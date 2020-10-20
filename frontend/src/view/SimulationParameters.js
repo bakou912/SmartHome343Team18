@@ -108,8 +108,8 @@ export default class SimulationParameters extends React.Component {
     }
 
     async saveParametersChanges() {
-        this.parametersInput.dateTime = this.date + "T" + this.time + (this.time.length === 5 ? ":00" : "");
-        this.setState({
+        this.parametersInput.dateTime = this.date + "T" + this.time + (this.time && this.time.length === 5 ? ":00" : "");
+        await this.setState({
             parametersInput: this.parametersInput
         });
 

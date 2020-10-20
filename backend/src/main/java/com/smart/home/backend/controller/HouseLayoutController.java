@@ -333,10 +333,10 @@ public class HouseLayoutController {
 	 * @param roomId room number
 	 * @param windowId id of window
 	 * @param windowInput window input
-	 * @return Updated houseLayout. returns null if  window, room, or row does not exist.
+	 * @return Updated window. returns null if  window, room, or row does not exist.
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}")
-	public ResponseEntity<HouseLayoutModel> changeWindowState(
+	public ResponseEntity<Window> changeWindowState(
 			@PathVariable(value = "rowId") int rowId,
 			@PathVariable(value = "roomId") int roomId,
 			@PathVariable(value = "windowId") int windowId,
@@ -359,7 +359,7 @@ public class HouseLayoutController {
 			targetWindow.setState(state);
 		}
 		
-		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
+		return new ResponseEntity<>(targetWindow, HttpStatus.OK);
 	}
 	
 }
