@@ -1,5 +1,12 @@
-.Header {
+.HeaderText {
   font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+}
+
+.HeaderResetButton {
+  left: 0;
+  top: 5px;
+  position: absolute;
 }
 
 .Dashboard {
@@ -11,19 +18,38 @@
 .SimulationContextContainer {
   display: inline-block;
   height: 500px;
-  width: 15%;
-  border-right: 4px solid grey;
+  min-width: 330px;
+}
+
+.ContextRow {
+  display: inline-block;
+  width: 300px;
+  height: 500px;
+  left: 0;
+}
+
+.ContextCol {
+  left: 0;
 }
 
 .ModulesContainer {
   display: inline-block;
   height: 500px;
-  width: 35%;
-  border-right: 4px solid grey;
+  min-width: 600px;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+.ModulesRow {
+  display: inline-block;
+  width: 600px;
+  height: 500px;
+}
+
+.ModulesCol {
 }
 
 .HouseLayoutContainer {
-  width: 25%;
   height: 500px;
   display: inline-block;
   vertical-align: top;
@@ -31,12 +57,25 @@
 
 .HouseLayoutImage {
   display: inline-block;
-  margin-left: 50px;
+  width: 630px;
+  height: 400px;
+  margin-bottom: 15px;
 }
 
 .SectionHeader {
   color: white;
+  width: 100%;
   border-radius: 15px;
   padding: 15px;
   background-color: #282c34;
+}
+
+.ContextHeader {
+  text-align: center;
+  min-width: 300px;
+}
+
+.ModulesHeader {
+  text-align: center;
+  min-width: 600px;
 }

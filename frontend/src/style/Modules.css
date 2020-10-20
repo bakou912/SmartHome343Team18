@@ -1,0 +1,22 @@
+.Modules {
+  background-color: white;
+  min-width: 600px;
+  height: 500px;
+}
+
+.Tabs {
+  background-color: #b6b9bd;
+  width: 100%;
+  height: 50px;
+}
+
+.Modules {
+  background-color: white;
+  min-width: 600px;
+  height: 470px;
+}
+
+.Module {
+  text-align: left;
+  padding: 10px;
+}

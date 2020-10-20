@@ -1,0 +1,27 @@
+.SimulationContext {
+  background-color: white;
+  min-width: 300px;
+  height: 500px;
+}
+
+.EditButton {
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.StartButton {
+  float: left;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.ContextEditModal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 500px;
+  height: 500px;
+}
+

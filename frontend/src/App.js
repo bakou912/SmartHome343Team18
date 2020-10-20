@@ -1,7 +1,7 @@
 import "./style/App.css";
 import React, { Suspense } from "react";
 import Container from "react-bootstrap/Container";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import Dashboard from "./view/Dashboard";
 import SimulationParameters from "./view/SimulationParameters";
 
@@ -13,6 +13,7 @@ export default function App() {
                 <Switch>
                     <Route exact path="/dashboard" component={Dashboard} />
                     <Route exact path="/parameters" component={SimulationParameters}/>
+                    <Redirect from="/" to="/parameters" />
                 </Switch>
             </Suspense>
         </Router>

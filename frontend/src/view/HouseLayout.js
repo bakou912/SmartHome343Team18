@@ -2,33 +2,43 @@ import "../style/HouseLayoutView.css";
 import React from "react";
 import Room from "../component/houselayout/Room";
 import DoorsFactory from "../service/factory/DoorsFactory";
-import houseLayoutService from "../service/HouseLayoutService";
+import HouseLayoutService from "../service/HouseLayoutService";
 import WindowsFactory from "../service/factory/WindowsFactory";
 import LightsFactory from "../service/factory/LightsFactory";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import {Container} from "react-bootstrap";
-
+import { Container } from "react-bootstrap";
 
 export default class HouseLayout extends React.Component {
 
-    layoutModel = undefined;
     layoutContainerDimensions = { width: 120, height: 60 }
     roomDimensions = { width: 120, height: 60 }
 
     constructor(props) {
         super(props);
+
         this.state = {
             rooms: [],
             doors: [],
             lights: [],
             windows: [],
             layoutWidth: 1,
-            layoutHeight: 1
+            layoutHeight: 1,
+            key: 0
         };
+
+        this.layoutInit = this.layoutInit.bind(this);
     }
 
     async componentDidMount() {
-        this.layoutModel = (await houseLayoutService.getLayout()).data;
+        window.addEventListener("updateLayout", async () => {
+            await this.layoutInit();
+        });
+
+        await this.layoutInit();
+    }
+
+    async layoutInit() {
+        this.layoutModel = (await HouseLayoutService.getLayout()).data;
 
         if (this.layoutModel && Array.isArray(this.layoutModel.rows)) {
             this.setState(this.createRooms());
@@ -78,7 +88,8 @@ export default class HouseLayout extends React.Component {
             lights: lights,
             windows: windows,
             layoutWidth: nbRoomsMax * this.roomDimensions.width,
-            layoutHeight: layoutHeight
+            layoutHeight: layoutHeight,
+            key: this.state.key + 1
         };
     }
 
@@ -87,7 +98,7 @@ export default class HouseLayout extends React.Component {
             <Container className="HouseLayoutRepresentation">
                 <TransformWrapper>
                     <TransformComponent>
-                        <svg width="600px" height="400px">
+                        <svg key={this.state.key} width="600px" height="400px">
                             <g transform={`translate(${300 - this.state.layoutWidth / 2}, ${200 - this.state.layoutHeight / 2})`}>
                                 {this.state.rooms}
                                 {this.state.doors}

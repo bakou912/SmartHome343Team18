@@ -10,6 +10,10 @@ class ParametersService {
         return httpClient.get("parameters");
     }
 
+    async resetParams() {
+        return httpClient.delete("parameters");
+    }
+
 }
 
 export default new ParametersService();

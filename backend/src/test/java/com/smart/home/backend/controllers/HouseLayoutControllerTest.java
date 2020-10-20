@@ -1,6 +1,7 @@
 package com.smart.home.backend.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,49 +11,49 @@ import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+
 /**
- * Test for Use Case 3.1.1
- * 
+ * Tests for Use Case 3.1.1: upload house layout
  */
-@ExtendWith(MockitoExtension.class)
-public class HouseLayoutControllerTest {
+class HouseLayoutControllerTest {
     
-    HouseLayoutController houseLayoutController = new HouseLayoutController( new HouseLayoutModel());
+    HouseLayoutController houseLayoutController;
+    
+    @BeforeEach
+    void beforeEach() {
+        houseLayoutController = new HouseLayoutController(new HouseLayoutModel());
+    }
 
     @Test
-    public void loadLayout(){
-
-        ResponseEntity<HouseLayoutModel> loadResponse = houseLayoutController.loadLayout(instantiateLayout());
+    void loadLayout(){
+        ResponseEntity<HouseLayoutModel> loadResponse = houseLayoutController.loadLayout(this.mockValidLayout());
+        assertNotNull(loadResponse.getBody());
         assertEquals( 3 , loadResponse.getBody().getRows().size());
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
         assertEquals( 3 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
     }
 
-
     @Test
-    public void getLayout(){
-
-        houseLayoutController.loadLayout(instantiateLayout());
+    void getLayout(){
+        houseLayoutController.loadLayout(this.mockValidLayout());
         ResponseEntity<HouseLayoutModel> getResponse = houseLayoutController.getLayout();
+        assertNotNull(getResponse.getBody());
         assertEquals( 3 , getResponse.getBody().getRows().size());
         assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
         assertEquals( 3 , getResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
         assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
-
     }
 
     /**
-     * Helper method to instantiate a house layout
-     * 
-     * @return a House Layout
+     * Helper method to mock a valid house layout
+     * @return A valid House Layout
      */
-    public HouseLayoutInput instantiateLayout(){
+    public HouseLayoutInput mockValidLayout(){
 
         HouseLayoutInput houseLayoutInput = Mockito.mock(HouseLayoutInput.class);
         List<RoomRowInput> roomRowInputs = new ArrayList<>();
@@ -64,7 +65,6 @@ public class HouseLayoutControllerTest {
             RoomInput RoomInput = new RoomInput();
             RoomInput.setName(room);
             RoomInput.setLights(3);
-    
             
             List<Direction> doorDirections = new ArrayList<>();
             doorDirections.add(Direction.NORTH);

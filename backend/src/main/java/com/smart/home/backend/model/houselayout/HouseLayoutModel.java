@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import lombok.*;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class HouseLayoutModel {
+public class HouseLayoutModel implements BaseModel {
 	
 	@Builder.Default
 	private List<RoomRow> rows = new ArrayList<>();
@@ -121,8 +122,7 @@ public class HouseLayoutModel {
 	}
 	
 	/**
-	 * Checks to see if the direction is available in room.
-	 * 
+	 * Checking if the direction is available in room.
 	 * @param room The room
 	 * @param direction direction of placement within room
 	 * @return True if that direction is available. False otherwise.
@@ -140,5 +140,10 @@ public class HouseLayoutModel {
 		}
 		
 		return !availableDirections.contains(direction);
-	} 
+	}
+	
+	@Override
+	public void reset() {
+		this.setRows(new ArrayList<>());
+	}
 }

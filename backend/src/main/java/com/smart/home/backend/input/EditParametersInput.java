@@ -4,16 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 /**
  * Input class for all the simulation parameters
  */
 @Getter
 @Setter
 public class EditParametersInput {
-    @JsonProperty("profileInput")
-    private ProfileInput profileInput;
+    @JsonProperty("userInput")
+    private UserInput userInput;
 
     @JsonProperty("parametersInput")
     private ParametersInput parametersInput;

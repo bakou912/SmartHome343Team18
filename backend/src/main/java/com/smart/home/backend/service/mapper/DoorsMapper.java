@@ -29,7 +29,7 @@ public class DoorsMapper {
 			doors.add(
 					Door.builder()
 							.id(i)
-							.state(DoorState.LOCKED)
+							.state(DoorState.CLOSED)
 							.direction(doorDirection)
 							.build()
 			);

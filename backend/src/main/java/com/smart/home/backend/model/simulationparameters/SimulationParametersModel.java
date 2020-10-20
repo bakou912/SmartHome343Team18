@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.simulationparameters;
 
+import com.smart.home.backend.model.BaseModel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,17 +15,23 @@ import org.springframework.stereotype.Component;
 @Builder
 @NoArgsConstructor
 @Component
-public class SimulationParametersModel{
-    private Profile profile;
+public class SimulationParametersModel implements BaseModel {
+    
+    private User user;
     private SystemParameters sysParams;
 
     /**
-     * Constructor
-     * @param profile
-     * @param sysParams
+     * Constructor.
+     * @param user user
+     * @param sysParams system parameters
      */
-    public SimulationParametersModel(Profile profile, SystemParameters sysParams) {
-        this.profile = profile;
+    public SimulationParametersModel(User user, SystemParameters sysParams) {
+        this.user = user;
         this.sysParams = sysParams;
+    }
+    
+    public void reset() {
+        this.setUser(null);
+        this.setSysParams(null);
     }
 }
