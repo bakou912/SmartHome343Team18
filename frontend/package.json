@@ -17,7 +17,7 @@
     "reactstrap": "^8.6.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"react-scripts start\" \"cd ../backend && mvn clean spring-boot:run\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
