@@ -300,7 +300,7 @@ export default class SimulationParameters extends React.Component {
                 </Row>
                 <Row>
                     <Col className="SimulationParameters_Buttons_Row">
-                        <Button className="SimulationParameters_Buttons" variant="secondary" size="sm">Cancel</Button>
+                        <Button className="SimulationParameters_Buttons" variant="secondary" size="sm" hidden>Cancel</Button>
                         <Button
                             className="SimulationParameters_Buttons"
                             onClick={this.saveParametersChanges}
