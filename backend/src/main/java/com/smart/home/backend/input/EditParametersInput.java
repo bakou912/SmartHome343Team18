@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EditParametersInput {
-    @JsonProperty("profileInput")
-    private ProfileInput profileInput;
+    @JsonProperty("userInput")
+    private UserInput userInput;
 
     @JsonProperty("parametersInput")
     private ParametersInput parametersInput;

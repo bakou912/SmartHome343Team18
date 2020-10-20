@@ -17,21 +17,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class SimulationParametersModel implements BaseModel {
     
-    private Profile profile;
+    private User user;
     private SystemParameters sysParams;
 
     /**
      * Constructor.
-     * @param profile profile
+     * @param user user
      * @param sysParams system parameters
      */
-    public SimulationParametersModel(Profile profile, SystemParameters sysParams) {
-        this.profile = profile;
+    public SimulationParametersModel(User user, SystemParameters sysParams) {
+        this.user = user;
         this.sysParams = sysParams;
     }
     
     public void reset() {
-        this.setProfile(null);
+        this.setUser(null);
         this.setSysParams(null);
     }
 }

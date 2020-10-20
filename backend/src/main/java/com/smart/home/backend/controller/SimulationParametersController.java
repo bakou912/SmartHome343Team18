@@ -1,9 +1,9 @@
 package com.smart.home.backend.controller;
 
-import com.smart.home.backend.constant.Role;
+import com.smart.home.backend.constant.Profile;
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.simulationparameters.Profile;
+import com.smart.home.backend.model.simulationparameters.User;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
 import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@CrossOrigin
 @RestController
 public class SimulationParametersController {
     
@@ -39,7 +38,7 @@ public class SimulationParametersController {
     @PostMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> editSimulationParameters(@RequestBody EditParametersInput parameters){
         if (this.areParametersValid(parameters)){
-            this.getModel().setProfile(new Profile(parameters.getProfileInput().getRole()));
+            this.getModel().setUser(new User(parameters.getUserInput()));
             this.getModel().setSysParams(new SystemParameters(parameters.getParametersInput()));
             return new ResponseEntity<>(model, HttpStatus.OK);
         }
@@ -71,12 +70,12 @@ public class SimulationParametersController {
      * @return Validity of the parameters
      */
     private boolean areParametersValid(EditParametersInput parameters) {
-        Role role = parameters.getProfileInput().getRole();
+        Profile profile = parameters.getUserInput().getProfile();
         Double insideTemp = parameters.getParametersInput().getInsideTemp();
         Double outsideTemp = parameters.getParametersInput().getOutsideTemp();
         LocalDateTime date = parameters.getParametersInput().getDate();
         
-        return insideTemp != null && outsideTemp != null && role != null && date != null
+        return insideTemp != null && outsideTemp != null && profile != null && date != null
                 && insideTemp > -20 && insideTemp <= 30 && outsideTemp > -60 && outsideTemp < 50;
     }
 }

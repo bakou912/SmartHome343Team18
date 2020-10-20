@@ -33,7 +33,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-@CrossOrigin
 @RestController
 public class HouseLayoutController {
 	

@@ -122,8 +122,7 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Checks to see if the direction is available in room.
-	 * 
+	 * Checking if the direction is available in room.
 	 * @param room The room
 	 * @param direction direction of placement within room
 	 * @return True if that direction is available. False otherwise.
