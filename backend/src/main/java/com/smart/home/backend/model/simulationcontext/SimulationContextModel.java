@@ -129,7 +129,7 @@ public class SimulationContextModel implements BaseModel {
 			this.support.firePropertyChange("awayMode", this.awayMode, value);
 			this.setAwayMode(value);
 		}else{
-			System.out.println("Away mode is already actived.");
+			System.out.println("Away mode is already active.");
 		}
 	}
 
