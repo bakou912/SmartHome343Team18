@@ -2,7 +2,7 @@ import React from "react";
 import ParametersService from '../service/ParametersService';
 import "../style/SimulationParametersView.css";
 import HouseLayout from "./HouseLayout";
-import {Button, Container, Row, Col} from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import HouseLayoutService from "../service/HouseLayoutService";
 import Select from 'react-select'
 
@@ -11,18 +11,8 @@ export default class SimulationParameters extends React.Component {
     time = undefined;
     date = undefined;
     parametersInput = {};
-    userInput = {
-        profile: "PARENT",
-        name: null
-    };
     layoutKey = 0;
-
-    static profiles = [
-        { value: "PARENT", label: "Parent"},
-        { value: "CHILD", label: "Child"},
-        { value: "VISITOR", label: "Visitor"},
-        { value: "STRANGER", label: "Stranger"}
-    ]
+    profiles = {};
 
     constructor(props) {
         super(props);
@@ -33,7 +23,7 @@ export default class SimulationParameters extends React.Component {
                 dateTime: null
             },
             userInput: {
-                profile: "PARENT",
+                profile: "",
                 name: null
             },
             file: null,
@@ -59,6 +49,7 @@ export default class SimulationParameters extends React.Component {
             this.redirectToDashboard();
         }
 
+        this.profiles = await ParametersService.getProfiles();
         await this.getHouseLayout();
     }
 
@@ -79,7 +70,7 @@ export default class SimulationParameters extends React.Component {
         await this.setState({
             userInput: {
                 ...this.state.userInput,
-                profile: evt.value
+                profile: evt.value.name
             }
         });
     }
@@ -216,9 +207,9 @@ export default class SimulationParameters extends React.Component {
                                                                 control: provided => ({...provided, width: 200}),
                                                                 singleValue: provided => provided
                                                             }}
-                                                            options={SimulationParameters.profiles}
+                                                            options={this.profiles}
                                                             onChange={this.onSelectedProfile}
-                                                            defaultValue={SimulationParameters.profiles[0]}
+                                                            defaultValue={this.profiles[0]}
                                                     />
                                                 </Container>
                                                 <br/>

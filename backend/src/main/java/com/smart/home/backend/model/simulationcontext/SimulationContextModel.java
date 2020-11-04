@@ -7,6 +7,7 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 
@@ -26,6 +27,11 @@ public class SimulationContextModel implements BaseModel {
 	@JsonProperty("state")
 	private SimulationState state;
 	
+	/**
+	 * 2-parameter constructor.m
+	 * @param houseLayoutModel house layout model
+	 * @param simulationParametersModel simulation parameters model
+	 */
 	@Autowired
 	public SimulationContextModel(
 			HouseLayoutModel houseLayoutModel,
@@ -38,18 +44,16 @@ public class SimulationContextModel implements BaseModel {
  
 	 /**
 	  * Finds a person with the corresponding row, room and person ids.
-	  * @param rowId Row id
-	  * @param roomId Room id
-	  * @param personId Searched person's id
+	  * @param location person's location
 	  * @return Found person
 	  */
 	 @Nullable
-	 public Person findPerson(int rowId, int roomId, int personId) {
-		 Room foundRoom = this.getHouseLayoutModel().findRoom(rowId, roomId);
+	 public Person findPerson(RoomItemLocation location) {
+		 Room foundRoom = this.getHouseLayoutModel().findRoom(location);
 		 Person foundPerson = null;
 		
 		 if (foundRoom != null) {
-			 foundPerson = foundRoom.findPerson(personId);
+			 foundPerson = foundRoom.findPerson(location.getItemId());
 		 }
 		
 		 return foundPerson;
@@ -68,7 +72,6 @@ public class SimulationContextModel implements BaseModel {
 	 	return this.getState();
 	 }
 	
-	@Override
 	public void reset() {
 	 	this.setState(SimulationState.OFF);
 		this.getHouseLayoutModel().reset();

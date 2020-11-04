@@ -4,18 +4,21 @@ import {Container, Modal, Button, Col, Row} from "react-bootstrap";
 import SimulationContextService from "../service/SimulationContextService";
 import HouseLayoutService from "../service/HouseLayoutService";
 import Select from "react-select";
-import SimulationParameters from "./SimulationParameters";
+import ParametersService from "../service/ParametersService";
+import {EditUserProfiles} from "../component/EditUserProfiles";
 
 export default class SimulationContext extends React.Component {
 
     contextModel = {};
     dateTime = new Date();
+    profiles = {}
 
     constructor(props) {
         super(props);
+
         this.state = {
             loaded: false,
-            editing: false
+            editingParameters: false
         };
 
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -30,6 +33,7 @@ export default class SimulationContext extends React.Component {
 
     async componentDidMount() {
         this.contextModel = (await SimulationContextService.getContext()).data;
+        this.profiles = await ParametersService.getProfiles(this.contextModel.parameters.userProfiles.profiles);
 
         const date = new Date(this.contextModel.parameters.sysParams.date);
         this.dateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -88,7 +92,7 @@ export default class SimulationContext extends React.Component {
 
     async setModal(value) {
         await this.setState({
-            editing: value
+            editingParameters: value
         });
     }
 
@@ -111,7 +115,12 @@ export default class SimulationContext extends React.Component {
     }
 
     async saveEdit() {
-        await SimulationContextService.modifyUser(this.state.user);
+        const userInput = {
+            ...this.state.user,
+            profile: this.state.user.profile.name
+        }
+
+        await SimulationContextService.modifyUser(userInput);
         await SimulationContextService.modifySysParams({
             dateTime: this.state.date + "T" + this.state.time + (this.state.time.length === 5 ? ":00" : ""),
             outsideTemp: this.state.outsideTemp
@@ -128,7 +137,7 @@ export default class SimulationContext extends React.Component {
                 })
             })
             .catch(() => {
-                alert("Simulation statecould not be changed");
+                alert("Simulation state could not be changed");
             })
     }
 
@@ -148,7 +157,8 @@ export default class SimulationContext extends React.Component {
                             <br/>
                             {this.state.firstState.user.name}
                             <br/>
-                            ({this.state.firstState.user.profile})
+                            Profile: {`${this.state.firstState.user.profile.name} `}
+                            <EditUserProfiles profiles={this.profiles}/>
                             <br/>
                             <br/>
                             Location: {this.state.firstState.user.location.name}
@@ -160,71 +170,71 @@ export default class SimulationContext extends React.Component {
                             {this.dateTime.toDateString()}
                             <br/>
                             {this.state.firstState.time}
-                            <Modal show={this.state.editing} onHide={() => this.setModal(false)}>
+                            <br/>
+                            <br/>
+                            <Modal show={this.state.editingParameters} onHide={() => this.setModal(false)}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Simulation Context Editing</Modal.Title>
                                 </Modal.Header>
-                                <Modal.Body>
-                                    Name
-                                    <br/>
-                                    <input type="text" placeholder="User" maxLength="20" value={this.state.user.name} onChange={this.handleNameChange}/>
-                                    <br/>
-                                    <br/>
-                                    Profile
-                                    <Select
-                                        styles={{
-                                            option: provided => ({...provided, width: "100%"}),
-                                            menu: provided => ({...provided, width: "100%"}),
-                                            control: provided => ({...provided, width: "100%"}),
-                                            singleValue: provided => provided
-                                        }}
-                                        options={SimulationParameters.profiles}
-                                        onChange={this.onSelectedProfile}
-                                        defaultValue={SimulationParameters.profiles.filter(profile => profile.value === this.state.user.profile)}
-                                    />
-                                    <br/>
-                                    Location
-                                    <Select
-                                        styles={{
-                                            option: provided => ({...provided, width: "100%"}),
-                                            menu: provided => ({...provided, width: "100%"}),
-                                            control: provided => ({...provided, width: "100%"}),
-                                            singleValue: provided => provided
-                                        }}
-                                        options={this.state.rooms}
-                                        onChange={this.onSelectedLocation}
-                                        defaultValue={this.state.rooms.filter(room => room.label === this.state.user.location.name)}
-                                    />
-                                    <br/>
-                                    <label>Outside Temperature</label>
-                                    <br/>
-                                    <input name="outsideTemp" type="number" value={this.state.outsideTemp} onChange={this.tempChangeHandler} style={{width: "120px"}}/>
-                                    <br/>
-                                    <br/>
-                                    <Row>
-                                        <Col>
-                                            <label>Date</label>
-                                            <br/>
-                                            <input type="date" name="date" value={this.state.date} onChange={this.onDateSelected}/>
-                                        </Col>
-                                        <Col>
-                                            <label>Time</label>
-                                            <br/>
-                                            <input type="time" name="time" value={this.state.time} onChange={this.onTimeSelected}/>
-                                        </Col>
-                                    </Row>
-
+                                <Modal.Body style={{display: "flex", justifyContent: "center"}}>
+                                    <div>
+                                        Name
+                                        <br/>
+                                        <input type="text" placeholder="User" maxLength="20" value={this.state.user.name} onChange={this.handleNameChange}/>
+                                        <br/>
+                                        <br/>
+                                        Profile
+                                        <div className="SelectDiv">
+                                            <Select
+                                                styles={{
+                                                    option: provided => ({...provided, width: "100%"}),
+                                                    menu: provided => ({...provided, width: "100%"}),
+                                                    control: provided => ({...provided, width: "100%"}),
+                                                    singleValue: provided => provided
+                                                }}
+                                                options={this.profiles}
+                                                onChange={this.onSelectedProfile}
+                                                defaultValue={this.profiles.filter(profile => profile.value.name === this.state.user.profile.name)}
+                                            />
+                                        </div>
+                                        <br/>
+                                        Location
+                                        <div className="SelectDiv">
+                                            <Select
+                                                styles={{
+                                                    option: provided => ({...provided, width: "100%"}),
+                                                    menu: provided => ({...provided, width: "100%"}),
+                                                    control: provided => ({...provided, width: "100%"}),
+                                                    singleValue: provided => provided
+                                                }}
+                                                options={this.state.rooms}
+                                                onChange={this.onSelectedLocation}
+                                                defaultValue={this.state.rooms.filter(room => room.label === this.state.user.location.name)}
+                                            />
+                                        </div>
+                                        <br/>
+                                        <label>Outside Temperature</label>
+                                        <br/>
+                                        <input name="outsideTemp" type="number" value={this.state.outsideTemp} onChange={this.tempChangeHandler} style={{width: "120px"}}/>
+                                        <br/>
+                                        <br/>
+                                        <Row>
+                                            <Col>
+                                                <label>Date</label>
+                                                <br/>
+                                                <input type="date" name="date" value={this.state.date} onChange={this.onDateSelected}/>
+                                            </Col>
+                                            <Col>
+                                                <label>Time</label>
+                                                <br/>
+                                                <input type="time" name="time" value={this.state.time} onChange={this.onTimeSelected}/>
+                                            </Col>
+                                        </Row>
+                                    </div>
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <Button onClick={this.saveEdit}>Save</Button>
                                 </Modal.Footer>
-                            </Modal>
-                            <Modal
-                                isOpen={this.state.editing}
-                                contentLabel="Context editing"
-                                className="ContextEditModal"
-                                portalClassName="ContextEditModal"
-                            >
                             </Modal>
                         </div>
                         : null

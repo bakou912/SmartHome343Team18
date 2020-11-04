@@ -5,7 +5,7 @@ import SimulationContextService from "../../service/SimulationContextService";
 import Select from "react-select";
 import {Container, Button, Col, Row} from "react-bootstrap";
 
-export default class ContextModule extends React.Component {
+export default class SHCModule extends React.Component {
 
     constructor(props) {
         super(props);
