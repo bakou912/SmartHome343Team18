@@ -1,7 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.DoorInput;
-import com.smart.home.backend.input.LightInput;
 import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
@@ -29,7 +28,7 @@ public class Room extends ModelObject {
 	private String name;
 	@Setter
 	@Builder.Default
-	private List<Light> lights = new ArrayList<>();
+	private Light light = new Light();
 	@Setter
 	@Builder.Default
 	private List<Window> windows = new ArrayList<>();
@@ -40,23 +39,9 @@ public class Room extends ModelObject {
 	@Builder.Default
 	private List<Person> persons = new ArrayList<>();
 	
-	private final IdUtil lightId = new IdUtil();
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
 	private final IdUtil personId = new IdUtil();
-	/**
-	 * Finds a light with the corresponding id.
-	 * @param id Searched light's id
-	 * @return Found light
-	 */
-	@Nullable
-	public Light findLight(int id) {
-		return this.getLights()
-				.stream()
-				.filter(light -> light.getId() == id)
-				.findFirst()
-				.orElse(null);
-	}
 	
 	/**
 	 * Finds a door with the corresponding id.
@@ -124,19 +109,6 @@ public class Room extends ModelObject {
 						.direction(windowInput.getDirection())
 						.state(windowInput.getState())
 						.id(this.getWindowId().newId())
-						.build()
-		);
-	}
-	
-	/**
-	 * Adds a light to the light list
-	 * @param lightInput light input
-	 */
-	public void addLight(LightInput lightInput) {
-		this.getLights().add(
-				Light.builder()
-						.state(lightInput.getState())
-						.id(this.getLightId().newId())
 						.build()
 		);
 	}

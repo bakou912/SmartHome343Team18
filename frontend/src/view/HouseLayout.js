@@ -7,11 +7,12 @@ import WindowsFactory from "../service/factory/WindowsFactory";
 import LightsFactory from "../service/factory/LightsFactory";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Container } from "react-bootstrap";
+import PersonsFactory from "../service/factory/PersonsFactory";
 
 export default class HouseLayout extends React.Component {
 
-    layoutContainerDimensions = { width: 120, height: 60 }
-    roomDimensions = { width: 120, height: 60 }
+    layoutContainerDimensions = { width: 150, height: 75 }
+    roomDimensions = { width: 150, height: 75 }
 
     constructor(props) {
         super(props);
@@ -51,6 +52,7 @@ export default class HouseLayout extends React.Component {
         let doors = [];
         let lights = [];
         let windows = [];
+        let persons = [];
         let layoutHeight = this.layoutModel.rows.length * this.roomDimensions.height;
         let nbRoomsMax = 0;
 
@@ -75,6 +77,7 @@ export default class HouseLayout extends React.Component {
                 doors = doors.concat(DoorsFactory.create(room, startPosition, this.roomDimensions, i));
                 windows = windows.concat(WindowsFactory.create(room, startPosition, this.roomDimensions, i));
                 lights = lights.concat(LightsFactory.create(room, startPosition, this.roomDimensions, i));
+                persons = persons.concat(PersonsFactory.create(room, startPosition, this.roomDimensions, i));
 
                 if (j >= nbRoomsMax) {
                     nbRoomsMax++;
@@ -87,6 +90,7 @@ export default class HouseLayout extends React.Component {
             doors: doors,
             lights: lights,
             windows: windows,
+            persons: persons,
             layoutWidth: nbRoomsMax * this.roomDimensions.width,
             layoutHeight: layoutHeight,
             key: this.state.key + 1
@@ -104,6 +108,7 @@ export default class HouseLayout extends React.Component {
                                 {this.state.doors}
                                 {this.state.windows}
                                 {this.state.lights}
+                                {this.state.persons}
                             </g>
                         </svg>
                     </TransformComponent>

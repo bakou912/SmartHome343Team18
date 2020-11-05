@@ -26,6 +26,6 @@ public enum Profile {
      * @return Retrieved enum object
      */
     public static Profile get(String profileValue) {
-        return Arrays.stream(Profile.values()).filter(d -> d.getText().equals(profileValue)).findFirst().get();
+        return Arrays.stream(Profile.values()).filter(d -> d.getText().equals(profileValue)).findFirst().orElse(null);
     }
 }

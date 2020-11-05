@@ -34,7 +34,6 @@ class HouseLayoutControllerTest {
         assertNotNull(loadResponse.getBody());
         assertEquals( 3 , loadResponse.getBody().getRows().size());
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
-        assertEquals( 3 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
         assertEquals( 2 , loadResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
     }
 
@@ -45,7 +44,6 @@ class HouseLayoutControllerTest {
         assertNotNull(getResponse.getBody());
         assertEquals( 3 , getResponse.getBody().getRows().size());
         assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getDoors().size());
-        assertEquals( 3 , getResponse.getBody().getRows().get(0).getRooms().get(0).getLights().size());
         assertEquals( 2 , getResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
     }
 
@@ -64,7 +62,6 @@ class HouseLayoutControllerTest {
         for(String room : roomNames){
             RoomInput RoomInput = new RoomInput();
             RoomInput.setName(room);
-            RoomInput.setLights(3);
             
             List<Direction> doorDirections = new ArrayList<>();
             doorDirections.add(Direction.NORTH);

@@ -21,9 +21,6 @@ public class RoomInput {
 	@JsonProperty("windowsOn")
 	private List<Direction> windowsOn = new ArrayList<>();
 	
-	@JsonProperty("lights")
-	private Integer lights;
-	
 	@JsonProperty("doorsOn")
 	private List<Direction> doorsOn = new ArrayList<>();
 	

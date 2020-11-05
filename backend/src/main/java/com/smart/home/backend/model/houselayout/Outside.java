@@ -19,7 +19,6 @@ public class Outside {
 	
 	@NonNull
 	private List<Person> persons = new ArrayList<>();
-	
 	private final IdUtil personId = new IdUtil();
 	
 	/**

@@ -1,8 +1,12 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.constant.WindowState;
+import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
+import com.smart.home.backend.model.simulationparameters.location.Location;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
 import lombok.*;
 
 import java.beans.PropertyChangeListener;
@@ -19,7 +23,6 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
@@ -53,55 +56,33 @@ public class HouseLayoutModel implements BaseModel {
 	
 	/**
 	 * Finds a room with the corresponding row and room ids.
-	 * @param rowId Row's id
-	 * @param roomId Searched room's id
+	 * @param location row's location
 	 * @return Found room
 	 */
 	@Nullable
-	public Room findRoom(int rowId, int roomId) {
-		RoomRow foundRow = this.findRow(rowId);
+	public Room findRoom(Location location) {
+		RoomRow foundRow = this.findRow(location.getRowId());
 		Room foundRoom = null;
 		
 		if (foundRow != null) {
-			foundRoom = foundRow.findRoom(roomId);
+			foundRoom = foundRow.findRoom(location.getRoomId());
 		}
 		
 		return foundRoom;
 	}
 	
 	/**
-	 * Finds a light with the corresponding row, room and light ids.
-	 * @param rowId Row id
-	 * @param roomId Room id
-	 * @param lightId Searched light's id
-	 * @return Found light
-	 */
-	@Nullable
-	public Light findLight(int rowId, int roomId, int lightId) {
-		Room foundRoom = this.findRoom(rowId, roomId);
-		Light foundLight = null;
-		
-		if (foundRoom != null) {
-			foundLight = foundRoom.findLight(lightId);
-		}
-		
-		return foundLight;
-	}
-	
-	/**
 	 * Finds a door with the corresponding row, room and door ids.
-	 * @param rowId Row id
-	 * @param roomId Room id
-	 * @param doorId Searched door's id
+	 * @param location door's location
 	 * @return Found door
 	 */
 	@Nullable
-	public Door findDoor(int rowId, int roomId, int doorId) {
-		Room foundRoom = this.findRoom(rowId, roomId);
+	public Door findDoor(RoomItemLocation location) {
+		Room foundRoom = this.findRoom(location);
 		Door foundDoor = null;
 		
 		if (foundRoom != null) {
-			foundDoor = foundRoom.findDoor(doorId);
+			foundDoor = foundRoom.findDoor(location.getItemId());
 		}
 		
 		return foundDoor;
@@ -109,18 +90,16 @@ public class HouseLayoutModel implements BaseModel {
 	
 	/**
 	 * Finds a window with the corresponding row, room and window ids.
-	 * @param rowId Row id
-	 * @param roomId Room id
-	 * @param windowId Searched window's id
+	 * @param location window's location
 	 * @return Found window
 	 */
 	@Nullable
-	public Window findWindow(int rowId, int roomId, int windowId) {
-		Room foundRoom = this.findRoom(rowId, roomId);
+	public Window findWindow(RoomItemLocation location) {
+		Room foundRoom = this.findRoom(location);
 		Window foundWindow = null;
 		
 		if (foundRoom != null) {
-			foundWindow = foundRoom.findWindow(windowId);
+			foundWindow = foundRoom.findWindow(location.getItemId());
 		}
 		
 		return foundWindow;
@@ -135,7 +114,6 @@ public class HouseLayoutModel implements BaseModel {
 	public boolean isDirectionAvailable(Room room, Direction direction){
 		List<Direction> availableDirections = new ArrayList<>();
 		
-		//get direction for doors and windows
 		for (Door door : room.getDoors()) {
 			availableDirections.add(door.getDirection());
 		}
@@ -145,6 +123,33 @@ public class HouseLayoutModel implements BaseModel {
 		}
 		
 		return !availableDirections.contains(direction);
+	}
+	
+	/**
+	 * Modifies a Window.
+	 * @param windowInput window input
+	 * @return Modified window. Null if not found
+	 */
+	public Window modifyWindowState(WindowInput windowInput) {
+		RoomItemLocation location = windowInput.getLocation();
+		Window targetWindow = this.findWindow(location);
+		
+		if (targetWindow == null) {
+			return null;
+		}
+		
+		Direction direction = windowInput.getDirection();
+		WindowState state = windowInput.getState();
+		
+		if (direction != null) {
+			targetWindow.setDirection(direction);
+		}
+		
+		if (state != null) {
+			targetWindow.setState(state);
+		}
+		
+		return targetWindow;
 	}
 	
 	@Override

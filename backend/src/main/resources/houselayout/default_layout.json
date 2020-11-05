@@ -5,7 +5,6 @@
                 {
                     "name": "Living Room",
                     "windowsOn": ["W", "N"],
-                    "lights": 2,
                     "doorsOn": ["E"]
                 },
                 {
@@ -21,13 +20,11 @@
                 {
                     "name": "Bathroom",
                     "windowsOn": ["W"],
-                    "lights": 1,
                     "doorsOn": ["E"]
                 },
                 {
                     "name": "Bedroom",
                     "windowsOn": ["S"],
-                    "lights": 3,
                     "doorsOn": []
                 }
             ]
