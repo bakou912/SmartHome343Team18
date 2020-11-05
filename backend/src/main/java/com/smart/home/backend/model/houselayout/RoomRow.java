@@ -2,7 +2,6 @@ package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.service.mapper.DoorsMapper;
-import com.smart.home.backend.service.mapper.LightsMapper;
 import com.smart.home.backend.service.mapper.WindowsMapper;
 import com.smart.home.backend.service.util.IdUtil;
 import lombok.Getter;
@@ -46,7 +45,6 @@ public class RoomRow extends ModelObject {
 						.name(roomInput.getName())
 						.doors(DoorsMapper.map(roomInput.getDoorsOn()))
 						.windows(WindowsMapper.map(roomInput.getWindowsOn()))
-						.lights(LightsMapper.map(roomInput.getLights()))
 						.id(this.getRoomId().newId())
 						.build()
 		);

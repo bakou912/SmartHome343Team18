@@ -11,7 +11,6 @@ import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.houselayout.Light;
 import com.smart.home.backend.model.houselayout.RoomRow;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationparameters.location.Location;
@@ -89,41 +88,6 @@ public class HouseLayoutController {
 		this.getHouseLayoutModel().reset();
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	/**
-	 * Adding a light to a room.
-	 * @param location room's location
-	 * @param lightInput new light to add
-	 * @return Updated house layout with new light in room. returns null if the room or row cannot be found.
-	 */
-	@PostMapping("layout/rows/{rowId}/rooms/{roomId}/lights")
-	public ResponseEntity<HouseLayoutModel> addLight(Location location, @RequestBody LightInput lightInput) {
-		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
-		
-		if (targetRoom == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		targetRoom.addLight(lightInput);
-		
-		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
-	}
-
-	/**
-	 * Removing a light from a room.
-	 * @param location light's location
-	 * @return Updated house layout. returns null if the room, row or light does not exist
-	 */
-	@DeleteMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{itemId}")
-	public ResponseEntity<HouseLayoutModel> removeLight(RoomItemLocation location) {
-		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
-		
-		if (targetRoom == null || !targetRoom.getLights().removeIf(light -> light.getId().equals(location.getItemId()))) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-
-		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
-	}
 
 	/**
 	 * Changing a light's state.
@@ -132,16 +96,16 @@ public class HouseLayoutController {
 	 */
 	@PutMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{itemId}")
 	public ResponseEntity<HouseLayoutModel> setLayoutLight(RoomItemLocation location, @RequestBody LightInput lightInput) {
-		Light light = houseLayoutModel.findLight(location);
+		Room room = houseLayoutModel.findRoom(location);
 		
-		if (light == null) {
+		if (room == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
 		LightState lightState = lightInput.getState();
 		
 		if (lightState != null) {
-			light.setState(lightState);
+			room.getLight().setState(lightState);
 		}
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
