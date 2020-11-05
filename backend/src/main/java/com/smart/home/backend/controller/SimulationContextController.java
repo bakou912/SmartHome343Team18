@@ -128,7 +128,7 @@ public class SimulationContextController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		this.houseLayoutController.getHouseLayoutModel().updateDetectedPerson(true); //for now this should be fine. We can redo addPerson another time.
+		this.simulationContextModel.getHouseLayoutModel().updateDetectedPerson(true); //for now this should be fine. We can redo addPerson another time.
 
 		return new ResponseEntity<>(targetRoom.addPerson(personInput), HttpStatus.OK);
 	}
