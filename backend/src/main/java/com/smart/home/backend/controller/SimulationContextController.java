@@ -1,6 +1,5 @@
 package com.smart.home.backend.controller;
 
-
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.*;

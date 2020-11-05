@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Smart Home Security Controller
+ */
 @Getter
 @Setter
 @RestController
@@ -45,7 +48,7 @@ public class SmartHomeSecurityController {
 	}
 
 	/**
-	 * set duration for authorityTimer while on away mode
+	 * Set duration for authorityTimer while on away mode
 	 * @param duration
 	 * @return
 	 */

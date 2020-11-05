@@ -156,7 +156,7 @@ public class HouseLayoutModel implements BaseModel {
 
 
 	/**
-	 * add a PropertyChangeListener, essentially an observable due to deprecation
+	 * Add a PropertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
@@ -164,8 +164,7 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * remove a propertyChangeListner, essentially an observable due to deprecation
-	 * 
+	 * Remove a propertyChangeListner, essentially an observable due to deprecation
 	 * @param pcl
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
@@ -174,20 +173,20 @@ public class HouseLayoutModel implements BaseModel {
 	
 
 	/**
-	 * update all propteryChangeListeners of change in awayMode only if no one is home.
-	 * @param value
+	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
+	 * @param value activate or deactivate away mode
 	 */
 	public void updateAwayMode( Boolean detected){
 
 		for (RoomRow row: this.getRows()) {
 			for (Room room : row.getRooms()) {
-				if(room.getPersons().size()>0){
+				if (room.getPersons().size()>0) {
 					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
 				}
 			}
 		}
 
-		if( detected == false){
+		if (detected == false) {
 			System.out.println("Activating Away mode!");
 		}else{
 			System.out.println("Deactivating Away mode.");
@@ -196,8 +195,8 @@ public class HouseLayoutModel implements BaseModel {
 		this.support.firePropertyChange("awayMode", null, detected);
 	}
 	/**
-	 * update all propteryChangeListeners of change in DetectedPerson
-	 * @param value
+	 * Update all propteryChangeListeners of change in DetectedPerson
+	 * @param value alert if person was detected at home
 	 */
 	public void updateDetectedPerson(Boolean detected){
 		this.support.firePropertyChange("detectedPerson", null, detected);
@@ -205,7 +204,7 @@ public class HouseLayoutModel implements BaseModel {
 
 	/**
 	 * update duration of auhtoritiesTimer
-	 * @param duration
+	 * @param duration duration to alert authoratities
 	 */
 	public void updateAuthoritiesTimer(java.time.Duration duration){
 		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
