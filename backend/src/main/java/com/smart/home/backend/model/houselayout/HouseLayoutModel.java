@@ -71,23 +71,6 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Finds a light with the corresponding row, room and light ids.
-	 * @param location light's location
-	 * @return Found light
-	 */
-	@Nullable
-	public Light findLight(RoomItemLocation location) {
-		Room foundRoom = this.findRoom(location);
-		Light foundLight = null;
-		
-		if (foundRoom != null) {
-			foundLight = foundRoom.findLight(location.getItemId());
-		}
-		
-		return foundLight;
-	}
-	
-	/**
 	 * Finds a door with the corresponding row, room and door ids.
 	 * @param location door's location
 	 * @return Found door

@@ -104,6 +104,8 @@ export default class SHCModule extends React.Component {
             personUpdateKey: this.state.personUpdateKey + 1,
             addingPerson: false
         });
+
+        window.dispatchEvent(new Event("updateLayout"));
     }
 
     async handleNameChange(evt) {

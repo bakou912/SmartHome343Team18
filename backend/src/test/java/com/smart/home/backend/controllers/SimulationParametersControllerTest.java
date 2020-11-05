@@ -6,7 +6,9 @@ import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
 import com.smart.home.backend.input.UserInput;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.UserProfile;
 import com.smart.home.backend.model.simulationparameters.UserProfiles;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -48,6 +52,7 @@ class SimulationParametersControllerTest {
      */
     @Test
     void validInsideTempTest(){
+        when(userProfiles.get(PROFILE_NAME)).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
         ResponseEntity<SimulationParametersModel> editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(PROFILE_NAME, 23.5, 33.0, LocalDateTime.parse("2020-04-08T12:30")));
         assertNotNull(editSimulationParameters.getBody());
         assertEquals(23.5, editSimulationParameters.getBody().getSysParams().getInsideTemp());
@@ -87,6 +92,7 @@ class SimulationParametersControllerTest {
      */
     @Test
     void validOutsideTempTest(){
+        when(userProfiles.get(PROFILE_NAME)).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
         ResponseEntity<SimulationParametersModel> editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(PROFILE_NAME, 23.5, 33.6, LocalDateTime.parse("2020-04-08T12:30")));
         assertNotNull(editSimulationParameters.getBody());
         assertEquals(23.5, editSimulationParameters.getBody().getSysParams().getInsideTemp());
@@ -119,6 +125,7 @@ class SimulationParametersControllerTest {
      */
     @Test
     void validProfileTest(){
+        when(userProfiles.get("profile_name_valid")).thenReturn(new UserProfile("profile_name_valid", new ArrayList<>()));
         ResponseEntity<SimulationParametersModel> editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters("profile_name_valid", 23.5, 33.6, LocalDateTime.parse("2020-04-08T12:30")));
         assertNotNull(editSimulationParameters.getBody());
         assertEquals(23.5, editSimulationParameters.getBody().getSysParams().getInsideTemp());
@@ -141,6 +148,7 @@ class SimulationParametersControllerTest {
      */
     @Test
     void validDatesTest(){
+        when(userProfiles.get(PROFILE_NAME)).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
         ResponseEntity<SimulationParametersModel> editSimulationParameters = controller.editSimulationParameters(instantiateSimulationParameters(PROFILE_NAME, 23.5, 33.6, LocalDateTime.parse("2020-04-08T12:30")));
         assertNotNull(editSimulationParameters.getBody());
         assertEquals(23.5, editSimulationParameters.getBody().getSysParams().getInsideTemp());
@@ -194,6 +202,7 @@ class SimulationParametersControllerTest {
      */
     @Test
     void getSimulationParametersTest(){
+        when(userProfiles.get(PROFILE_NAME)).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
         controller.editSimulationParameters(instantiateSimulationParameters(PROFILE_NAME, 23.5, 33.0, LocalDateTime.parse("2020-04-08T12:30")));
         SimulationParametersModel simulationParametersModel = controller.getSimulationParameters().getBody();
         assertNotNull(simulationParametersModel);
@@ -209,8 +218,9 @@ class SimulationParametersControllerTest {
     EditParametersInput instantiateSimulationParameters(String profile, double insideTemp, double outsideTemp, LocalDateTime date){
         EditParametersInput parameters = Mockito.mock(EditParametersInput.class);
         UserInput userInput = new UserInput();
-        ParametersInput paramInput = new ParametersInput();
+        userInput.setLocation(new PersonLocation());
         userInput.setProfile(profile);
+        ParametersInput paramInput = new ParametersInput();
         paramInput.setInsideTemp(insideTemp);
         paramInput.setOutsideTemp(outsideTemp);
         paramInput.setDate(date);

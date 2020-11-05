@@ -45,6 +45,10 @@ public class SimulationParametersModel implements BaseModel {
         this.sysParams = sysParams;
     }
     
+    /**
+     * Edit the simulation parameters.
+     * @param parameters parameters input
+     */
     public void editModel(EditParametersInput parameters) {
         UserProfile profile = this.userProfiles.get(parameters.getUserInput().getProfile());
         this.setUser(new User(profile, parameters.getUserInput().getName(), parameters.getUserInput().getLocation()));
