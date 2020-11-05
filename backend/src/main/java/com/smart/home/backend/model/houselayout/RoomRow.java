@@ -5,7 +5,6 @@ import com.smart.home.backend.service.mapper.DoorsMapper;
 import com.smart.home.backend.service.mapper.LightsMapper;
 import com.smart.home.backend.service.mapper.WindowsMapper;
 import com.smart.home.backend.service.util.IdUtil;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

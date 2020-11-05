@@ -15,7 +15,7 @@ public class RoomItemLocation extends Location {
     private Integer itemId;
     
     public RoomItemLocation(Integer rowId, Integer roomId, Integer itemId) {
-        super(rowId, roomId);
+        super(rowId, roomId, false);
         this.itemId = itemId;
     }
 }

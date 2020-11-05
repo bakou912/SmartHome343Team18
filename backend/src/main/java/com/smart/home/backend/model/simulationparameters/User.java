@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.simulationparameters;
 
-import com.smart.home.backend.input.UserInput;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,18 +24,20 @@ public class User {
     public User(UserProfile profile, String name, PersonLocation location) {
         this.profile = profile;
         this.name = name;
-        this.location = location;
+        this.setLocation(location);
     }
     
     /**
-     * 1-parameter constructor.
-     * @param userInput user input
+     * Mutator for location
+     * @param location location value to be assigned
      */
-    public User(UserInput userInput) {
-        this(
-                new UserProfile(userInput.getProfile(), userInput.getCommandPermissions()),
-                userInput.getName(),
-                userInput.getLocation()
-        );
+    public void setLocation(PersonLocation location) {
+        if (location.getOutside() != null && (location.getOutside() || location.getName().equals("Outside"))) {
+            this.location.setOutside(true);
+        } else {
+            this.location = location;
+            this.location.setOutside(false);
+        }
     }
+    
 }

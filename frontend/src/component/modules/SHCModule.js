@@ -4,6 +4,8 @@ import HouseLayoutService from "../../service/HouseLayoutService";
 import SimulationContextService from "../../service/SimulationContextService";
 import Select from "react-select";
 import {Container, Button, Col, Row} from "react-bootstrap";
+import ParametersService from "../../service/ParametersService";
+import Command from "./Command";
 
 export default class SHCModule extends React.Component {
 
@@ -28,6 +30,7 @@ export default class SHCModule extends React.Component {
     async componentDidMount() {
         await this.setState({
             locations: await HouseLayoutService.getAllLocations(),
+            user: await ParametersService.getUser(),
             selectedLocation: null,
             selectedWindow: null,
             loaded: true
@@ -173,14 +176,18 @@ export default class SHCModule extends React.Component {
                                                     />
                                                     {
                                                         this.state.selectedWindow !== null ?
-                                                            <div>
+                                                            <Command
+                                                                name="Window obstruction"
+                                                                user={this.state.user}
+                                                                location={this.state.selectedLocation}
+                                                            >
                                                                 {
                                                                     this.state.selectedWindow.value.state === "BLOCKED" ?
                                                                         <Button onClick={() => this.blockWindow(false)} variant="secondary" size="sm">Unobstruct</Button>
                                                                         :
                                                                         <Button onClick={() => this.blockWindow(true)} variant="secondary" size="sm">Obstruct</Button>
                                                                 }
-                                                            </div>
+                                                            </Command>
                                                             : null
                                                     }
                                                 </Col>
@@ -215,7 +222,7 @@ export default class SHCModule extends React.Component {
                         : null
                 }
             </Container>
-        )
+        );
     }
 
 }

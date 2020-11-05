@@ -3,9 +3,10 @@ import {Image, Modal} from "react-bootstrap";
 import ParametersService from "../service/ParametersService";
 import Select from "react-select";
 
-export class EditUserProfiles extends React.Component{
+export class EditUserProfiles extends React.Component {
 
     foundPermission = false
+    modificationsMade = false
 
     constructor(props) {
         super(props);
@@ -66,6 +67,10 @@ export class EditUserProfiles extends React.Component{
     }
 
     hideReset() {
+        if (this.modificationsMade) {
+            return window.location.reload();
+        }
+
         this.setState({
             selectedProfile: null,
             selectedModule: null,
@@ -75,8 +80,9 @@ export class EditUserProfiles extends React.Component{
     }
 
     async onChangePermission(evt) {
+        this.modificationsMade = true;
+
         const restriction = evt.target.value;
-        console.log(evt.target.value)
 
         if (restriction === "REMOVE") {
             this.foundPermission = false;

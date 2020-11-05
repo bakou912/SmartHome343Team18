@@ -42,7 +42,7 @@ export default class Modules extends React.Component {
                 </div>
                 {this.modules.get(this.state.selectedTab)}
             </div>
-        )
+        );
     }
 
 }

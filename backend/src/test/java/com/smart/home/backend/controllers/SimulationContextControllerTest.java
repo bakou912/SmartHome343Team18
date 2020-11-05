@@ -188,9 +188,9 @@ class SimulationContextControllerTest {
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            assertEquals(0, simulationContextController.addPersonToRoom(new Location(0, 0), personInput).getBody());
-            assertEquals(1, simulationContextController.addPersonToRoom(new Location(0, 0), personInput).getBody());
-            assertEquals(2, simulationContextController.addPersonToRoom(new Location(0, 0), personInput).getBody());
+            assertEquals(0, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
         }
     
         /**
@@ -219,7 +219,7 @@ class SimulationContextControllerTest {
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new Location(0, 0), personInput);
+            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput);
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

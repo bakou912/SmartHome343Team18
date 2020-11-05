@@ -10,8 +10,9 @@ public abstract class AbstractCommand<X, Y, Z> implements Command<X, Y, Z> {
 	private final Boolean locationDependent;
 	
 	/**
-	 * 1-parameter constructor
+	 * 2-parameter constructor
 	 * @param name command name
+	 * @param locationDependent wether the command is dependent on location
 	 */
 	protected AbstractCommand(String name, Boolean locationDependent) {
 		this.name = name;
