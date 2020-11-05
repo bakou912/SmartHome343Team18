@@ -1,6 +1,5 @@
 package com.smart.home.backend.controller;
 
-import java.time.Duration;
 
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
@@ -11,7 +10,6 @@ import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.User;
-import com.smart.home.backend.model.smarthomesecurity.SmartHomeSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +27,11 @@ public class SimulationContextController {
 	
 	private SimulationContextModel simulationContextModel;
 	private HouseLayoutController houseLayoutController;
-	private SmartHomeSecurity smartHomeSecurity;
 
 	@Autowired
 	public SimulationContextController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
 		this.simulationContextModel = simulationContextModel;
 		this.houseLayoutController = houseLayoutController;
-		this.smartHomeSecurity = new SmartHomeSecurity();
-		this.simulationContextModel.addPropertyChangeListener(smartHomeSecurity);
 	}
 	
 	/**
@@ -137,9 +132,7 @@ public class SimulationContextController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		if(this.simulationContextModel.getAwayMode()==true){
-			this.simulationContextModel.updateDetectedPerson(true);
-		}
+		this.houseLayoutController.getHouseLayoutModel().updateDetectedPerson(true); //for now this should be fine. We can redo addPerson another time.
 
 		return new ResponseEntity<>(targetRoom.addPerson(personInput), HttpStatus.OK);
 	}
@@ -267,30 +260,5 @@ public class SimulationContextController {
 	}
 	
 
-	/**
-	 * activate or deactivate AwayMode
-	 * @param state
-	 * @return
-	 */
-	@PutMapping("context/SHP/awayMode/{state}")
-	public ResponseEntity<Boolean> setAwayMode(@PathVariable(value = "state") boolean state){
-
-		
-		this.simulationContextModel.updateAwayMode(state);
-		return new ResponseEntity<Boolean>(this.simulationContextModel.getAwayMode(), HttpStatus.OK);
-	}
-
-	/**
-	 * set duration for authorityTimer while on away mode
-	 * @param duration
-	 * @return
-	 */
-	@PutMapping("context/SHP/authoritiyTimer/{duraction}")
-	public ResponseEntity<Duration> setAuthorityTimerDuraction(@PathVariable(value="duration") Duration duration){
-		
-		//set authorityTimer of SHP module
-		this.simulationContextModel.updateAuthoritiesTimer(duration);
-		return new ResponseEntity<>(duration, HttpStatus.OK);
-	};
 	
 }

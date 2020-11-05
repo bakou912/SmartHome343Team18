@@ -5,6 +5,8 @@ import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import lombok.*;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,9 @@ public class HouseLayoutModel implements BaseModel {
 	private List<RoomRow> rows = new ArrayList<>();
 	private Outside outside = new Outside();
 	
+	private PropertyChangeSupport support; 
+
+
 	/**
 	 * Finds a row with the corresponding id.
 	 * @param id Searched row's id
@@ -146,5 +151,63 @@ public class HouseLayoutModel implements BaseModel {
 	public void reset() {
 		this.setRows(new ArrayList<>());
 		this.setOutside(new Outside());
+	}
+
+
+
+	/**
+	 * add a PropertyChangeListener, essentially an observable due to deprecation
+	 * @param pcl
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+	}
+	
+	/**
+	 * remove a propertyChangeListner, essentially an observable due to deprecation
+	 * 
+	 * @param pcl
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
+    }
+	
+
+	/**
+	 * update all propteryChangeListeners of change in awayMode only if no one is home.
+	 * @param value
+	 */
+	public void updateAwayMode( Boolean detected){
+
+		for (RoomRow row: this.getRows()) {
+			for (Room room : row.getRooms()) {
+				if(room.getPersons().size()>0){
+					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
+				}
+			}
+		}
+
+		if( detected == false){
+			System.out.println("Activating Away mode!");
+		}else{
+			System.out.println("Deactivating Away mode.");
+		}
+
+		this.support.firePropertyChange("awayMode", null, detected);
+	}
+	/**
+	 * update all propteryChangeListeners of change in DetectedPerson
+	 * @param value
+	 */
+	public void updateDetectedPerson(Boolean detected){
+		this.support.firePropertyChange("detectedPerson", null, detected);
+	}
+
+	/**
+	 * update duration of auhtoritiesTimer
+	 * @param duration
+	 */
+	public void updateAuthoritiesTimer(java.time.Duration duration){
+		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
 	}
 }

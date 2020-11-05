@@ -2,39 +2,32 @@ package com.smart.home.backend.model.smarthomesecurity;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.time.*;
-import java.util.Map;
+import java.time.Duration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.smart.home.backend.model.houselayout.Room;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+@AllArgsConstructor
 @Getter
 @Setter
-public class SmartHomeSecurity implements PropertyChangeListener {
-
-    private Boolean awayMode;
-    private Boolean personDetected;
+public class Security implements PropertyChangeListener{
+    
+    private Boolean awayMode; 
+	private Boolean personDetected;
     private Duration alertAuthoritiesTime;
-
-
-    public SmartHomeSecurity() {
-		this.awayMode = false;
-		this.personDetected = false;
-	}    
 
     /**
      * runs when one of the 3 properties have been updated in the SimulationContext's support object.
+     * 
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
         if(evt.getPropertyName().equals("awayMode")){
-            this.setAwayMode((Boolean) evt.getNewValue());
-            if (this.getAwayMode() == true){
+            if ((Boolean) evt.getNewValue() == true){
                 System.out.println("telling SHC to close all windows and lock all doors");
                 //TODO : call SHC to close all windows and lock all doors
             }
@@ -43,9 +36,9 @@ public class SmartHomeSecurity implements PropertyChangeListener {
                 this.sendNotification();
             }
         }else if(evt.getPropertyName().equals("alertAuthoritiesTime")){
+            System.out.println("Setting duration for alerting authorities");
             this.setAlertAuthoritiesTime((Duration) evt.getNewValue());
         }
-
     }
 
 
@@ -53,7 +46,7 @@ public class SmartHomeSecurity implements PropertyChangeListener {
      * set specific lights on
      * @param state
      */
-    public void setLightsDuringAway(Map<Room, Integer> lights){
+    public void setLightsDuringAway(){
         //TODO : tell SHC module to turn on specific lights in specific room using lightId
 
     }
@@ -62,29 +55,26 @@ public class SmartHomeSecurity implements PropertyChangeListener {
      * send notification of a person detected to the console and to authorities.
      */
     public void sendNotification(){
+        //TODO : send notification to console module
+        System.out.println("A Person was detected in the house while on away mode!");
+        System.out.println("Sending notification to output console.");
 
-        if(this.getAwayMode() == true){
-            //TODO : send notification to console module
-            System.out.println("A Person was detected in the house while on away mode!");
-            System.out.println("Sending notification to output console.");
-
-            
-            if(this.getAlertAuthoritiesTime() != null){
-                System.out.println("Alerting authorities in: "  + this.getAlertAuthoritiesTime().toString());
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask(){
-                    @Override
-                    public void run(){
+        if(this.getAlertAuthoritiesTime()!= null){
+            System.out.println("Alerting authorities in: "  + this.getAlertAuthoritiesTime().toString());
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask(){
+                @Override
+                public void run(){
+                    System.out.println("Alerting authorities"); 
                         System.out.println("Alerting authorities"); 
-                        //TODO: send police notification to console module
+                    System.out.println("Alerting authorities"); 
+                    //TODO: send police notification to console module
 
-                    }
-                }, this.getAlertAuthoritiesTime().getSeconds());
-            }
+                }
+            }, this.getAlertAuthoritiesTime().getSeconds());
         }
-    }
-    
-   
 
+        
+    }
 
 }
