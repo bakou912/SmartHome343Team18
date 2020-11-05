@@ -274,7 +274,6 @@ public class HouseLayoutController {
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}")
 	public ResponseEntity<Light> modifyLightState(RoomItemLocation location,@RequestBody Light light){
-		Logger logger = Logger.getLogger(HouseLayoutController.class.getName());
 		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
 		if(targetRoom == null){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
