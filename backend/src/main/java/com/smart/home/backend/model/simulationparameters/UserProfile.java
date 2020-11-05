@@ -12,10 +12,10 @@ import java.util.Objects;
  * User profile class that encapsulates user permissions.
  */
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserProfile {
 	
-	@Setter
 	private String name;
 	private List<CommandPermission> commandPermissions;
 	

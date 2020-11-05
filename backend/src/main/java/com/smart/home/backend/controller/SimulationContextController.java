@@ -211,7 +211,19 @@ public class SimulationContextController {
 		
 		return this.getChangeWindowStateResponse(location, unblockedWindowInput);
 	}
-	
+
+	/**
+	 * open a window
+	 * @param location window's location
+	 * @return Updated simulation context. returns null if window, room, or row does not exist.
+	 */
+	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/open")
+	public ResponseEntity<Window> openWindow(RoomItemLocation location) {
+		WindowInput unblockedWindowInput = new WindowInput();
+		unblockedWindowInput.setState(WindowState.OPEN);
+
+		return this.getChangeWindowStateResponse(location, unblockedWindowInput);
+	}
 	/**
 	 * Calling the window state changing method.
 	 * @param location window's location

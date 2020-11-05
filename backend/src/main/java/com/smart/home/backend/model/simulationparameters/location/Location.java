@@ -16,5 +16,6 @@ public class Location {
     
     private Integer rowId;
     private Integer roomId;
+    private Boolean outside;
     
 }

@@ -10,6 +10,10 @@ class ParametersService {
         return httpClient.get("parameters");
     }
 
+    async getUser() {
+        return (await httpClient.get("parameters")).data.user;
+    }
+
     async getModules() {
         return httpClient.get("parameters/modules");
     }

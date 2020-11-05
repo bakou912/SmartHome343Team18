@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 public class PersonLocation extends Location {
     
-    private String name;
+    private String name = "";
     
 }

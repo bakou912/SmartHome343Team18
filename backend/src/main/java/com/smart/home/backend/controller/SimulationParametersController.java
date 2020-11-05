@@ -38,8 +38,7 @@ public class SimulationParametersController {
     @PostMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> editSimulationParameters(@RequestBody EditParametersInput parameters){
         if (this.areParametersValid(parameters)){
-            this.getModel().setUser(new User(parameters.getUserInput()));
-            this.getModel().setSysParams(new SystemParameters(parameters.getParametersInput()));
+            this.getModel().editModel(parameters);
             return new ResponseEntity<>(model, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

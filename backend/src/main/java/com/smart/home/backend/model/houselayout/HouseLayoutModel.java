@@ -1,6 +1,8 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
+import com.smart.home.backend.input.LightInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
@@ -165,7 +167,6 @@ public class HouseLayoutModel implements BaseModel {
 		
 		return targetWindow;
 	}
-	
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());

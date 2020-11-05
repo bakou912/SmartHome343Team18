@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.simulationparameters;
 
+import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
@@ -42,6 +43,12 @@ public class SimulationParametersModel implements BaseModel {
     public SimulationParametersModel(User user, SystemParameters sysParams) {
         this.user = user;
         this.sysParams = sysParams;
+    }
+    
+    public void editModel(EditParametersInput parameters) {
+        UserProfile profile = this.userProfiles.get(parameters.getUserInput().getProfile());
+        this.setUser(new User(profile, parameters.getUserInput().getName(), parameters.getUserInput().getLocation()));
+        this.setSysParams(new SystemParameters(parameters.getParametersInput()));
     }
     
     public void reset() {

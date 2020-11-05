@@ -299,5 +299,22 @@ public class HouseLayoutController {
 		
 		return new ResponseEntity<>(modifiedWindow, HttpStatus.OK);
 	}
-	
+
+	/**
+	 * Changing a light's state
+	 * @param location light's location
+	 * @param lightInput light input
+	 * @return update light. returns null if light, room, or ro does not exist.
+	 */
+	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/light/{itemId}")
+	public ResponseEntity<Light> turnOnLight(RoomItemLocation location, @RequestBody LightInput lightInput){
+		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
+
+		if(targetRoom == null){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Light modifiedLight = targetRoom.findLight(0);
+		modifiedLight.setState(LightState.ON);
+		return new ResponseEntity<>(modifiedLight, HttpStatus.OK);
+	}
 }

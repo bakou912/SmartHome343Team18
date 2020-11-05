@@ -39,7 +39,10 @@ class SimulationContextService {
         const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
         return httpClient.put(path);
     }
-
+    async openWindow(rowId, roomId, windowId){
+      const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/open`
+      return httpClient.put(path);
+    }
     async modifyUser(userInput) {
         const path = `context/parameters/user`;
         return httpClient.put(path, userInput);
