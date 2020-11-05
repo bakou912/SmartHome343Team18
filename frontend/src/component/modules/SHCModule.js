@@ -3,8 +3,9 @@ import "../../style/Modules.css";
 import HouseLayoutService from "../../service/HouseLayoutService";
 import SimulationContextService from "../../service/SimulationContextService";
 import Select from "react-select";
-import {Container, Button, Col, Row} from "react-bootstrap";
+import {Container, Button, Col, Row, ListGroup} from "react-bootstrap";
 
+const ITEMS = ["Windows","Lights","Doors"];
 export default class SHCModule extends React.Component {
 
     constructor(props) {
@@ -23,6 +24,9 @@ export default class SHCModule extends React.Component {
         this.setEditing = this.setEditing.bind(this);
         this.addPerson = this.addPerson.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.ItemSelected = this.ItemSelected.bind(this);
+        this.openCloseWindow = this.openCloseWindow.bind(this);
+        this.onOffLight = this.onOffLight.bind(this);
     }
 
     async componentDidMount() {
@@ -39,7 +43,10 @@ export default class SHCModule extends React.Component {
             locations: await HouseLayoutService.getAllLocations(),
             selectedLocation: null,
             selectedWindow: null,
-            loaded: true
+            loaded: true,
+            selectedWindowItem: false,
+            selectedLigthItem: false,
+            selectedDoorItem: false
         });
 
         const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
@@ -104,7 +111,22 @@ export default class SHCModule extends React.Component {
             personName: evt.target.value
         });
     }
-
+    async openCloseWindow(open){
+      if (open){
+        console.log("Opening");
+      }
+      else{
+        console.log("Closing");
+      }
+    }
+    async onOffLight(on){
+      if (on){
+        console.log("turning On");
+      }
+      else{
+        console.log("Turning Off");
+      }
+    }
     async blockWindow(block) {
         if (block === true) {
             this.setState({
@@ -132,6 +154,34 @@ export default class SHCModule extends React.Component {
 
         window.dispatchEvent(new Event("updateLayout"));
     }
+    async ItemSelected(item){
+        switch (item) {
+          case "Windows":
+            console.log("here");
+            await this.setState({
+              selectedWindowItem: true,
+              selectedLigthItem: false,
+              selectedDoorItem: false,
+            })
+            break;
+          case "Lights":
+          await this.setState({
+            selectedWindowItem: false,
+            selectedLigthItem: true,
+            selectedDoorItem: false,
+          })
+            break;
+          case "Doors":
+          await this.setState({
+            selectedWindowItem: false,
+            selectedLigthItem: false,
+            selectedDoorItem: true,
+          })
+            break;
+          default:
+
+        }
+    }
 
     render() {
         return (
@@ -152,9 +202,22 @@ export default class SHCModule extends React.Component {
                                 onChange={this.onSelectedLocation}
                             />
                             <br/>
-                            <br/>
                             {
-                                this.state.selectedLocation !== null ?
+                              this.state.selectedLocation !== null ?
+                              <Row>
+                                <Col>
+                                  <ListGroup>
+                                    <h5 style={{textAlign:"center",color:"blue"}}>Item</h5>
+                                    {ITEMS.map((item) =>
+                                      <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.ItemSelected(item)} variant="dark">{item}</ListGroup.Item>
+                                    )}
+                                  </ListGroup>
+                                </Col>
+                              </Row>
+                              :null
+                            }
+                            {
+                                this.state.selectedLocation !==null && this.state.selectedWindowItem ?
                                     <Row>
                                         {
                                             this.state.selectedLocation.label !== "Outside" ?
@@ -179,6 +242,20 @@ export default class SHCModule extends React.Component {
                                                                         <Button onClick={() => this.blockWindow(false)} variant="secondary" size="sm">Unobstruct</Button>
                                                                         :
                                                                         <Button onClick={() => this.blockWindow(true)} variant="secondary" size="sm">Obstruct</Button>
+                                                                }
+                                                            </div>
+                                                            : null
+                                                    }
+                                                    {
+                                                        this.state.selectedWindow !== null ?
+                                                            <div>
+                                                                {
+                                                                    this.state.selectedWindow.value.state !== "BLOCKED" ?
+                                                                      this.state.selectedWindow.value.openState === "CLOSED"?
+                                                                        <Button onClick={() => this.openCloseWindow(true)} variant="secondary" size="sm">Open</Button>
+                                                                        :
+                                                                        <Button onClick={() => this.openCloseWindow(false)} variant="secondary" size="sm">Close</Button>
+                                                                      :null
                                                                 }
                                                             </div>
                                                             : null
@@ -211,6 +288,31 @@ export default class SHCModule extends React.Component {
                                     </Row>
                                     : null
                             }
+                            {
+                              this.state.selectedLocation !==null && this.state.selectedLigthItem ?
+                              <Row>
+                                <Col>
+                                  Ligths
+                                  {
+                                    true === true?
+                                    <div>
+                                      <Button onClick={() => this.onOffLight(true)} variant="secondary" size="md">On</Button>
+                                    </div>
+                                    :
+                                    <div>
+                                      <Button onClick={() => this.onOffLight(false)} variant="secondary" size="md">Off</Button>
+                                    </div>
+                                  }
+                                </Col>
+                                <Col>
+                                  <div style={{margin:"25px"}}>
+                                    <input type="checkbox" id="autoMode" name="autoMode" value="true"/>
+                                    <label for="autoMode">Enable Auto Mode</label>
+                                  </div>
+                                </Col>
+                            </Row>
+                            : null
+                          }
                         </div>
                         : null
                 }
