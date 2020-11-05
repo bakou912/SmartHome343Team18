@@ -23,17 +23,23 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Component
 public class HouseLayoutModel implements BaseModel {
 	
-	private List<RoomRow> rows = new ArrayList<>();
-	private Outside outside = new Outside();
+	private List<RoomRow> rows;
+	private Outside outside;
 	
-	private PropertyChangeSupport support; 
-
-
+	private PropertyChangeSupport support;
+	
+	/**
+	 * Default constructor.
+	 */
+	public HouseLayoutModel() {
+		this.rows = new ArrayList<>();
+		this.outside = new Outside();
+		this.support = new PropertyChangeSupport(this);
+	}
+	
 	/**
 	 * Finds a row with the corresponding id.
 	 * @param id Searched row's id
@@ -160,15 +166,15 @@ public class HouseLayoutModel implements BaseModel {
 
 	/**
 	 * Add a PropertyChangeListener, essentially an observable due to deprecation
-	 * @param pcl
+	 * @param pcl property change listener
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
         support.addPropertyChangeListener(pcl);
 	}
 	
 	/**
-	 * Remove a propertyChangeListner, essentially an observable due to deprecation
-	 * @param pcl
+	 * Remove a propertyChangeListener, essentially an observable due to deprecation
+	 * @param pcl property change listener
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
         support.removePropertyChangeListener(pcl);
@@ -176,32 +182,32 @@ public class HouseLayoutModel implements BaseModel {
 	
 	/**
 	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
-	 * @param value activate or deactivate away mode
+	 * @param activate wether to activate or deactivate away mode
 	 */
-	public void updateAwayMode( Boolean detected){
+	public void updateAwayMode(boolean activate){
 
 		for (RoomRow row: this.getRows()) {
 			for (Room room : row.getRooms()) {
-				if (room.getPersons().size()>0) {
+				if (!room.getPersons().isEmpty()) {
 					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
 				}
 			}
 		}
-
-		if (detected == false) {
-			System.out.println("Activating Away mode!");
-		}else{
+		
+		if(activate) {
 			System.out.println("Deactivating Away mode.");
+		} else {
+			System.out.println("Activating Away mode!");
 		}
-
-		this.support.firePropertyChange("awayMode", null, detected);
+		
+		this.support.firePropertyChange("awayMode", null, activate);
 	}
 	
 	/**
 	 * Update all propteryChangeListeners of change in DetectedPerson
-	 * @param value alert if person was detected at home
+	 * @param detected wether someone was detected or not
 	 */
-	public void updateDetectedPerson(Boolean detected){
+	public void updateDetectedPerson(boolean detected){
 		this.support.firePropertyChange("detectedPerson", null, detected);
 	}
 
