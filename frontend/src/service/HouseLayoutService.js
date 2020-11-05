@@ -39,6 +39,24 @@ class HouseLayoutService {
         return httpClient.delete("layout");
     }
 
+    async blockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/block`
+        return httpClient.put(path);
+    }
+
+    async unblockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
+        return httpClient.put(path);
+    }
+    async openWindow(rowId, roomId, windowId){
+      const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/open`
+      return httpClient.put(path);
+    }
+
+    async modifyLightState(rowId,roomId,ligth){
+      const path = `/layout/rows/${rowId}/rooms/${roomId}`
+      return httpClient.put(path);
+    }
 }
 
 export default new HouseLayoutService();

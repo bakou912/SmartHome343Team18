@@ -4,233 +4,268 @@ import HouseLayoutService from "../../service/HouseLayoutService";
 import SimulationContextService from "../../service/SimulationContextService";
 import Select from "react-select";
 
-import {Container, Button, Col, Row, ListGroup} from "react-bootstrap";
+import {
+	Container,
+	Button,
+	Col,
+	Row,
+	ListGroup
+} from "react-bootstrap";
 import ParametersService from "../../service/ParametersService";
 import Command from "./Command";
 
-const ITEMS = ["Windows","Lights","Doors", "Person"];
+const ITEMS = ["Windows", "Light", "Doors", "Person"];
 export default class SHCModule extends React.Component {
 
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        this.state = {
-            locations: [],
-            loaded: false,
-            addingPerson: false,
-            personUpdateKey: 0
-        };
+		this.state = {
+			locations: [],
+			loaded: false,
+			addingPerson: false,
+			personUpdateKey: 0
+		};
 
-        this.onSelectedLocation = this.onSelectedLocation.bind(this);
-        this.onSelectedWindow = this.onSelectedWindow.bind(this);
-        this.blockWindow = this.blockWindow.bind(this);
-        this.setEditing = this.setEditing.bind(this);
-        this.addPerson = this.addPerson.bind(this);
-        this.handleNameChange = this.handleNameChange.bind(this);
-        this.ItemSelected = this.ItemSelected.bind(this);
-        this.openCloseWindow = this.openCloseWindow.bind(this);
-        this.onOffLight = this.onOffLight.bind(this);
-        this.openCloseDoor = this.openCloseDoor.bind(this);
-        this.autoMode = this.autoMode.bind(this);
-    }
+		this.onSelectedLocation = this.onSelectedLocation.bind(this);
+		this.onSelectedWindow = this.onSelectedWindow.bind(this);
+		this.blockWindow = this.blockWindow.bind(this);
+		this.setEditing = this.setEditing.bind(this);
+		this.addPerson = this.addPerson.bind(this);
+		this.handleNameChange = this.handleNameChange.bind(this);
+		this.itemSelected = this.itemSelected.bind(this);
+		this.openCloseWindow = this.openCloseWindow.bind(this);
+		this.modifyLighttate = this.modifyLighttate.bind(this);
+		this.openCloseDoor = this.openCloseDoor.bind(this);
+		this.autoMode = this.autoMode.bind(this);
+	}
 
-    async componentDidMount() {
-        await this.setState({
-            locations: await HouseLayoutService.getAllLocations(),
-            user: await ParametersService.getUser(),
-            selectedLocation: null,
-            selectedWindow: null,
-            loaded: true
-        });
-    }
+	async componentDidMount() {
+		await this.setState({
+			locations: await HouseLayoutService.getAllLocations(),
+			user: await ParametersService.getUser(),
+			selectedLocation: null,
+			selectedWindow: null,
+			loaded: true
+		});
+	}
 
-    async onSelectedLocation(evt) {
-        await this.setState({
-            locations: await HouseLayoutService.getAllLocations(),
-            selectedLocation: null,
-            selectedWindow: null,
-            loaded: true,
-            selectedWindowItem: false,
-            selectedLigthItem: false,
-            selectedDoorItem: false
-        });
+	async onSelectedLocation(evt) {
+		await this.setState({
+			locations: await HouseLayoutService.getAllLocations(),
+			selectedLocation: null,
+			selectedWindow: null,
+			loaded: true,
+			selectedDoor: null,
+			selectedWindowItem: false,
+			selectedLigthItem: false,
+			selectedDoorItem: false
+		});
 
-        const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
-            return { value: w, label: w.direction };
-        });
+		const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
+			return {
+				value: w,
+				label: w.direction
+			};
+		});
 
-        await this.setState({
-            persons: evt.value.persons.map(p => {
-                return { value: p, label: p.name };
-            }),
-            windows: windows,
-            selectedLocation: { rowId: evt.value.rowId, roomId: evt.value.roomId, label: evt.label },
-            selectedWindow: null,
-            selectedPerson: null,
-            personName: ""
-        });
-    }
+		const doors = evt.label === "Outside" ? [] : evt.value.doors.map(w => {
+			return {
+				value: w,
+				label: w.direction
+			};
+		})
 
-    async onSelectedWindow(evt) {
-        await this.setState({
-            selectedWindow: evt
-        });
-    }
+		await this.setState({
+			persons: evt.value.persons.map(p => {
+				return {
+					value: p,
+					label: p.name
+				};
+			}),
+			windows: windows,
+			doors: doors,
+			selectedLocation: {
+				rowId: evt.value.rowId,
+				roomId: evt.value.roomId,
+				label: evt.label
+			},
+			selectedWindow: null,
+			selectedPerson: null,
+			personName: ""
+		});
+	}
 
-    async setEditing(value) {
-        await this.setState({
-            addingPerson: value
-        });
-    }
+	async onSelectedWindow(evt) {
+		await this.setState({
+			selectedWindow: evt
+		});
+	}
 
-    async addPerson() {
-        const id = this.state.selectedLocation.label === "Outside" ? (await SimulationContextService.addPersonOutside({ name:this.state.personName })).data
-                :
-                (await SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { name:this.state.personName })).data;
+	async setEditing(value) {
+		await this.setState({
+			addingPerson: value
+		});
+	}
 
-        const person = {
-            value: {
-                id: id,
-                name: this.state.personName
-            },
-            label: this.state.personName
-        };
+	async addPerson() {
+		const id = this.state.selectedLocation.label === "Outside" ? (await SimulationContextService.addPersonOutside({
+				name: this.state.personName
+			})).data :
+			(await SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, {
+				name: this.state.personName
+			})).data;
 
-        const updatedPersons = this.state.persons;
-        updatedPersons.push(person);
+		const person = {
+			value: {
+				id: id,
+				name: this.state.personName
+			},
+			label: this.state.personName
+		};
 
-        await this.setState({
-            persons: updatedPersons,
-            personUpdateKey: this.state.personUpdateKey + 1,
-            addingPerson: false
-        });
+		const updatedPersons = this.state.persons;
+		updatedPersons.push(person);
 
-        window.dispatchEvent(new Event("updateLayout"));
-    }
+		await this.setState({
+			persons: updatedPersons,
+			personUpdateKey: this.state.personUpdateKey + 1,
+			addingPerson: false
+		});
 
-    async handleNameChange(evt) {
-        const targetValue = evt.target.value;
+		window.dispatchEvent(new Event("updateLayout"));
+	}
 
-        if (targetValue.length > 20) {
-            return;
-        }
+	async handleNameChange(evt) {
+		const targetValue = evt.target.value;
 
-        await this.setState( {
-            personName: evt.target.value
-        });
-    }
-    async openCloseWindow(open){
-      var state = "";
-      if (open){
-        console.log("Opening");
-        state = "OPEN";
-        await SimulationContextService.openWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-      }
-      else{
-        console.log("Closing");
-        state = "CLOSED";
-        await SimulationContextService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-      }
-      this.setState({
-          selectedWindow: {
-              ...this.state.selectedWindow,
-              value: {
-                  ...this.state.selectedWindow.value,
-                  state: state
-              }
-          }
-      });
-    }
-    async onOffLight(on){
-      if (on){
-        console.log("turning On");
-      }
-      else{
-        console.log("Turning Off");
-      }
-    }
-    async openCloseDoor(open){
-      if (open){
-        console.log("Opening door");
-      }
-      else{
-        console.log("Closing door");
-      }
-    }
-    async autoMode(mode){
-      if(mode){
-        console.log("automode set");
-      }
-      else{
-        console.log("automode removed");
-      }
-    }
-    async blockWindow(block) {
-        if (block === true) {
-            this.setState({
-                selectedWindow: {
-                    ...this.state.selectedWindow,
-                    value: {
-                        ...this.state.selectedWindow.value,
-                        state: "BLOCKED"
-                    }
-                }
-            });
-            await SimulationContextService.blockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-        } else {
-            this.setState({
-                selectedWindow: {
-                    ...this.state.selectedWindow,
-                    value: {
-                        ...this.state.selectedWindow.value,
-                        state: "CLOSED"
-                    }
-                }
-            });
-            await SimulationContextService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-        }
+		if (targetValue.length > 20) {
+			return;
+		}
 
-        window.dispatchEvent(new Event("updateLayout"));
-    }
-    async ItemSelected(item){
-        switch (item) {
-          case "Windows":
-            console.log("here");
-            await this.setState({
-              selectedWindowItem: true,
-              selectedLigthItem: false,
-              selectedDoorItem: false,
-              selectedPersonItem: false,
-            })
-            break;
-          case "Lights":
-          await this.setState({
-            selectedWindowItem: false,
-            selectedLigthItem: true,
-            selectedDoorItem: false,
-            selectedPersonItem: false,
-          })
-            break;
-          case "Doors":
-          await this.setState({
-            selectedWindowItem: false,
-            selectedLigthItem: false,
-            selectedDoorItem: true,
-            selectedPersonItem: false,
-          })
-            break;
-          case "Person":
-          await this.setState({
-            selectedWindowItem: false,
-            selectedLigthItem: false,
-            selectedDoorItem: false,
-            selectedPersonItem: true,
-          })
-            break;
-          default:
+		await this.setState({
+			personName: evt.target.value
+		});
+	}
+	async openCloseWindow(open) {
+		let state = "";
+		if (open) {
+			console.log("Opening");
+			state = "OPEN";
+			await HouseLayoutService.openWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
+		} else {
+			console.log("Closing");
+			state = "CLOSED";
+			await HouseLayoutService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
+		}
+		this.setState({
+			selectedWindow: {
+				...this.state.selectedWindow,
+				value: {
+					...this.state.selectedWindow.value,
+					state: state
+				}
+			}
+		});
+		window.dispatchEvent(new Event("updateLayout"));
+	}
+	async modifyLighttate(Lighttate) {
+		console.log("heeere");
+		(await HouseLayoutService.modifyLighttate(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, {
+			state: Lighttate
+		}))
+		.then(async () => {
+			await this.setState({
+				selectedLocation: {
+					...this.state.selectedLocation,
+					light: {
+						state: Lighttate
+					}
+				}
+			});
+		});
+		window.dispatchEvent(new Event("updateLayout"));
+	}
+	async openCloseDoor(open) {
+		if (open) {
+			console.log("Opening door");
+		} else {
+			console.log("Closing door");
+		}
+	}
+	async autoMode(mode) {
+		if (mode) {
+			console.log("automode set");
+		} else {
+			console.log("automode removed");
+		}
+	}
+	async blockWindow(block) {
+		if (block === true) {
+			this.setState({
+				selectedWindow: {
+					...this.state.selectedWindow,
+					value: {
+						...this.state.selectedWindow.value,
+						state: "BLOCKED"
+					}
+				}
+			});
+			await HouseLayoutService.blockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
+		} else {
+			this.setState({
+				selectedWindow: {
+					...this.state.selectedWindow,
+					value: {
+						...this.state.selectedWindow.value,
+						state: "CLOSED"
+					}
+				}
+			});
+			await HouseLayoutService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
+		}
 
-        }
-    }
+		window.dispatchEvent(new Event("updateLayout"));
+	}
+	async itemSelected(item) {
+		switch (item) {
+			case "Windows":
+				console.log("here");
+				await this.setState({
+					selectedWindowItem: true,
+					selectedLigthItem: false,
+					selectedDoorItem: false,
+					selectedPersonItem: false,
+				})
+				break;
+			case "Light":
+				await this.setState({
+					selectedWindowItem: false,
+					selectedLigthItem: true,
+					selectedDoorItem: false,
+					selectedPersonItem: false,
+				})
+				break;
+			case "Doors":
+				await this.setState({
+					selectedWindowItem: false,
+					selectedLigthItem: false,
+					selectedDoorItem: true,
+					selectedPersonItem: false,
+				})
+				break;
+			case "Person":
+				await this.setState({
+					selectedWindowItem: false,
+					selectedLigthItem: false,
+					selectedDoorItem: false,
+					selectedPersonItem: true,
+				})
+				break;
+			default:
+
+		}
+	}
 
     render() {
         return (
@@ -260,12 +295,12 @@ export default class SHCModule extends React.Component {
                                     {
                                       this.state.selectedLocation.label !== "Outside"?
                                       ITEMS.map((item) =>
-                                          <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.ItemSelected(item)} variant="dark">{item}</ListGroup.Item>
+                                          <ListGroup.Item key="" className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.itemSelected(item)} variant="dark">{item}</ListGroup.Item>
                                       )
                                       :
                                       [
-                                        <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.ItemSelected("Lights")} variant="dark">Lights</ListGroup.Item>,
-                                        <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.ItemSelected("Person")} variant="dark">Person</ListGroup.Item>
+                                        <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.itemSelected("Light")} variant="dark">Light</ListGroup.Item>,
+                                        <ListGroup.Item className="ItemsTable" bsPrefix="list-group-item py-1" action onClick={()=>this.itemSelected("Person")} variant="dark">Person</ListGroup.Item>
                                       ]
                                     }
 
@@ -366,15 +401,15 @@ export default class SHCModule extends React.Component {
                               >
                                 <Row>
                                   <Col>
-                                    Ligths
+                                    Ligth
                                     {
-                                      true === true?
+                                      this.state.selectedLocation.light.state === "OFF"?
                                       <div>
-                                        <Button onClick={() => this.onOffLight(true)} variant="secondary" size="md">On</Button>
+                                        <Button onClick={() => this.modifyLighttate("ON")} variant="secondary" size="md">On</Button>
                                       </div>
                                       :
                                       <div>
-                                        <Button onClick={() => this.onOffLight(false)} variant="secondary" size="md">Off</Button>
+                                        <Button onClick={() => this.modifyLighttate("OFF")} variant="secondary" size="md">Off</Button>
                                       </div>
                                     }
                                   </Col>
@@ -401,6 +436,17 @@ export default class SHCModule extends React.Component {
                                   {
                                     true === true?
                                     <div>
+                                    <Select
+                                        styles={{
+                                            option: provided => ({...provided, width: "50%"}),
+                                            menu: provided => ({...provided, width: "50%"}),
+                                            control: provided => ({...provided, width: "50%"}),
+                                            singleValue: provided => provided
+                                        }}
+                                        options={this.state.doors}
+                                        value={this.state.selectedDoor}
+                                        onChange={this.onSelectedWindow}
+                                    />
                                       <Button onClick={() => this.openCloseDoor(true)} variant="secondary" size="md">Open</Button>
                                     </div>
                                     :

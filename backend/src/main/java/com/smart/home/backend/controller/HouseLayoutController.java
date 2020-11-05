@@ -9,6 +9,7 @@ import com.smart.home.backend.input.LightInput;
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.input.WindowInput;
+import com.smart.home.backend.model.houselayout.Light;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.RoomRow;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * House Layout Controller
@@ -267,18 +270,17 @@ public class HouseLayoutController {
 	/**
 	 * Changing a light's state
 	 * @param location light's location
-	 * @param lightInput light input
 	 * @return update light. returns null if light, room, or ro does not exist.
 	 */
-	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/light/{itemId}")
-	public ResponseEntity<Light> turnOnLight(RoomItemLocation location, @RequestBody LightInput lightInput){
+	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}")
+	public ResponseEntity<Light> modifyLightState(RoomItemLocation location,@RequestBody Light light){
+		Logger logger = Logger.getLogger(HouseLayoutController.class.getName());
 		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
-
 		if(targetRoom == null){
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		Light modifiedLight = targetRoom.findLight(0);
-		modifiedLight.setState(LightState.ON);
+		Light modifiedLight = targetRoom.getLight();
+		modifiedLight.setState(light.getState());
 		return new ResponseEntity<>(modifiedLight, HttpStatus.OK);
 	}
 }
