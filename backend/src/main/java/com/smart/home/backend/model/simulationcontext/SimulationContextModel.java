@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.simulationcontext;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.model.BaseModel;

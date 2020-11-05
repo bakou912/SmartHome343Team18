@@ -258,6 +258,4 @@ public class SimulationContextController {
 		return new ResponseEntity<>(layoutResponse.getBody(), HttpStatus.OK);
 	}
 	
-
-	
 }

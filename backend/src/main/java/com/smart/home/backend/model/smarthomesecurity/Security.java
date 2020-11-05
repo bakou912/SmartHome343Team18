@@ -33,16 +33,15 @@ public class Security implements PropertyChangeListener{
                 System.out.println("telling SHC to close all windows and lock all doors");
                 //TODO : call SHC to close all windows and lock all doors
             }
-        }else if (evt.getPropertyName().equals("personDetected")) {
+        } else if (evt.getPropertyName().equals("personDetected")) {
             if (evt.getNewValue().equals(true)) {
                 this.sendNotification();
             }
-        }else if (evt.getPropertyName().equals("alertAuthoritiesTime")) {
+        } else if (evt.getPropertyName().equals("alertAuthoritiesTime")) {
             System.out.println("Setting duration for alerting authorities");
             this.setAlertAuthoritiesTime((Duration) evt.getNewValue());
         }
     }
-
 
     /**
      * Set specific lights on

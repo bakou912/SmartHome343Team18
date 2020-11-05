@@ -153,8 +153,6 @@ public class HouseLayoutModel implements BaseModel {
 		this.setOutside(new Outside());
 	}
 
-
-
 	/**
 	 * Add a PropertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl
@@ -171,7 +169,6 @@ public class HouseLayoutModel implements BaseModel {
         support.removePropertyChangeListener(pcl);
     }
 	
-
 	/**
 	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
 	 * @param value activate or deactivate away mode
@@ -194,6 +191,7 @@ public class HouseLayoutModel implements BaseModel {
 
 		this.support.firePropertyChange("awayMode", null, detected);
 	}
+	
 	/**
 	 * Update all propteryChangeListeners of change in DetectedPerson
 	 * @param value alert if person was detected at home
