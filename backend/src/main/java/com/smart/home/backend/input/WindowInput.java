@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.WindowState;
 
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +17,6 @@ public class WindowInput {
 
     @JsonProperty("state")
     private WindowState state;
-
+    
+    private RoomItemLocation location;
 }

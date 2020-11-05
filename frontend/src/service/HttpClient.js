@@ -25,6 +25,7 @@ class HttpClient {
     async delete(path) {
         return this.client.delete(path);
     }
+
 }
 
 export default new HttpClient();

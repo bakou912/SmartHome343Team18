@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Parent",
+        "commandPermissions": []
+    },
+    {
+        "name": "Child",
+        "commandPermissions": [
+            {
+                "name": "Window obstruction",
+                "locationRestriction": "INSIDE"
+            }
+        ]
+    }
+]

@@ -25,3 +25,35 @@
   height: 500px;
 }
 
+.EditProfilesDiv {
+  display: inline-flex;
+}
+
+.EditProfilesButton {
+  border-radius: 0;
+  display: inline-flex;
+  background-color: #343a40;
+  padding: 2px;
+}
+
+.EditProfilesButton:hover {
+  background-color: #23272b;
+  cursor: pointer;
+}
+
+.DarkButton:hover {
+  box-shadow: 0 2px 4px 0 black, 0 2px 4px 0 black;
+}
+
+.EditIcon {
+  margin: auto;
+}
+
+.SelectDiv {
+  display: inline;
+  width: 200px;
+}
+
+.SelectDivLarger {
+  width: 300px;
+}

@@ -60,7 +60,7 @@ export default class Dashboard extends React.Component {
                             <Col className="ContextCol">
                                 <Container>
                                     <h2 className="SectionHeader ContextHeader">
-                                        Context
+                                        SHS
                                     </h2>
                                 </Container>
                                 <SimulationContext/>

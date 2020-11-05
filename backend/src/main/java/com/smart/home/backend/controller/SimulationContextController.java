@@ -9,6 +9,10 @@ import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.User;
+import com.smart.home.backend.model.simulationparameters.UserProfile;
+import com.smart.home.backend.model.simulationparameters.location.Location;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +29,10 @@ import lombok.Setter;
 public class SimulationContextController {
 	
 	private SimulationContextModel simulationContextModel;
-	private HouseLayoutController houseLayoutController;
 	
 	@Autowired
-	public SimulationContextController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
+	public SimulationContextController(SimulationContextModel simulationContextModel) {
 		this.simulationContextModel = simulationContextModel;
-		this.houseLayoutController = houseLayoutController;
 	}
 	
 	/**
@@ -71,7 +73,7 @@ public class SimulationContextController {
 			user.setName(userInput.getName());
 		}
 		if (userInput.getProfile() != null) {
-			user.setProfile(userInput.getProfile());
+			user.setProfile(new UserProfile(userInput.getProfile(), userInput.getCommandPermissions()));
 		}
 		
 		return new ResponseEntity<>(user, HttpStatus.OK);
@@ -115,17 +117,12 @@ public class SimulationContextController {
 	
 	/**
 	 * Adding a person to a room.
-	 * @param rowId  row number in house layout
-	 * @param roomId room number of row
+	 * @param location room's location
 	 * @return Person's id
 	 */
 	@PostMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons")
-	public ResponseEntity<Integer> addPersonToRoom(
-			@PathVariable(value = "rowId") int rowId,
-			@PathVariable(value = "roomId") int roomId,
-			@RequestBody PersonInput personInput
-	) {
-		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
+	public ResponseEntity<Integer> addPersonToRoom(Location location, @RequestBody PersonInput personInput) {
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
 		
 		if(targetRoom == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -146,19 +143,13 @@ public class SimulationContextController {
 	
 	/**
 	 * Modifying a person.
-	 * @param rowId row number in house layout
-	 * @param roomId room number in row
+	 * @param location person's location
 	 * @param personInput person input
 	 * @return Updated person. returns null if the room, row or person does not exist
 	 */
-	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{oldName}")
-	public ResponseEntity<Person> modifyPerson(
-			@PathVariable(value = "rowId") int rowId,
-			@PathVariable(value = "roomId") int roomId,
-			@PathVariable(value = "oldName") String oldName,
-			@RequestBody PersonInput personInput
-	) {
-		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
+	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{name}")
+	public ResponseEntity<Person> modifyPerson(PersonLocation location, @RequestBody PersonInput personInput) {
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
 		
 		if (targetRoom == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -166,7 +157,7 @@ public class SimulationContextController {
 		
 		Person foundPerson = targetRoom.getPersons()
 				.stream()
-				.filter(person -> person.getName().equals(oldName))
+				.filter(person -> person.getName().equals(location.getName()))
 				.findFirst()
 				.orElse(null);
 		
@@ -181,20 +172,14 @@ public class SimulationContextController {
 	
 	/**
 	 * Removing a person from a room.
-	 * @param rowId row number in house layout
-	 * @param roomId room number in row
-	 * @param personId person id
+	 * @param location person's location
 	 * @return updated house layout. returns null if the room, row or person does not exist
 	 */
-	@DeleteMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{personId}")
-	public ResponseEntity<SimulationContextModel> removePerson(
-			@PathVariable(value = "rowId") int rowId,
-			@PathVariable(value = "roomId") int roomId,
-			@PathVariable(value = "personId") int personId
-	) {
-		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(rowId, roomId);
+	@DeleteMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{itemId}")
+	public ResponseEntity<SimulationContextModel> removePerson(RoomItemLocation location) {
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
 		
-		if (targetRoom == null || !targetRoom.getPersons().removeIf(person -> person.getId() == personId)) {
+		if (targetRoom == null || !targetRoom.getPersons().removeIf(person -> person.getId().equals(location.getItemId()))) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -203,57 +188,44 @@ public class SimulationContextController {
         
     /**
      * Blocking a window.
-     * @param rowId row number
-     * @param roomId room number
-     * @param windowId id of window
+     * @param location window's location
      * @return Updated simulation context. returns null if window, room, or row does not exist.
     */
-    @PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}/block")
-    public ResponseEntity<Window> blockWindow(
-    		@PathVariable(value = "rowId") int rowId,
-			@PathVariable(value = "roomId") int roomId,
-			@PathVariable(value = "windowId") int windowId
-	) {
+    @PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/block")
+    public ResponseEntity<Window> blockWindow(RoomItemLocation location) {
     	WindowInput blockedWindowInput = new WindowInput();
 		blockedWindowInput.setState(WindowState.BLOCKED);
 	
-		return this.getChangeWindowStateResponse(rowId, roomId, windowId, blockedWindowInput);
+		return this.getChangeWindowStateResponse(location, blockedWindowInput);
 	}
 	
 	/**
 	 * Unlocking a window.
-	 * @param rowId row number
-	 * @param roomId room number
-	 * @param windowId id of window
+	 * @param location window's location
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
-	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{windowId}/unblock")
-	public ResponseEntity<Window> unBlockWindow(
-			@PathVariable(value = "rowId") int rowId,
-			@PathVariable(value = "roomId") int roomId,
-			@PathVariable(value = "windowId") int windowId
-	) {
+	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/unblock")
+	public ResponseEntity<Window> unBlockWindow(RoomItemLocation location) {
 		WindowInput unblockedWindowInput = new WindowInput();
 		unblockedWindowInput.setState(WindowState.CLOSED);
 		
-		return this.getChangeWindowStateResponse(rowId, roomId, windowId, unblockedWindowInput);
+		return this.getChangeWindowStateResponse(location, unblockedWindowInput);
 	}
 	
 	/**
 	 * Calling the window state changing method.
-	 * @param rowId row number
-	 * @param roomId room number
-	 * @param windowId id of window
+	 * @param location window's location
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
-	private ResponseEntity<Window> getChangeWindowStateResponse(int rowId, int roomId, int windowId, WindowInput windowInput) {
-		ResponseEntity<Window> layoutResponse = this.getHouseLayoutController().changeWindowState(rowId, roomId, windowId, windowInput);
+	private ResponseEntity<Window> getChangeWindowStateResponse(RoomItemLocation location, WindowInput windowInput) {
+		windowInput.setLocation(location);
+		Window modifyWindow = this.getSimulationContextModel().getHouseLayoutModel().modifyWindowState(windowInput);
 		
-		if (!layoutResponse.getStatusCode().equals(HttpStatus.OK)) {
-			return new ResponseEntity<>(layoutResponse.getStatusCode());
+		if (modifyWindow == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		return new ResponseEntity<>(layoutResponse.getBody(), HttpStatus.OK);
+		return new ResponseEntity<>(modifyWindow, HttpStatus.OK);
 	}
 	
 }
