@@ -21,19 +21,6 @@ public enum DoorState {
 		this.text = text;
 	}
 	
-	/**
-	 * Retrieves the enum object paired to a value.
-	 * @param stateValue state value
-	 * @return Retrieved enum object
-	 */
-	@JsonCreator
-	public static DoorState get(String stateValue) {
-		return Arrays.stream(DoorState.values())
-				.filter(d -> d.getText().equals(stateValue))
-				.findFirst()
-				.orElse(null);
-	}
-	
 	@Override
 	public String toString() {
 		return text;

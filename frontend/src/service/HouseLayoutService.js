@@ -48,20 +48,23 @@ class HouseLayoutService {
         const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
         return httpClient.put(path);
     }
-    async openWindow(rowId, roomId, windowId){
+
+    async openWindow(rowId, roomId, windowId) {
       const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/open`
       return httpClient.put(path);
     }
 
-    async modifyLightState(rowId, roomId, light){
+    async modifyLightState(rowId, roomId, light) {
         const path = `/layout/rows/${rowId}/rooms/${roomId}`
         return httpClient.put(path, light);
     }
 
-	async changeDoorState(rowId, roomId, doorId){
+	async changeDoorState(rowId, roomId, doorId, door) {
+        console.log(door)
 		const path = `/layout/rows/${rowId}/rooms/${roomId}/doors/${doorId}`
-		return httpClient.put(path);
+		return httpClient.put(path, door);
 	}
+
 }
 
 export default new HouseLayoutService();

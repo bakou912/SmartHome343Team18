@@ -6,9 +6,12 @@ import com.smart.home.backend.model.houselayout.Person;
 import org.springframework.http.ResponseEntity;
 
 public class PersonManagementCommand extends AbstractCommand<HouseLayoutModel, PersonInput, Person> {
-
+    
+    /**
+     * Default Constructor
+     */
     public PersonManagementCommand() {
-        super("Person Management", true);
+        super("Person management", true);
     }
 
     @Override

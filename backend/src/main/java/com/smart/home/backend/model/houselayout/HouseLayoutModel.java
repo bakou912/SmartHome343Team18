@@ -1,8 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
-import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
-import com.smart.home.backend.input.LightInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
@@ -15,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 

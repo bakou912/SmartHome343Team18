@@ -7,7 +7,7 @@ import {Container, Button, Col, Row, ListGroup} from "react-bootstrap";
 import ParametersService from "../../service/ParametersService";
 import Command from "./Command";
 
-const ITEMS = ["Windows", "Light", "Doors", "Person"];
+const ITEMS = ["Window", "Light", "Door", "Person"];
 export default class SHCModule extends React.Component {
 
     constructor(props) {
@@ -21,7 +21,6 @@ export default class SHCModule extends React.Component {
         };
 
         this.onSelectedLocation = this.onSelectedLocation.bind(this);
-        this.onSelectedWindow = this.onSelectedWindow.bind(this);
         this.blockWindow = this.blockWindow.bind(this);
         this.setEditing = this.setEditing.bind(this);
         this.addPerson = this.addPerson.bind(this);
@@ -31,7 +30,7 @@ export default class SHCModule extends React.Component {
         this.modifyLightState = this.modifyLightState.bind(this);
         this.openCloseDoor = this.openCloseDoor.bind(this);
         this.autoMode = this.autoMode.bind(this);
-		this.onSelectedDoor = this.onSelectedDoor.bind(this);
+		this.onSelectedItem = this.onSelectedItem.bind(this);
     }
 
     async componentDidMount() {
@@ -50,8 +49,8 @@ export default class SHCModule extends React.Component {
             locations: await HouseLayoutService.getAllLocations(),
             selectedLocation: null,
             selectedWindow: null,
-            loaded: true,
             selectedDoor: null,
+            loaded: true,
             selectedWindowItem: false,
             selectedLightItem: false,
             selectedDoorItem: false
@@ -64,16 +63,20 @@ export default class SHCModule extends React.Component {
             };
         });
 
-        const doors = evt.label === "Outside" ? [] : evt.value.doors.map(w => {
+        const doors = evt.label === "Outside" ? [] : evt.value.doors.map(d => {
             return {
-                value: w,
-                label: w.direction
+                value: d,
+                label: d.direction
             };
         })
 
-		console.log(evt.value)
-
         await this.setState({
+            selectedLocation: {
+                light: evt.value.light,
+                rowId: evt.value.rowId,
+                roomId: evt.value.roomId,
+                label: evt.label
+            },
             persons: evt.value.persons.map(p => {
                 return {
                     value: p,
@@ -82,12 +85,6 @@ export default class SHCModule extends React.Component {
             }),
             windows: windows,
             doors: doors,
-            selectedLocation: {
-            	light: evt.value.light,
-                rowId: evt.value.rowId,
-                roomId: evt.value.roomId,
-                label: evt.label
-            },
             selectedWindow: null,
             selectedPerson: null,
 			selectedDoor: null,
@@ -95,16 +92,12 @@ export default class SHCModule extends React.Component {
         });
     }
 
-    async onSelectedWindow(evt) {
+    async onSelectedItem(item, evt) {
         await this.setState({
-            selectedWindow: evt
+            [`selected${item}`]: evt
         });
     }
-	async onSelectedDoor(evt) {
-        await this.setState({
-            selectedDoor: evt
-        });
-    }
+
     async setEditing(value) {
         await this.setState({
             addingPerson: value
@@ -151,15 +144,10 @@ export default class SHCModule extends React.Component {
         });
     }
 
-    async openCloseWindow(open) {
-        let state = "";
-        if (open) {
-            console.log("Opening");
-            state = "OPEN";
+    async openCloseWindow(windowState) {
+        if (windowState === "OPEN") {
             await HouseLayoutService.openWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
         } else {
-            console.log("Closing");
-            state = "CLOSED";
             await HouseLayoutService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
         }
         this.setState({
@@ -167,7 +155,7 @@ export default class SHCModule extends React.Component {
                 ...this.state.selectedWindow,
                 value: {
                     ...this.state.selectedWindow.value,
-                    state: state
+                    state: windowState
                 }
             }
         });
@@ -175,9 +163,7 @@ export default class SHCModule extends React.Component {
     }
 
     async modifyLightState(lightState) {
-        await HouseLayoutService.modifyLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, {
-            state: lightState
-        })
+        await HouseLayoutService.modifyLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { state: lightState })
         .then(async () => {
             await this.setState({
                 selectedLocation: {
@@ -192,9 +178,14 @@ export default class SHCModule extends React.Component {
     }
 
     async openCloseDoor(doorState) {
-        await HouseLayoutService.changeDoorState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId,this.state.selectedDoor.value.id)
+        await HouseLayoutService.changeDoorState(
+            this.state.selectedLocation.rowId,
+            this.state.selectedLocation.roomId,
+            this.state.selectedDoor.value.id,
+            { state: doorState }
+        )
 		.then(async () => {
-			this.setState({
+			await this.setState({
 	            selectedDoor: {
 	                ...this.state.selectedDoor,
 	                value: {
@@ -204,6 +195,7 @@ export default class SHCModule extends React.Component {
 	            }
 	        });
 		});
+
 		window.dispatchEvent(new Event("updateLayout"));
     }
 
@@ -244,43 +236,16 @@ export default class SHCModule extends React.Component {
     }
 
     async itemSelected(item) {
-        switch (item) {
-            case "Windows":
-                console.log("here");
-                await this.setState({
-                    selectedWindowItem: true,
-                    selectedLightItem: false,
-                    selectedDoorItem: false,
-                    selectedPersonItem: false,
-                })
-                break;
-            case "Light":
-                await this.setState({
-                    selectedWindowItem: false,
-					selectedLightItem: true,
-                    selectedDoorItem: false,
-                    selectedPersonItem: false,
-                })
-                break;
-            case "Doors":
-                await this.setState({
-                    selectedWindowItem: false,
-					selectedLightItem: false,
-                    selectedDoorItem: true,
-                    selectedPersonItem: false,
-                })
-                break;
-            case "Person":
-                await this.setState({
-                    selectedWindowItem: false,
-                    selectedLightItem: false,
-                    selectedDoorItem: false,
-                    selectedPersonItem: true,
-                })
-                break;
-            default:
-
+        const state = {
+            selectedWindowItem: false,
+            selectedLightItem: false,
+            selectedDoorItem: false,
+            selectedPersonItem: false,
         }
+
+        state[`selected${item}Item`] = true;
+
+        await this.setState(state)
     }
 
     render() {
@@ -348,7 +313,7 @@ export default class SHCModule extends React.Component {
 																	}}
 																	options={this.state.windows}
 																	value={this.state.selectedWindow}
-																	onChange={this.onSelectedWindow}
+																	onChange={(evt) => this.onSelectedItem("Window", evt)}
 																/>
 																{
 																	this.state.selectedWindow !== null ?
@@ -367,22 +332,26 @@ export default class SHCModule extends React.Component {
 																							variant="secondary"
 																							size="sm">Obstruct</Button>
 																			}
-																			<div>
-																				{
-																					this.state.selectedWindow.value.state !== "BLOCKED" ?
-																						this.state.selectedWindow.value.state === "CLOSED" ?
-																							<Button
-																								onClick={() => this.openCloseWindow(true)}
-																								variant="secondary"
-																								size="sm">Open</Button>
-																							:
-																							<Button
-																								onClick={() => this.openCloseWindow(false)}
-																								variant="secondary"
-																								size="sm">Close</Button>
-																						: null
-																				}
-																			</div>
+                                                                            <Command
+                                                                                name="Window management"
+                                                                                user={this.state.user}
+                                                                                location={this.state.selectedLocation}
+                                                                            >
+                                                                                {
+                                                                                    this.state.selectedWindow.value.state !== "BLOCKED" ?
+                                                                                        this.state.selectedWindow.value.state === "CLOSED" ?
+                                                                                            <Button
+                                                                                                onClick={() => this.openCloseWindow("OPEN")}
+                                                                                                variant="secondary"
+                                                                                                size="sm">Open</Button>
+                                                                                            :
+                                                                                            <Button
+                                                                                                onClick={() => this.openCloseWindow("CLOSED")}
+                                                                                                variant="secondary"
+                                                                                                size="sm">Close</Button>
+                                                                                        : null
+                                                                                }
+                                                                            </Command>
 																		</Command>
 																		: null
 																}
@@ -418,7 +387,7 @@ export default class SHCModule extends React.Component {
 																</div>
 																:
 																<Command
-																	name="Person Management"
+																	name="Person management"
 																	user={this.state.user}
 																	location={this.state.selectedLocation}
 																>
@@ -466,44 +435,54 @@ export default class SHCModule extends React.Component {
 												</Command>
 												: null
 										}
-										{
-											this.state.selectedDoorItem ?
-												<Command
-													name="Door Management"
-													user={this.state.user}
-													location={this.state.selectedLocation}
-												>
-													<Row>
-														<Col>
-															Doors
-															{
-																"CLOSED" === "CLOSED" ?
-																	<div>
-																		<Select
-																			styles={{
-																				option: provided => ({...provided, width: "50%"}),
-																				menu: provided => ({...provided, width: "50%"}),
-																				control: provided => ({...provided, width: "50%"}),
-																				singleValue: provided => provided
-																			}}
-																			options={this.state.doors}
-																			value={this.state.selectedDoor}
-																			onChange={this.onSelectedDoor}
-																		/>
-																		<Button onClick={() => this.openCloseDoor("OPEN")}
-																				variant="secondary" size="md">Open</Button>
-																	</div>
-																	:
-																	<div>
-																		<Button onClick={() => this.openCloseDoor("CLOSED")}
-																				variant="secondary" size="md">Close</Button>
-																	</div>
-															}
-														</Col>
-													</Row>
-												</Command>
-												: null
-										}
+                                        {
+                                            this.state.selectedDoorItem ?
+                                                <Row>
+                                                    {
+                                                        this.state.selectedLocation.label !== "Outside" ?
+                                                            <Col>
+                                                                Doors
+                                                                <Select
+                                                                    styles={{
+                                                                        option: provided => ({...provided, width: "50%"}),
+                                                                        menu: provided => ({...provided, width: "50%"}),
+                                                                        control: provided => ({...provided, width: "50%"}),
+                                                                        singleValue: provided => provided
+                                                                    }}
+                                                                    options={this.state.doors}
+                                                                    value={this.state.selectedDoor}
+                                                                    onChange={(evt) => this.onSelectedItem("Door", evt)}
+                                                                />
+                                                                {
+                                                                    this.state.selectedDoor !== null ?
+                                                                        <Command
+                                                                            name="Door management"
+                                                                            user={this.state.user}
+                                                                            location={this.state.selectedLocation}
+                                                                        >
+                                                                            {
+                                                                                this.state.selectedDoor.value.state !== "LOCKED" ?
+                                                                                    this.state.selectedDoor.value.state === "CLOSED" ?
+                                                                                        <Button
+                                                                                            onClick={() => this.openCloseDoor("OPEN")}
+                                                                                            variant="secondary"
+                                                                                            size="sm">Open</Button>
+                                                                                        :
+                                                                                        <Button
+                                                                                            onClick={() => this.openCloseDoor("CLOSED")}
+                                                                                            variant="secondary"
+                                                                                            size="sm">Close</Button>
+                                                                                    : null
+                                                                            }
+                                                                        </Command>
+                                                                        : null
+                                                                }
+                                                            </Col>
+                                                            : null
+                                                    }
+                                                </Row>
+                                                : null
+                                        }
 									</Container>
                                     : null
                             }

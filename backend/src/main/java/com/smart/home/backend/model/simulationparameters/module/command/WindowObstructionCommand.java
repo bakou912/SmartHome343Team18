@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 
 public class WindowObstructionCommand extends AbstractCommand<HouseLayoutModel, WindowInput, Window> {
 	
+	/**
+	 * Default Constructor
+	 */
 	public WindowObstructionCommand() {
 		super("Window obstruction", true);
 	}

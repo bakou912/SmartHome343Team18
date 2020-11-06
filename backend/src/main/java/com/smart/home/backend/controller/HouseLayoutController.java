@@ -3,7 +3,6 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.constant.LightState;
-import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.LightInput;
@@ -190,7 +189,7 @@ public class HouseLayoutController {
 	/**
 	 * Changing a door's state.
 	 * @param location door's location
-	 * @return Updated houseLayout. returns null if door, room, row does not exist/
+	 * @return Updated houseLayout. returns null if door, room, row does not exist
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/doors/{itemId}")
 	public ResponseEntity<HouseLayoutModel> changeDoorState(RoomItemLocation location, @RequestBody DoorInput doorInput) {
@@ -210,7 +209,6 @@ public class HouseLayoutController {
 		if (state != null) {
 			targetDoor.setState(state);
 		}
-		
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
