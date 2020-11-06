@@ -29,7 +29,7 @@ class SimulationContextService {
         const path = `context/layout/rows/${rowId}/rooms/${roomId}/persons/${personId}`
         return httpClient.delete(path);
     }
-    
+
     async modifyUser(userInput) {
         const path = `context/parameters/user`;
         return httpClient.put(path, userInput);
