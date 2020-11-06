@@ -1,9 +1,6 @@
 package com.smart.home.backend.constant;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
-
-import java.util.Arrays;
 
 /**
  * State enum for doors.
