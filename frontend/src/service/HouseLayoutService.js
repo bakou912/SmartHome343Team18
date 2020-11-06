@@ -27,10 +27,16 @@ class HouseLayoutService {
             }));
         })
 
-        locations.push({
-            value: layout.outside,
-            label: "Outside"
-        })
+        locations = locations.concat([
+            {
+                value: layout.entrance,
+                label: "Entrance"
+            },
+            {
+                value: layout.backyard,
+                label: "Backyard"
+            }
+        ])
 
         return locations;
     }
@@ -38,6 +44,36 @@ class HouseLayoutService {
     async resetLayout() {
         return httpClient.delete("layout");
     }
+
+    async blockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/block`
+        return httpClient.put(path);
+    }
+
+    async unblockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
+        return httpClient.put(path);
+    }
+
+    async openWindow(rowId, roomId, windowId) {
+      const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/open`
+      return httpClient.put(path);
+    }
+
+    async modifyRoomLightState(rowId, roomId, light) {
+        const path = `/layout/rows/${rowId}/rooms/${roomId}/light`
+        return httpClient.put(path, light);
+    }
+
+    async modifyOutsideLightState(light) {
+        const path = `layout/outside/light`
+        return httpClient.put(path, light);
+    }
+
+	async changeDoorState(rowId, roomId, doorId, door) {
+		const path = `/layout/rows/${rowId}/rooms/${roomId}/doors/${doorId}`
+		return httpClient.put(path, door);
+	}
 
 }
 

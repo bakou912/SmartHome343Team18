@@ -2,7 +2,7 @@ package com.smart.home.backend.model.simulationparameters;
 
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.model.BaseModel;
-import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,7 +56,7 @@ public class SimulationParametersModel implements BaseModel {
     }
     
     public void reset() {
-        this.setUser(new User(this.userProfiles.get(0), "", new PersonLocation()));
+        this.setUser(new User(this.userProfiles.get(0), "", new PersonLocationPosition()));
         this.setSysParams(new SystemParameters(0.0, 0.0, LocalDateTime.now()));
     }
     

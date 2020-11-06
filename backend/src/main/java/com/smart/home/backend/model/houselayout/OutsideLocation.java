@@ -1,25 +1,26 @@
 package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.PersonInput;
-import com.smart.home.backend.service.util.IdUtil;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class for outside the house.
  */
 @Getter
 @Setter
-public class Outside {
+public class OutsideLocation extends Location {
 	
-	@NonNull
-	private List<Person> persons = new ArrayList<>();
-	private final IdUtil personId = new IdUtil();
+	/**
+	 * 1-parameter constructor.
+	 * @param name location's name
+	 */
+	public OutsideLocation(String name) {
+		super(name, new Light(), new ArrayList<>());
+	}
 	
 	/**
 	 * Finds a person with the corresponding id.

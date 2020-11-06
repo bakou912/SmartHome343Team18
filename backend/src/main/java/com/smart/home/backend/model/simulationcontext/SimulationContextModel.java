@@ -7,8 +7,7 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
-
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 
@@ -49,7 +48,7 @@ public class SimulationContextModel implements BaseModel {
 	  * @return Found person
 	  */
 	 @Nullable
-	 public Person findPerson(RoomItemLocation location) {
+	 public Person findPerson(RoomItemLocationPosition location) {
 		 Room foundRoom = this.getHouseLayoutModel().findRoom(location);
 		 Person foundPerson = null;
 		
@@ -58,6 +57,21 @@ public class SimulationContextModel implements BaseModel {
 		 }
 		
 		 return foundPerson;
+	 }
+	
+	/**
+	 * Removes a person from outside.
+	 * @param id person id
+	 * @return Wether the person was removed or not
+	 */
+	 public boolean removePersonOutside(Integer id) {
+	 	boolean removed = this.getHouseLayoutModel().getBackyard().getPersons().removeIf(person -> person.getId().equals(id));
+		 
+		 if (!removed) {
+			 removed = this.getHouseLayoutModel().getEntrance().getPersons().removeIf(person -> person.getId().equals(id));
+		 }
+		 
+		 return removed;
 	 }
 	
 	/**

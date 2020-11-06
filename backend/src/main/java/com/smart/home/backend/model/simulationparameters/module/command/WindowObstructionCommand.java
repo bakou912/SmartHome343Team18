@@ -6,8 +6,14 @@ import com.smart.home.backend.model.houselayout.directional.Window;
 
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Window obstruction command.
+ */
 public class WindowObstructionCommand extends AbstractCommand<HouseLayoutModel, WindowInput, Window> {
 	
+	/**
+	 * Default Constructor
+	 */
 	public WindowObstructionCommand() {
 		super("Window obstruction", true);
 	}
