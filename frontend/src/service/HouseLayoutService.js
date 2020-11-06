@@ -57,6 +57,11 @@ class HouseLayoutService {
         const path = `/layout/rows/${rowId}/rooms/${roomId}`
         return httpClient.put(path, light);
     }
+
+	async changeDoorState(rowId, roomId, doorId){
+		const path = `/layout/rows/${rowId}/rooms/${roomId}/doors/${doorId}`
+		return httpClient.put(path);
+	}
 }
 
 export default new HouseLayoutService();

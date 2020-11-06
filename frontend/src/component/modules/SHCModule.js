@@ -31,6 +31,7 @@ export default class SHCModule extends React.Component {
         this.modifyLightState = this.modifyLightState.bind(this);
         this.openCloseDoor = this.openCloseDoor.bind(this);
         this.autoMode = this.autoMode.bind(this);
+		this.onSelectedDoor = this.onSelectedDoor.bind(this);
     }
 
     async componentDidMount() {
@@ -39,6 +40,7 @@ export default class SHCModule extends React.Component {
             user: await ParametersService.getUser(),
             selectedLocation: null,
             selectedWindow: null,
+			selectedDoor: null,
             loaded: true
         });
     }
@@ -88,6 +90,7 @@ export default class SHCModule extends React.Component {
             },
             selectedWindow: null,
             selectedPerson: null,
+			selectedDoor: null,
             personName: ""
         });
     }
@@ -97,7 +100,11 @@ export default class SHCModule extends React.Component {
             selectedWindow: evt
         });
     }
-
+	async onSelectedDoor(evt) {
+        await this.setState({
+            selectedDoor: evt
+        });
+    }
     async setEditing(value) {
         await this.setState({
             addingPerson: value
@@ -171,25 +178,33 @@ export default class SHCModule extends React.Component {
         await HouseLayoutService.modifyLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, {
             state: lightState
         })
-            .then(async () => {
-                await this.setState({
-                    selectedLocation: {
-                        ...this.state.selectedLocation,
-                        light: {
-                            state: lightState
-                        }
+        .then(async () => {
+            await this.setState({
+                selectedLocation: {
+                    ...this.state.selectedLocation,
+                    light: {
+                        state: lightState
                     }
-                });
+                }
             });
+        });
         window.dispatchEvent(new Event("updateLayout"));
     }
 
-    async openCloseDoor(open) {
-        if (open) {
-            console.log("Opening door");
-        } else {
-            console.log("Closing door");
-        }
+    async openCloseDoor(doorState) {
+        await HouseLayoutService.changeDoorState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId,this.state.selectedDoor.value.id)
+		.then(async () => {
+			this.setState({
+	            selectedDoor: {
+	                ...this.state.selectedDoor,
+	                value: {
+	                    ...this.state.selectedDoor.value,
+	                    state: doorState
+	                }
+	            }
+	        });
+		});
+		window.dispatchEvent(new Event("updateLayout"));
     }
 
     async autoMode(mode) {
@@ -401,8 +416,17 @@ export default class SHCModule extends React.Component {
 																	<Button onClick={this.addPerson} variant="secondary"
 																			size="sm">Save</Button>
 																</div>
-																: <Button onClick={() => this.setEditing(true)} variant="secondary"
-																		  size="sm">Add</Button>
+																:
+																<Command
+																	name="Person Management"
+																	user={this.state.user}
+																	location={this.state.selectedLocation}
+																>
+																	<Button onClick={() => this.setEditing(true)} variant="secondary"
+																			  size="sm">Add</Button>
+																	<Button variant="secondary"
+																			  size="sm">Remove</Button>
+														  		</Command>
 
 														}
 													</Col>
@@ -445,7 +469,7 @@ export default class SHCModule extends React.Component {
 										{
 											this.state.selectedDoorItem ?
 												<Command
-													name="Window obstruction"
+													name="Door Management"
 													user={this.state.user}
 													location={this.state.selectedLocation}
 												>
@@ -453,7 +477,7 @@ export default class SHCModule extends React.Component {
 														<Col>
 															Doors
 															{
-																true === true ?
+																"CLOSED" === "CLOSED" ?
 																	<div>
 																		<Select
 																			styles={{
@@ -464,14 +488,14 @@ export default class SHCModule extends React.Component {
 																			}}
 																			options={this.state.doors}
 																			value={this.state.selectedDoor}
-																			onChange={this.onSelectedWindow}
+																			onChange={this.onSelectedDoor}
 																		/>
-																		<Button onClick={() => this.openCloseDoor(true)}
+																		<Button onClick={() => this.openCloseDoor("OPEN")}
 																				variant="secondary" size="md">Open</Button>
 																	</div>
 																	:
 																	<div>
-																		<Button onClick={() => this.openCloseDoor(false)}
+																		<Button onClick={() => this.openCloseDoor("CLOSED")}
 																				variant="secondary" size="md">Close</Button>
 																	</div>
 															}

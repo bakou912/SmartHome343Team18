@@ -3,6 +3,7 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.constant.LightState;
+import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.LightInput;
