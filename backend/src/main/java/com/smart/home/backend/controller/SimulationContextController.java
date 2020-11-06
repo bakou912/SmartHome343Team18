@@ -30,7 +30,7 @@ import lombok.Setter;
 public class SimulationContextController {
 	
 	private SimulationContextModel simulationContextModel;
-	
+
 	@Autowired
 	public SimulationContextController(SimulationContextModel simulationContextModel) {
 		this.simulationContextModel = simulationContextModel;
@@ -132,7 +132,9 @@ public class SimulationContextController {
 		if (this.getSimulationContextModel().getHouseLayoutModel().isInHouse(personInput.getName())) {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
-		
+
+		this.simulationContextModel.getHouseLayoutModel().updateDetectedPerson(true); //for now this should be fine. We can redo addPerson another time.
+
 		return new ResponseEntity<>(targetRoom.addPerson(personInput), HttpStatus.OK);
 	}
 	

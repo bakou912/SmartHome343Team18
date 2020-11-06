@@ -9,6 +9,8 @@ import com.smart.home.backend.model.simulationparameters.location.LocationPositi
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import lombok.*;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +23,22 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Component
 public class HouseLayoutModel implements BaseModel {
 	
-	private List<RoomRow> rows = new ArrayList<>();
-	private Outside outside = new Outside();
+	private List<RoomRow> rows;
+	private Outside outside;
+	
+	private PropertyChangeSupport support;
+	
+	/**
+	 * Default constructor.
+	 */
+	public HouseLayoutModel() {
+		this.rows = new ArrayList<>();
+		this.outside = new Outside();
+		this.support = new PropertyChangeSupport(this);
+	}
 	
 	/**
 	 * Finds a row with the corresponding id.
@@ -169,5 +180,60 @@ public class HouseLayoutModel implements BaseModel {
 	public void reset() {
 		this.setRows(new ArrayList<>());
 		this.setOutside(new Outside());
+	}
+
+	/**
+	 * Add a PropertyChangeListener, essentially an observable due to deprecation
+	 * @param pcl property change listener
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+	}
+	
+	/**
+	 * Remove a propertyChangeListener, essentially an observable due to deprecation
+	 * @param pcl property change listener
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
+    }
+	
+	/**
+	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
+	 * @param activate wether to activate or deactivate away mode
+	 */
+	public void updateAwayMode(boolean activate){
+
+		for (RoomRow row: this.getRows()) {
+			for (Room room : row.getRooms()) {
+				if (!room.getPersons().isEmpty()) {
+					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
+				}
+			}
+		}
+		
+		if(activate) {
+			System.out.println("Deactivating Away mode.");
+		} else {
+			System.out.println("Activating Away mode!");
+		}
+		
+		this.support.firePropertyChange("awayMode", null, activate);
+	}
+	
+	/**
+	 * Update all propteryChangeListeners of change in DetectedPerson
+	 * @param detected wether someone was detected or not
+	 */
+	public void updateDetectedPerson(boolean detected){
+		this.support.firePropertyChange("detectedPerson", null, detected);
+	}
+
+	/**
+	 * update duration of auhtoritiesTimer
+	 * @param duration duration to alert authoratities
+	 */
+	public void updateAuthoritiesTimer(java.time.Duration duration){
+		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
 	}
 }
