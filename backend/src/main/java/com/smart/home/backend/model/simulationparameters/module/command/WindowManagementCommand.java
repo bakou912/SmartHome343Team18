@@ -5,6 +5,9 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Window management command.
+ */
 public class WindowManagementCommand extends AbstractCommand<HouseLayoutModel, WindowInput, Window> {
     
     /**

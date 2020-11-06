@@ -8,6 +8,8 @@ import ParametersService from "../../service/ParametersService";
 import Command from "./Command";
 
 const ITEMS = ["Window", "Light", "Door", "Person"];
+const OUTSIDE = ["Backyard", "Entrance"];
+
 export default class SHCModule extends React.Component {
 
     constructor(props) {
@@ -58,14 +60,14 @@ export default class SHCModule extends React.Component {
             selectedPersonItem: false,
         });
 
-        const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
+        const windows = OUTSIDE.includes(evt.label) ? [] : evt.value.windows.map(w => {
             return {
                 value: w,
                 label: w.direction
             };
         });
 
-        const doors = evt.label === "Outside" ? [] : evt.value.doors.map(d => {
+        const doors = OUTSIDE.includes(evt.label) ? [] : evt.value.doors.map(d => {
             return {
                 value: d,
                 label: d.direction
@@ -107,8 +109,8 @@ export default class SHCModule extends React.Component {
     }
 
     async addPerson() {
-        const action = this.state.selectedLocation.label === "Outside" ?
-            async () => SimulationContextService.addPersonOutside({name: this.state.personName})
+        const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
+            async () => SimulationContextService.addPersonOutside({ location: this.state.selectedLocation.label, name: this.state.personName})
             :
             async () => SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId,  {name: this.state.personName});
 
@@ -141,7 +143,7 @@ export default class SHCModule extends React.Component {
     }
 
 	async removePerson() {
-        const action =  this.state.selectedLocation.label === "Outside" ?
+        const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
             async () => SimulationContextService.removePersonFromOutside(this.state.selectedPerson.value.id)
             :
             async () => SimulationContextService.removePersonFromRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedPerson.value.id);
@@ -188,8 +190,8 @@ export default class SHCModule extends React.Component {
 
     async modifyLightState(lightState) {
 
-        const action =  this.state.selectedLocation.label === "Outside" ?
-            async () => HouseLayoutService.modifyOutsideLightState({ state: lightState })
+        const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
+            async () => HouseLayoutService.modifyOutsideLightState({ location: this.state.selectedLocation.label, state: lightState })
             :
             async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { state: lightState })
 
@@ -305,7 +307,7 @@ export default class SHCModule extends React.Component {
 												<ListGroup>
 													<h5 style={{textAlign: "center", color: "blue"}}>Item</h5>
 													{
-														this.state.selectedLocation.label !== "Outside" ?
+                                                        !OUTSIDE.includes(this.state.selectedLocation.label) ?
 															ITEMS.map((item) =>
 																<ListGroup.Item
                                                                     key={ITEMS.indexOf(item)} className="ItemsTable"
@@ -339,7 +341,7 @@ export default class SHCModule extends React.Component {
 											this.state.selectedWindowItem ?
 												<Row>
 													{
-														this.state.selectedLocation.label !== "Outside" ?
+														!OUTSIDE.includes(this.state.selectedLocation.label) ?
 															<Col>
 																Windows
 																<Select
@@ -484,7 +486,7 @@ export default class SHCModule extends React.Component {
                                             this.state.selectedDoorItem ?
                                                 <Row>
                                                     {
-                                                        this.state.selectedLocation.label !== "Outside" ?
+                                                        !OUTSIDE.includes(this.state.selectedLocation.label) ?
                                                             <Col>
                                                                 Doors
                                                                 <Select

@@ -26,8 +26,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HouseLayoutModel implements BaseModel {
 	
+	private static final String BACKYARD = "Backyard";
+	private static final String ENTRANCE = "Entrance";
+	
 	private List<RoomRow> rows;
-	private Outside outside;
+	private OutsideLocation entrance;
+	private OutsideLocation backyard;
 	
 	private PropertyChangeSupport support;
 	
@@ -36,7 +40,8 @@ public class HouseLayoutModel implements BaseModel {
 	 */
 	public HouseLayoutModel() {
 		this.rows = new ArrayList<>();
-		this.outside = new Outside();
+		this.backyard = new OutsideLocation(BACKYARD);
+		this.entrance = new OutsideLocation(ENTRANCE);
 		this.support = new PropertyChangeSupport(this);
 	}
 	
@@ -158,6 +163,11 @@ public class HouseLayoutModel implements BaseModel {
 		return targetWindow;
 	}
 	
+	/**
+	 * Checks if a person is in the house.
+	 * @param personName person's name
+	 * @return Wether the person is in the house or not
+	 */
 	public boolean isInHouse(String personName) {
 		boolean present = false;
 		
@@ -169,7 +179,11 @@ public class HouseLayoutModel implements BaseModel {
 			}
 		}
 		
-		if (this.getOutside().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+		if (this.getBackyard().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+			present = true;
+		}
+		
+		if (this.getEntrance().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
 			present = true;
 		}
 		
@@ -179,11 +193,12 @@ public class HouseLayoutModel implements BaseModel {
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());
-		this.setOutside(new Outside());
+		this.setBackyard(new OutsideLocation(BACKYARD));
+		this.setEntrance(new OutsideLocation(ENTRANCE));
 	}
 
 	/**
-	 * Add a PropertyChangeListener, essentially an observable due to deprecation
+	 * Adds a PropertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl property change listener
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
@@ -191,7 +206,7 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Remove a propertyChangeListener, essentially an observable due to deprecation
+	 * Removes a propertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl property change listener
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
@@ -199,7 +214,7 @@ public class HouseLayoutModel implements BaseModel {
     }
 	
 	/**
-	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
+	 * Updates all propteryChangeListeners of change in awayMode only if no one is home.
 	 * @param activate wether to activate or deactivate away mode
 	 */
 	public void updateAwayMode(boolean activate){
@@ -222,7 +237,7 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Update all propteryChangeListeners of change in DetectedPerson
+	 * Updates all propteryChangeListeners of change in DetectedPerson
 	 * @param detected wether someone was detected or not
 	 */
 	public void updateDetectedPerson(boolean detected){
@@ -230,10 +245,26 @@ public class HouseLayoutModel implements BaseModel {
 	}
 
 	/**
-	 * update duration of auhtoritiesTimer
+	 * Updates duration of auhtoritiesTimer
 	 * @param duration duration to alert authoratities
 	 */
 	public void updateAuthoritiesTimer(java.time.Duration duration){
 		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
 	}
+	
+	/**
+	 * Retrieves an outside location using its name.
+	 * @param locationName location's name
+	 * @return Corresponding outside location
+	 */
+	public OutsideLocation getOutsideLocation(String locationName) {
+		OutsideLocation outsideLocation = this.getBackyard();
+		
+		if (locationName.equals(ENTRANCE)) {
+			outsideLocation = this.getEntrance();
+		}
+		
+		return outsideLocation;
+	}
+	
 }

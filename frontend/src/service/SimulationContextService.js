@@ -17,12 +17,7 @@ class SimulationContextService {
 
     async addPersonOutside(person) {
         const path = `context/layout/outside/persons`
-        return httpClient.post(path, { name: person.name });
-    }
-
-    async modifyPerson(rowId, roomId, oldName, person) {
-        const path = `context/layout/rows/${rowId}/rooms/${roomId}/persons/${oldName}`
-        return httpClient.put(path, { name: person.name });
+        return httpClient.post(path, person);
     }
 
     async removePersonFromRoom(rowId, roomId, personId) {

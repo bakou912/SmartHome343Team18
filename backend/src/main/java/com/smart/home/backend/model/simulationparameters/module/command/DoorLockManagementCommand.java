@@ -5,11 +5,14 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import org.springframework.http.ResponseEntity;
 
-public class DoorLockManagement extends AbstractCommand<HouseLayoutModel, DoorInput, Door> {
+/**
+ * Door lock command.
+ */
+public class DoorLockManagementCommand extends AbstractCommand<HouseLayoutModel, DoorInput, Door> {
     /**
      * Default Constructor
      */
-    public DoorLockManagement(){
+    public DoorLockManagementCommand(){
         super("Door Lock Management",true);
     }
 

@@ -19,7 +19,7 @@ public class SHCModule extends Module {
 		this.getCommands().add(new PersonManagementCommand());
 		this.getCommands().add(new DoorManagementCommand());
 		this.getCommands().add(new LightManagementCommand());
-		this.getCommands().add(new DoorLockManagement());
+		this.getCommands().add(new DoorLockManagementCommand());
 	}
 	
 }

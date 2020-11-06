@@ -27,10 +27,16 @@ class HouseLayoutService {
             }));
         })
 
-        locations.push({
-            value: layout.outside,
-            label: "Outside"
-        })
+        locations = locations.concat([
+            {
+                value: layout.entrance,
+                label: "Entrance"
+            },
+            {
+                value: layout.backyard,
+                label: "Backyard"
+            }
+        ])
 
         return locations;
     }

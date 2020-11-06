@@ -85,11 +85,15 @@ export default class HouseLayout extends React.Component {
             }
         }
 
-        const outsidePosition = { x: 0, y: -layoutHeight / 2 };
+        const backyardPosition = { x: 0, y: -layoutHeight / 2 };
+        const entrancePosition = { x: 0, y: layoutHeight};
         const outsideDimensions = { width: nbRoomsMax * this.roomDimensions.width, height: layoutHeight / 2};
 
-        lights = lights.concat(LightsFactory.create(this.layoutModel.outside, outsidePosition, outsideDimensions, "-1"));
-        persons = persons.concat(PersonsFactory.create(this.layoutModel.outside, outsidePosition, outsideDimensions, "-1"));
+        lights = lights.concat(LightsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
+        persons = persons.concat(PersonsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
+
+        lights = lights.concat(LightsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
+        persons = persons.concat(PersonsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
 
         return {
             rooms: rooms,

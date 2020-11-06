@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ParametersInput {
+    
     @JsonProperty("outsideTemp")
     private Double outsideTemp;
 

@@ -12,13 +12,14 @@ import java.util.ArrayList;
  */
 @Getter
 @Setter
-public class Outside extends Location {
+public class OutsideLocation extends Location {
 	
 	/**
-	 * Default constructor.
+	 * 1-parameter constructor.
+	 * @param name location's name
 	 */
-	public Outside() {
-		super("Outside", new Light(), new ArrayList<>());
+	public OutsideLocation(String name) {
+		super(name, new Light(), new ArrayList<>());
 	}
 	
 	/**

@@ -5,6 +5,9 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Person management command.
+ */
 public class PersonManagementCommand extends AbstractCommand<HouseLayoutModel, PersonInput, Person> {
     
     /**

@@ -6,7 +6,7 @@ import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.controller.SimulationContextController;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.houselayout.Outside;
+import com.smart.home.backend.model.houselayout.OutsideLocation;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
@@ -198,11 +198,12 @@ class SimulationContextControllerTest {
          */
         @Test
         void validAddPersonOutside() {
-            Outside outside = new Outside();
-            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutside()).thenReturn(outside);
+            OutsideLocation outsideLocation = new OutsideLocation("");
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutsideLocation("")).thenReturn(outsideLocation);
         
-            PersonInput personInput = new PersonInput();
+            OutsidePersonInput personInput = new OutsidePersonInput();
             personInput.setName("personname");
+            personInput.setLocation("");
         
             assertEquals(0, simulationContextController.addPersonOutside(personInput).getBody());
             assertEquals(1, simulationContextController.addPersonOutside(personInput).getBody());

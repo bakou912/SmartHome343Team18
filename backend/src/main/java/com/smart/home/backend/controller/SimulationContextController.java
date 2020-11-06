@@ -3,7 +3,7 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.*;
-import com.smart.home.backend.model.houselayout.Outside;
+import com.smart.home.backend.model.houselayout.OutsideLocation;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
@@ -144,7 +144,7 @@ public class SimulationContextController {
 	 * @return Person's id
 	 */
 	@PostMapping("context/layout/outside/persons")
-	public ResponseEntity<Integer> addPersonOutside(@RequestBody PersonInput personInput) {
+	public ResponseEntity<Integer> addPersonOutside(@RequestBody OutsidePersonInput personInput) {
 		if (personInput.getName() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
@@ -153,7 +153,7 @@ public class SimulationContextController {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 		
-		return new ResponseEntity<>(this.getSimulationContextModel().getHouseLayoutModel().getOutside().addPerson(personInput), HttpStatus.OK);
+		return new ResponseEntity<>(this.getSimulationContextModel().getHouseLayoutModel().getOutsideLocation(personInput.getLocation()).addPerson(personInput), HttpStatus.OK);
 	}
 	
 	/**
@@ -163,9 +163,8 @@ public class SimulationContextController {
 	 */
 	@DeleteMapping("context/layout/outside/persons/{personId}")
 	public ResponseEntity<SimulationContextModel> removePersonOutside(@PathVariable Integer personId) {
-		Outside outside = this.getSimulationContextModel().getHouseLayoutModel().getOutside();
 		
-		if (!outside.getPersons().removeIf(person -> person.getId().equals(personId))) {
+		if (!this.getSimulationContextModel().removePersonOutside(personId)) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -244,7 +243,7 @@ public class SimulationContextController {
 	}
 
 	/**
-	 * open a window
+	 * Opens a window.
 	 * @param location window's location
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
@@ -255,6 +254,7 @@ public class SimulationContextController {
 
 		return this.getChangeWindowStateResponse(location, unblockedWindowInput);
 	}
+	
 	/**
 	 * Calling the window state changing method.
 	 * @param location window's location

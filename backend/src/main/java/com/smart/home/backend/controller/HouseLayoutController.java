@@ -2,12 +2,7 @@ package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
-import com.smart.home.backend.input.DoorInput;
-import com.smart.home.backend.input.HouseLayoutInput;
-import com.smart.home.backend.input.LightInput;
-import com.smart.home.backend.input.RoomInput;
-import com.smart.home.backend.input.RoomRowInput;
-import com.smart.home.backend.input.WindowInput;
+import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.*;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
@@ -262,9 +257,9 @@ public class HouseLayoutController {
 	 * @return Updated light
 	 */
 	@PutMapping("layout/outside/light")
-	public ResponseEntity<Light> modifyOutsideLight(@RequestBody LightInput lightInput) {
+	public ResponseEntity<Light> modifyOutsideLight(@RequestBody OutsideLightInput lightInput) {
 		
-		Light modifiedLight = this.getHouseLayoutModel().getOutside().getLight();
+		Light modifiedLight = this.getHouseLayoutModel().getOutsideLocation(lightInput.getLocation()).getLight();
 		modifiedLight.setState(lightInput.getState());
 		
 		return new ResponseEntity<>(modifiedLight, HttpStatus.OK);

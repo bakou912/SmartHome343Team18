@@ -5,6 +5,9 @@ import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Door management command.
+ */
 public class DoorManagementCommand extends AbstractCommand<HouseLayoutModel, DoorInput, Door> {
     
     /**
