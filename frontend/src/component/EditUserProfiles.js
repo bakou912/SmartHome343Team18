@@ -53,7 +53,6 @@ export class EditUserProfiles extends React.Component {
         await this.setState({
             [component]: evt.value
         });
-        console.log(this.state.selectedCommand);
     }
 
     permissionDefaultValue(restriction) {

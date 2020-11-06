@@ -54,7 +54,8 @@ export default class SHCModule extends React.Component {
             loaded: true,
             selectedWindowItem: false,
             selectedLightItem: false,
-            selectedDoorItem: false
+            selectedDoorItem: false,
+            selectedPersonItem: false,
         });
 
         const windows = evt.label === "Outside" ? [] : evt.value.windows.map(w => {
@@ -106,41 +107,50 @@ export default class SHCModule extends React.Component {
     }
 
     async addPerson() {
-        const id = this.state.selectedLocation.label === "Outside" ? (await SimulationContextService.addPersonOutside({
-                name: this.state.personName
-            })).data :
-            (await SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, {
-                name: this.state.personName
-            })).data;
+        const action = this.state.selectedLocation.label === "Outside" ?
+            async () => SimulationContextService.addPersonOutside({name: this.state.personName})
+            :
+            async () => SimulationContextService.addPersonToRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId,  {name: this.state.personName});
 
-        const person = {
-            value: {
-                id: id,
-                name: this.state.personName
-            },
-            label: this.state.personName
-        };
+        await action().then(async response => {
+            const person = {
+                value: {
+                    id: response.data,
+                    name: this.state.personName
+                },
+                label: this.state.personName
+            };
 
-        const updatedPersons = this.state.persons;
-        updatedPersons.push(person);
+            const updatedPersons = this.state.persons;
+            updatedPersons.push(person);
 
-        await this.setState({
-            persons: updatedPersons,
-            personUpdateKey: this.state.personUpdateKey + 1,
-            addingPerson: false
-        });
+            await this.setState({
+                persons: updatedPersons,
+                personUpdateKey: this.state.personUpdateKey + 1,
+                addingPerson: false,
+                personName: ""
+            });
 
-        window.dispatchEvent(new Event("updateLayout"));
+            window.dispatchEvent(new Event("updateLayout"));
+        }).catch(err => {
+            if (err.response.status === 409) {
+                alert("A person with this name is already present.");
+            }
+        })
+
     }
 
 	async removePerson() {
-		let newState = this.state.persons.filter(person => person.value.id !== this.state.selectedPerson.value.id);
-		console.log(newState);
-		await SimulationContextService.removePersonFromRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedPerson.value.id)
-		.then(async () =>{
+        const action =  this.state.selectedLocation.label === "Outside" ?
+            async () => SimulationContextService.removePersonFromOutside(this.state.selectedPerson.value.id)
+            :
+            async () => SimulationContextService.removePersonFromRoom(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedPerson.value.id);
+
+            await action().then(async () =>{
 			await this.setState({
-				persons:newState,
-				personUpdateKey: this.state.personUpdateKey - 1,
+				persons: this.state.persons.filter(person => person.value.id !== this.state.selectedPerson.value.id),
+                personUpdateKey: this.state.personUpdateKey + 1,
+                selectedPerson: null
 			});
 		});
 		window.dispatchEvent(new Event("updateLayout"));
@@ -177,8 +187,13 @@ export default class SHCModule extends React.Component {
     }
 
     async modifyLightState(lightState) {
-        await HouseLayoutService.modifyLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { state: lightState })
-        .then(async () => {
+
+        const action =  this.state.selectedLocation.label === "Outside" ?
+            async () => HouseLayoutService.modifyOutsideLightState({ state: lightState })
+            :
+            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { state: lightState })
+
+        await action().then(async () =>{
             await this.setState({
                 selectedLocation: {
                     ...this.state.selectedLocation,
@@ -188,6 +203,7 @@ export default class SHCModule extends React.Component {
                 }
             });
         });
+
         window.dispatchEvent(new Event("updateLayout"));
     }
 
@@ -291,21 +307,29 @@ export default class SHCModule extends React.Component {
 													{
 														this.state.selectedLocation.label !== "Outside" ?
 															ITEMS.map((item) =>
-																<ListGroup.Item key={ITEMS.indexOf(item)} className="ItemsTable"
-																				bsPrefix="list-group-item py-1" action
-																				onClick={() => this.itemSelected(item)}
-																				variant="dark">{item}</ListGroup.Item>
+																<ListGroup.Item
+                                                                    key={ITEMS.indexOf(item)} className="ItemsTable"
+                                                                    bsPrefix="list-group-item py-1" action
+                                                                    onClick={() => this.itemSelected(item)}
+                                                                    variant="dark">{item}</ListGroup.Item
+                                                                >
 															)
 															:
 															[
-																<ListGroup.Item className="ItemsTable"
-																				bsPrefix="list-group-item py-1" action
-																				onClick={() => this.itemSelected("Light")}
-																				variant="dark">Light</ListGroup.Item>,
-																<ListGroup.Item className="ItemsTable"
-																				bsPrefix="list-group-item py-1" action
-																				onClick={() => this.itemSelected("Person")}
-																				variant="dark">Person</ListGroup.Item>
+																<ListGroup.Item
+                                                                    key={ITEMS.indexOf("Light")}
+                                                                    className="ItemsTable"
+                                                                    bsPrefix="list-group-item py-1" action
+                                                                    onClick={() => this.itemSelected("Light")}
+                                                                    variant="dark">Light</ListGroup.Item
+                                                                >,
+																<ListGroup.Item
+                                                                    key={ITEMS.indexOf("Person")}
+                                                                    className="ItemsTable"
+                                                                    bsPrefix="list-group-item py-1" action
+                                                                    onClick={() => this.itemSelected("Person")}
+                                                                    variant="dark">Person</ListGroup.Item
+                                                                >
 															]
 													}
 												</ListGroup>
@@ -410,8 +434,12 @@ export default class SHCModule extends React.Component {
 																>
 																	<Button onClick={() => this.setEditing(true)} variant="secondary"
 																			  size="sm">Add</Button>
-																	<Button onClick={this.removePerson} variant="secondary"
-																			  size="sm">Remove</Button>
+                                                                    {
+                                                                        this.state.selectedPerson !== null ?
+                                                                            <Button onClick={this.removePerson} variant="secondary"
+                                                                                    size="sm">Remove</Button>
+                                                                            : null
+                                                                    }
 														  		</Command>
 
 														}

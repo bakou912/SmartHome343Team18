@@ -54,13 +54,17 @@ class HouseLayoutService {
       return httpClient.put(path);
     }
 
-    async modifyLightState(rowId, roomId, light) {
-        const path = `/layout/rows/${rowId}/rooms/${roomId}`
+    async modifyRoomLightState(rowId, roomId, light) {
+        const path = `/layout/rows/${rowId}/rooms/${roomId}/light`
+        return httpClient.put(path, light);
+    }
+
+    async modifyOutsideLightState(light) {
+        const path = `layout/outside/light`
         return httpClient.put(path, light);
     }
 
 	async changeDoorState(rowId, roomId, doorId, door) {
-        console.log(door)
 		const path = `/layout/rows/${rowId}/rooms/${roomId}/doors/${doorId}`
 		return httpClient.put(path, door);
 	}

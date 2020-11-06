@@ -1,25 +1,36 @@
 package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.PersonInput;
+import com.smart.home.backend.model.ModelObject;
+import com.smart.home.backend.service.util.IdUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Class for outside the house.
+ * Class for a room.
  */
 @Getter
-@Setter
-public class Outside extends Location {
+@SuperBuilder
+@AllArgsConstructor
+public class Location extends ModelObject {
 	
-	/**
-	 * Default constructor.
-	 */
-	public Outside() {
-		super("Outside", new Light(), new ArrayList<>());
-	}
+	@Setter
+	private String name;
+	@Setter
+	@Builder.Default
+	private Light light = new Light();
+	@Setter
+	@Builder.Default
+	private List<Person> persons = new ArrayList<>();
+	
+	private final IdUtil personId = new IdUtil();
 	
 	/**
 	 * Finds a person with the corresponding id.
@@ -51,4 +62,5 @@ public class Outside extends Location {
 		
 		return id;
 	}
+	
 }

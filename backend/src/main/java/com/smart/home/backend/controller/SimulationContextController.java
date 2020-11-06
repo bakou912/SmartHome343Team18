@@ -3,6 +3,7 @@ package com.smart.home.backend.controller;
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.*;
+import com.smart.home.backend.model.houselayout.Outside;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
@@ -10,9 +11,9 @@ import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.User;
 import com.smart.home.backend.model.simulationparameters.UserProfile;
-import com.smart.home.backend.model.simulationparameters.location.Location;
-import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,15 +118,19 @@ public class SimulationContextController {
 	
 	/**
 	 * Adding a person to a room.
-	 * @param location room's location
+	 * @param locationPosition room's location
 	 * @return Person's id
 	 */
 	@PostMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons")
-	public ResponseEntity<Integer> addPersonToRoom(Location location, @RequestBody PersonInput personInput) {
-		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
+	public ResponseEntity<Integer> addPersonToRoom(LocationPosition locationPosition, @RequestBody PersonInput personInput) {
+		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(locationPosition);
 		
-		if(targetRoom == null) {
+		if (targetRoom == null || personInput.getName() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if (this.getSimulationContextModel().getHouseLayoutModel().isInHouse(personInput.getName())) {
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 		
 		return new ResponseEntity<>(targetRoom.addPerson(personInput), HttpStatus.OK);
@@ -138,7 +143,31 @@ public class SimulationContextController {
 	 */
 	@PostMapping("context/layout/outside/persons")
 	public ResponseEntity<Integer> addPersonOutside(@RequestBody PersonInput personInput) {
+		if (personInput.getName() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if (this.getSimulationContextModel().getHouseLayoutModel().isInHouse(personInput.getName())) {
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
+		}
+		
 		return new ResponseEntity<>(this.getSimulationContextModel().getHouseLayoutModel().getOutside().addPerson(personInput), HttpStatus.OK);
+	}
+	
+	/**
+	 * Removing a person from outside.
+	 * @param personId person's id
+	 * @return updated house layout. returns null if the room, row or person does not exist
+	 */
+	@DeleteMapping("context/layout/outside/persons/{personId}")
+	public ResponseEntity<SimulationContextModel> removePersonOutside(@PathVariable Integer personId) {
+		Outside outside = this.getSimulationContextModel().getHouseLayoutModel().getOutside();
+		
+		if (!outside.getPersons().removeIf(person -> person.getId().equals(personId))) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(this.getSimulationContextModel(), HttpStatus.OK);
 	}
 	
 	/**
@@ -148,7 +177,7 @@ public class SimulationContextController {
 	 * @return Updated person. returns null if the room, row or person does not exist
 	 */
 	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{name}")
-	public ResponseEntity<Person> modifyPerson(PersonLocation location, @RequestBody PersonInput personInput) {
+	public ResponseEntity<Person> modifyPerson(PersonLocationPosition location, @RequestBody PersonInput personInput) {
 		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
 		
 		if (targetRoom == null) {
@@ -176,7 +205,7 @@ public class SimulationContextController {
 	 * @return updated house layout. returns null if the room, row or person does not exist
 	 */
 	@DeleteMapping("context/layout/rows/{rowId}/rooms/{roomId}/persons/{itemId}")
-	public ResponseEntity<SimulationContextModel> removePerson(RoomItemLocation location) {
+	public ResponseEntity<SimulationContextModel> removePersonFromRoom(RoomItemLocationPosition location) {
 		Room targetRoom = this.getSimulationContextModel().getHouseLayoutModel().findRoom(location);
 		
 		if (targetRoom == null || !targetRoom.getPersons().removeIf(person -> person.getId().equals(location.getItemId()))) {
@@ -192,7 +221,7 @@ public class SimulationContextController {
      * @return Updated simulation context. returns null if window, room, or row does not exist.
     */
     @PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/block")
-    public ResponseEntity<Window> blockWindow(RoomItemLocation location) {
+    public ResponseEntity<Window> blockWindow(RoomItemLocationPosition location) {
     	WindowInput blockedWindowInput = new WindowInput();
 		blockedWindowInput.setState(WindowState.BLOCKED);
 	
@@ -205,7 +234,7 @@ public class SimulationContextController {
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
 	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/unblock")
-	public ResponseEntity<Window> unBlockWindow(RoomItemLocation location) {
+	public ResponseEntity<Window> unBlockWindow(RoomItemLocationPosition location) {
 		WindowInput unblockedWindowInput = new WindowInput();
 		unblockedWindowInput.setState(WindowState.CLOSED);
 		
@@ -218,7 +247,7 @@ public class SimulationContextController {
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
 	@PutMapping("context/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}/open")
-	public ResponseEntity<Window> openWindow(RoomItemLocation location) {
+	public ResponseEntity<Window> openWindow(RoomItemLocationPosition location) {
 		WindowInput unblockedWindowInput = new WindowInput();
 		unblockedWindowInput.setState(WindowState.OPEN);
 
@@ -229,7 +258,7 @@ public class SimulationContextController {
 	 * @param location window's location
 	 * @return Updated simulation context. returns null if window, room, or row does not exist.
 	 */
-	private ResponseEntity<Window> getChangeWindowStateResponse(RoomItemLocation location, WindowInput windowInput) {
+	private ResponseEntity<Window> getChangeWindowStateResponse(RoomItemLocationPosition location, WindowInput windowInput) {
 		windowInput.setLocation(location);
 		Window modifyWindow = this.getSimulationContextModel().getHouseLayoutModel().modifyWindowState(windowInput);
 		

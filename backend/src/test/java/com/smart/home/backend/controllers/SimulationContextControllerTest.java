@@ -11,9 +11,9 @@ import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.*;
-import com.smart.home.backend.model.simulationparameters.location.Location;
-import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -85,11 +85,11 @@ class SimulationContextControllerTest {
         @Test
         void validModifyUser() {
             when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUser()).thenReturn(
-                    new User(new UserProfile(PROFILE_NAME, new ArrayList<>()), "oldname", new PersonLocation())
+                    new User(new UserProfile(PROFILE_NAME, new ArrayList<>()), "oldname", new PersonLocationPosition())
             );
             
             UserInput modifyInput = new UserInput();
-            PersonLocation newLocation = new PersonLocation();
+            PersonLocationPosition newLocation = new PersonLocationPosition();
             newLocation.setName("newroom");
             newLocation.setRowId(0);
             newLocation.setRoomId(1);
@@ -182,15 +182,15 @@ class SimulationContextControllerTest {
                     simulationContextController
                             .getSimulationContextModel()
                             .getHouseLayoutModel()
-                            .findRoom(any(Location.class))
+                            .findRoom(any(LocationPosition.class))
             ).thenReturn(foundRoom);
             
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            assertEquals(0, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
-            assertEquals(1, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
-            assertEquals(2, simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput).getBody());
+            assertEquals(0, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
         }
     
         /**
@@ -214,12 +214,12 @@ class SimulationContextControllerTest {
          */
         @Test
         void invalidAddPerson() {
-            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(Location.class))).thenReturn(null);
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(LocationPosition.class))).thenReturn(null);
     
             PersonInput personInput = new PersonInput();
             personInput.setName("personname");
             
-            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new Location(0, 0, false), personInput);
+            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput);
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -237,7 +237,7 @@ class SimulationContextControllerTest {
                     .build();
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().modifyWindowState(any(WindowInput.class))).thenReturn(newWindow);
     
-            ResponseEntity<Window> responseEntity = simulationContextController.blockWindow(new RoomItemLocation(0, 0, 0));
+            ResponseEntity<Window> responseEntity = simulationContextController.blockWindow(new RoomItemLocationPosition(0, 0, 0));
     
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -261,7 +261,7 @@ class SimulationContextControllerTest {
                             .modifyWindowState(any(WindowInput.class))
             ).thenReturn(newWindow);
         
-            ResponseEntity<Window> responseEntity = simulationContextController.unBlockWindow(new RoomItemLocation(0, 0, 0));
+            ResponseEntity<Window> responseEntity = simulationContextController.unBlockWindow(new RoomItemLocationPosition(0, 0, 0));
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

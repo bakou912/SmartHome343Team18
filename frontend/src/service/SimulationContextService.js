@@ -30,6 +30,11 @@ class SimulationContextService {
         return httpClient.delete(path);
     }
 
+    async removePersonFromOutside(personId) {
+        const path = `context/layout/outside/persons/${personId}`
+        return httpClient.delete(path);
+    }
+
     async modifyUser(userInput) {
         const path = `context/parameters/user`;
         return httpClient.put(path, userInput);

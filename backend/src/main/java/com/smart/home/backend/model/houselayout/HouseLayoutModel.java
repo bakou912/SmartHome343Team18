@@ -5,8 +5,8 @@ import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
-import com.smart.home.backend.model.simulationparameters.location.Location;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -51,16 +51,16 @@ public class HouseLayoutModel implements BaseModel {
 	
 	/**
 	 * Finds a room with the corresponding row and room ids.
-	 * @param location row's location
+	 * @param locationPosition row's location
 	 * @return Found room
 	 */
 	@Nullable
-	public Room findRoom(Location location) {
-		RoomRow foundRow = this.findRow(location.getRowId());
+	public Room findRoom(LocationPosition locationPosition) {
+		RoomRow foundRow = this.findRow(locationPosition.getRowId());
 		Room foundRoom = null;
 		
 		if (foundRow != null) {
-			foundRoom = foundRow.findRoom(location.getRoomId());
+			foundRoom = foundRow.findRoom(locationPosition.getRoomId());
 		}
 		
 		return foundRoom;
@@ -72,7 +72,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Found door
 	 */
 	@Nullable
-	public Door findDoor(RoomItemLocation location) {
+	public Door findDoor(RoomItemLocationPosition location) {
 		Room foundRoom = this.findRoom(location);
 		Door foundDoor = null;
 		
@@ -89,7 +89,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Found window
 	 */
 	@Nullable
-	public Window findWindow(RoomItemLocation location) {
+	public Window findWindow(RoomItemLocationPosition location) {
 		Room foundRoom = this.findRoom(location);
 		Window foundWindow = null;
 		
@@ -126,7 +126,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Modified window. Null if not found
 	 */
 	public Window modifyWindowState(WindowInput windowInput) {
-		RoomItemLocation location = windowInput.getLocation();
+		RoomItemLocationPosition location = windowInput.getLocation();
 		Window targetWindow = this.findWindow(location);
 		
 		if (targetWindow == null) {
@@ -146,6 +146,25 @@ public class HouseLayoutModel implements BaseModel {
 		
 		return targetWindow;
 	}
+	
+	public boolean isInHouse(String personName) {
+		boolean present = false;
+		
+		for (RoomRow roomRow: this.getRows()) {
+			for (Room room: roomRow.getRooms()) {
+				if (room.getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+					return true;
+				}
+			}
+		}
+		
+		if (this.getOutside().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+			present = true;
+		}
+		
+		return present;
+	}
+	
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());

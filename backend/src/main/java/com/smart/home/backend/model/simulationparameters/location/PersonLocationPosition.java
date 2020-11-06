@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PersonLocation extends Location {
+public class PersonLocationPosition extends LocationPosition {
     
     private String name = "";
     
