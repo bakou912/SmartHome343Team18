@@ -10,4 +10,5 @@ public class PersonInput {
     
     @JsonProperty("name")
     private String name;
+    
 }

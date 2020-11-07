@@ -8,7 +8,7 @@ import com.smart.home.backend.input.UserInput;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
 import com.smart.home.backend.model.simulationparameters.UserProfile;
 import com.smart.home.backend.model.simulationparameters.UserProfiles;
-import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -218,7 +217,7 @@ class SimulationParametersControllerTest {
     EditParametersInput instantiateSimulationParameters(String profile, double insideTemp, double outsideTemp, LocalDateTime date){
         EditParametersInput parameters = Mockito.mock(EditParametersInput.class);
         UserInput userInput = new UserInput();
-        userInput.setLocation(new PersonLocation());
+        userInput.setLocation(new PersonLocationPosition());
         userInput.setProfile(profile);
         ParametersInput paramInput = new ParametersInput();
         paramInput.setInsideTemp(insideTemp);

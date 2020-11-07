@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class LocationPosition {
     
     private Integer rowId;
     private Integer roomId;

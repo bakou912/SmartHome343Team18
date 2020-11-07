@@ -2,21 +2,13 @@ package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
-import com.smart.home.backend.constant.LightState;
-import com.smart.home.backend.input.DoorInput;
-import com.smart.home.backend.input.HouseLayoutInput;
-import com.smart.home.backend.input.LightInput;
-import com.smart.home.backend.input.RoomInput;
-import com.smart.home.backend.input.RoomRowInput;
-import com.smart.home.backend.input.WindowInput;
+import com.smart.home.backend.input.*;
+import com.smart.home.backend.model.houselayout.*;
 import com.smart.home.backend.model.houselayout.directional.Door;
-import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import com.smart.home.backend.model.houselayout.RoomRow;
 import com.smart.home.backend.model.houselayout.directional.Window;
-import com.smart.home.backend.model.simulationparameters.location.Location;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import com.smart.home.backend.service.mapper.RoomsMapper;
-import com.smart.home.backend.model.houselayout.Room;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -90,28 +82,6 @@ public class HouseLayoutController {
 	}
 
 	/**
-	 * Changing a light's state.
-	 * @param location light's location
-	 * @return Updated house layout with updated state of light. returns null if the room does not exist
-	 */
-	@PutMapping("layout/rows/{rowId}/rooms/{roomId}/lights/{itemId}")
-	public ResponseEntity<HouseLayoutModel> setLayoutLight(RoomItemLocation location, @RequestBody LightInput lightInput) {
-		Room room = houseLayoutModel.findRoom(location);
-		
-		if (room == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		LightState lightState = lightInput.getState();
-		
-		if (lightState != null) {
-			room.getLight().setState(lightState);
-		}
-
-		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
-	}
-
-	/**
 	 * Adding a room to a row.
 	 * @param rowId row number
 	 * @param roomInput new room to add
@@ -150,13 +120,13 @@ public class HouseLayoutController {
 
 	/**
 	 * Adding a door in a room.
-	 * @param location room's location
+	 * @param locationPosition room's location
 	 * @param doorInput new door to be added
 	 * @return Updated house layout where a door was added to new room. returns null if no available space in room or if the room, row does not exist.
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/doors")
-	public ResponseEntity<HouseLayoutModel> addDoor(Location location, @RequestBody DoorInput doorInput) {
-		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
+	public ResponseEntity<HouseLayoutModel> addDoor(LocationPosition locationPosition, @RequestBody DoorInput doorInput) {
+		Room targetRoom = this.getHouseLayoutModel().findRoom(locationPosition);
 		
 		if (targetRoom == null || !this.getHouseLayoutModel().isDirectionAvailable(targetRoom, doorInput.getDirection())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -173,7 +143,7 @@ public class HouseLayoutController {
 	 * @return Updated houseLayout. returns null if the door, room, row does not exist
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/doors/{itemId}")
-	public ResponseEntity<HouseLayoutModel> removeDoor(RoomItemLocation location) {
+	public ResponseEntity<HouseLayoutModel> removeDoor(RoomItemLocationPosition location) {
 		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
 
 		if (targetRoom == null || !targetRoom.getDoors().removeIf(door -> door.getId().equals(location.getItemId()))) {
@@ -186,10 +156,10 @@ public class HouseLayoutController {
 	/**
 	 * Changing a door's state.
 	 * @param location door's location
-	 * @return Updated houseLayout. returns null if door, room, row does not exist/
+	 * @return Updated houseLayout. returns null if door, room, row does not exist
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/doors/{itemId}")
-	public ResponseEntity<HouseLayoutModel> changeDoorState(RoomItemLocation location, @RequestBody DoorInput doorInput) {
+	public ResponseEntity<HouseLayoutModel> changeDoorState(RoomItemLocationPosition location, @RequestBody DoorInput doorInput) {
 		Door targetDoor = this.getHouseLayoutModel().findDoor(location);
 		
 		if (targetDoor == null) {
@@ -206,20 +176,19 @@ public class HouseLayoutController {
 		if (state != null) {
 			targetDoor.setState(state);
 		}
-		
 
 		return new ResponseEntity<>(this.getHouseLayoutModel(), HttpStatus.OK);
 	}
 
 	/**
 	 * Adding a window to a room.
-	 * @param location room's location
+	 * @param locationPosition room's location
 	 * @param windowInput new window to be added
 	 * @return Updated houseLayout. Returns null if no space for window or if room, row does not exist
 	 */
 	@PostMapping("/layout/rows/{rowId}/rooms/{roomId}/windows")
-	public ResponseEntity<HouseLayoutModel> addWindow(Location location, @RequestBody WindowInput windowInput) {
-		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
+	public ResponseEntity<HouseLayoutModel> addWindow(LocationPosition locationPosition, @RequestBody WindowInput windowInput) {
+		Room targetRoom = this.getHouseLayoutModel().findRoom(locationPosition);
 		
 		if (targetRoom == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -236,7 +205,7 @@ public class HouseLayoutController {
 	 * @return Updated houseLayout. returns null if  window, room, or row does not exist.
 	 */
 	@DeleteMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}")
-	public ResponseEntity<HouseLayoutModel> removeWindow(RoomItemLocation location) {
+	public ResponseEntity<HouseLayoutModel> removeWindow(RoomItemLocationPosition location) {
 		Room targetRoom = houseLayoutModel.findRoom(location);
 
 		if (targetRoom == null || !targetRoom.getWindows().removeIf(window -> window.getId().equals(location.getItemId()))) {
@@ -253,7 +222,7 @@ public class HouseLayoutController {
 	 * @return Updated window. returns null if  window, room, or row does not exist.
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/windows/{itemId}")
-	public ResponseEntity<Window> changeWindowState(RoomItemLocation location, @RequestBody WindowInput windowInput) {
+	public ResponseEntity<Window> changeWindowState(RoomItemLocationPosition location, @RequestBody WindowInput windowInput) {
 		windowInput.setLocation(location);
 		Window modifiedWindow = this.getHouseLayoutModel().modifyWindowState(windowInput);
 		
@@ -262,6 +231,38 @@ public class HouseLayoutController {
 		}
 		
 		return new ResponseEntity<>(modifiedWindow, HttpStatus.OK);
+	}
+
+	/**
+	 * Changing a light's state in a room.
+	 * @param location light's location
+	 * @return update light. returns null if light, room, or row does not exist.
+	 */
+	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/light")
+	public ResponseEntity<Light> modifyRoomLightState(RoomItemLocationPosition location, @RequestBody Light lightInput){
+		Room targetRoom = this.getHouseLayoutModel().findRoom(location);
+		
+		if (targetRoom == null){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		Light modifiedLight = targetRoom.getLight();
+		modifiedLight.setState(lightInput.getState());
+		
+		return new ResponseEntity<>(modifiedLight, HttpStatus.OK);
+	}
+	
+	/**
+	 * Changing a light's state outside.
+	 * @return Updated light
+	 */
+	@PutMapping("layout/outside/light")
+	public ResponseEntity<Light> modifyOutsideLight(@RequestBody OutsideLightInput lightInput) {
+		
+		Light modifiedLight = this.getHouseLayoutModel().getOutsideLocation(lightInput.getLocation()).getLight();
+		modifiedLight.setState(lightInput.getState());
+		
+		return new ResponseEntity<>(modifiedLight, HttpStatus.OK);
 	}
 	
 }
