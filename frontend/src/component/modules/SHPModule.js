@@ -1,8 +1,8 @@
 import React from "react";
+import SmartHomeSecurityService from "../../service/SmartHomeSecurityService";
 import "../../style/Modules.css";
 import Switch from "react-switch";
-import { Container, Button, Col, Row } from "react-bootstrap";
-import HttpClient from "../../service/HttpClient";
+import { Container } from "react-bootstrap";
 export default class SHPModule extends React.Component {
   constructor() {
     super();
@@ -12,7 +12,7 @@ export default class SHPModule extends React.Component {
 
   changeHandler(checked) {
     this.setState({ checked });
-    HttpClient.put("context/awayMode/" + checked);
+    SmartHomeSecurityService.toggleAwayMode(checked);
   }
 
   render() {
