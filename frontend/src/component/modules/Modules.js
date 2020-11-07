@@ -1,6 +1,7 @@
 import React from "react";
 import "../../style/Modules.css";
 import SHCModule from "./SHCModule";
+import SHPModule from "./SHPModule";
 
 export default class Modules extends React.Component {
 
@@ -10,7 +11,7 @@ export default class Modules extends React.Component {
         super(props);
 
         this.modules.set("SHC", <SHCModule/>);
-        this.modules.set("SHP", null);
+        this.modules.set("SHP", <SHPModule/>);
 
         this.state = {
             selectedTab: Array.from(this.modules.keys())[0]
