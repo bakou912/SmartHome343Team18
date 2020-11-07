@@ -6,8 +6,8 @@ class SmartHomeSecurityService {
         return httpClient.put(path);
      }
 
-    async getAwayModeState(){
-        const path ='context/awayMode/state'
+    async getAwayModeState() {
+        const path = "context/awayMode/state"
         return httpClient.get(path);
     }     
 }

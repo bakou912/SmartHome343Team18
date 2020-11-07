@@ -3,16 +3,27 @@ import SmartHomeSecurityService from "../../service/SmartHomeSecurityService";
 import "../../style/Modules.css";
 import Switch from "react-switch";
 import { Container } from "react-bootstrap";
+
 export default class SHPModule extends React.Component {
-    constructor() {
-        super();
-        this.state = { checked: SmartHomeSecurityService.getAwayModeState };
+
+    constructor(props) {
+        super(props);
+        this.state = { checked: false };
         this.changeHandler = this.changeHandler.bind(this);
     }
 
-    changeHandler(checked) {
-        this.setState({ checked });
-        SmartHomeSecurityService.toggleAwayMode(checked);
+    async componentDidMount() {
+        this.setState({
+            checked: (await SmartHomeSecurityService.getAwayModeState()).data
+        })
+    }
+
+    async changeHandler(checked) {
+        await SmartHomeSecurityService.toggleAwayMode(checked).then(async () => {
+            await this.setState({
+                checked: checked
+            });
+        });
     }
 
     render() {
