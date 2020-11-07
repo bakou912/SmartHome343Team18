@@ -3,7 +3,7 @@ package com.smart.home.backend.controller;
 import java.time.Duration;
 
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
-import com.smart.home.backend.model.smarthomesecurity.Security;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,15 +24,10 @@ import lombok.Setter;
 public class SmartHomeSecurityController {
     
     private SimulationContextModel simulationContextModel;
-	private HouseLayoutController houseLayoutController;
-	private Security security;
+	private SecurityModel security;
 
 	@Autowired
-	public SmartHomeSecurityController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
-		this.simulationContextModel = simulationContextModel;
-		this.houseLayoutController = houseLayoutController;
-		this.security = new Security(false, false, null);
-		this.houseLayoutController.getHouseLayoutModel().addPropertyChangeListener(security);
+	public SmartHomeSecurityController() {
 	}
 
     /**
@@ -43,7 +38,7 @@ public class SmartHomeSecurityController {
 	@PutMapping("context/awayMode/{state}")
 	public ResponseEntity<Boolean> setAwayMode(@PathVariable(value = "state") boolean state){
 		
-		this.houseLayoutController.getHouseLayoutModel().updateAwayMode(state);
+		this.simulationContextModel.getHouseLayoutModel().updateAwayMode(state);
 		return new ResponseEntity<Boolean>(this.getSecurity().getAwayMode(), HttpStatus.OK);
 	}
 
@@ -55,7 +50,7 @@ public class SmartHomeSecurityController {
 	@PutMapping("context/authoritiyTimer/{duration}")
 	public ResponseEntity<Duration> setAuthorityTimerDuration(@PathVariable(value="duration") Duration duration){
 		
-		this.houseLayoutController.getHouseLayoutModel().updateAuthoritiesTimer(duration);
+		this.simulationContextModel.getHouseLayoutModel().updateAuthoritiesTimer(duration);
 		return new ResponseEntity<>(this.getSecurity().getAlertAuthoritiesTime(), HttpStatus.OK);
 	}
 

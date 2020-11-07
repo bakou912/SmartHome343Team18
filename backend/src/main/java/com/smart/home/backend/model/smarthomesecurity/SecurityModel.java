@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.springframework.stereotype.Component;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +18,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Security implements PropertyChangeListener{
+@Component
+public class SecurityModel implements PropertyChangeListener{
     
     private Boolean awayMode; 
 	private Boolean personDetected;

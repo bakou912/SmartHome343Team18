@@ -7,6 +7,8 @@ import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationparameters.location.Location;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+
 import lombok.*;
 
 import java.beans.PropertyChangeListener;
@@ -30,7 +32,7 @@ public class HouseLayoutModel implements BaseModel {
 	private Outside outside;
 	
 	private PropertyChangeSupport support;
-	
+
 	/**
 	 * Default constructor.
 	 */
@@ -38,6 +40,7 @@ public class HouseLayoutModel implements BaseModel {
 		this.rows = new ArrayList<>();
 		this.outside = new Outside();
 		this.support = new PropertyChangeSupport(this);
+		this.support.addPropertyChangeListener(new SecurityModel(false, false, null));
 	}
 	
 	/**
@@ -203,13 +206,6 @@ public class HouseLayoutModel implements BaseModel {
 		this.support.firePropertyChange("awayMode", null, activate);
 	}
 	
-	/**
-	 * Update all propteryChangeListeners of change in DetectedPerson
-	 * @param detected wether someone was detected or not
-	 */
-	public void updateDetectedPerson(boolean detected){
-		this.support.firePropertyChange("detectedPerson", null, detected);
-	}
 
 	/**
 	 * update duration of auhtoritiesTimer
