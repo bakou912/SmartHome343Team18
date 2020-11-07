@@ -8,6 +8,7 @@ import com.smart.home.backend.model.smarthomesecurity.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,27 +37,35 @@ public class SmartHomeSecurityController {
 	}
 
     /**
-	 * activate or deactivate AwayMode
-	 * @param state
-	 * @return
+	 * Activating or deactivating AwayMode
+	 * @param state away mode state
+	 * @return New away mode value
 	 */
 	@PutMapping("context/awayMode/{state}")
 	public ResponseEntity<Boolean> setAwayMode(@PathVariable(value = "state") boolean state){
-		
 		this.houseLayoutController.getHouseLayoutModel().updateAwayMode(state);
-		return new ResponseEntity<Boolean>(this.getSecurity().getAwayMode(), HttpStatus.OK);
+		this.getSecurity().setAwayMode(state);
+		return new ResponseEntity<>(this.getSecurity().getAwayMode(), HttpStatus.OK);
 	}
 
 	/**
-	 * Set duration for authorityTimer while on away mode
-	 * @param duration
-	 * @return
+	 * Setting duration for authorityTimer while on away mode
+	 * @param duration new duration
+	 * @return Updated duration
 	 */
 	@PutMapping("context/authoritiyTimer/{duration}")
 	public ResponseEntity<Duration> setAuthorityTimerDuration(@PathVariable(value="duration") Duration duration){
-		
 		this.houseLayoutController.getHouseLayoutModel().updateAuthoritiesTimer(duration);
 		return new ResponseEntity<>(this.getSecurity().getAlertAuthoritiesTime(), HttpStatus.OK);
 	}
-
+	
+	/**
+	 * Retrieving the away mode state.
+	 * @return Wether the away mode is on or not
+	 */
+	@GetMapping("context/awayMode/state")
+	public ResponseEntity<Boolean> getAwayMode(){
+		return new ResponseEntity<>(this.getSecurity().getAwayMode(), HttpStatus.OK);
+	}
+	
 }
