@@ -15,15 +15,28 @@ class HttpClient {
     }
 
     async post(path, body) {
-        return this.client.post(path, body);
+        return this.client.post(path, body).then(async response => {
+            await this.notifyConsole();
+            return response;
+        });
     }
 
     async put(path, body) {
-        return this.client.put(path, body);
+        return this.client.put(path, body).then(async response => {
+            await this.notifyConsole();
+            return response;
+        });
     }
 
     async delete(path) {
-        return this.client.delete(path);
+        return this.client.delete(path).then(async response => {
+            await this.notifyConsole();
+            return response;
+        });
+    }
+
+    async notifyConsole() {
+        await window.dispatchEvent(new Event("updateConsole"));
     }
 
 }

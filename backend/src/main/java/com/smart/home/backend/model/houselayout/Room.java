@@ -1,7 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.input.DoorInput;
-import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
@@ -13,7 +12,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.smart.home.backend.model.ModelObject;
 import lombok.experimental.SuperBuilder;
 import org.springframework.lang.Nullable;
 
@@ -22,26 +20,19 @@ import org.springframework.lang.Nullable;
  */
 @Getter
 @SuperBuilder
-public class Room extends ModelObject {
+public class Room extends Location {
 	
 	@Setter
 	private String name;
-	@Setter
-	@Builder.Default
-	private Light light = new Light();
 	@Setter
 	@Builder.Default
 	private List<Window> windows = new ArrayList<>();
 	@Setter
 	@Builder.Default
 	private List<Door> doors = new ArrayList<>();
-	@Setter
-	@Builder.Default
-	private List<Person> persons = new ArrayList<>();
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
-	private final IdUtil personId = new IdUtil();
 	
 	/**
 	 * Finds a door with the corresponding id.
@@ -67,20 +58,6 @@ public class Room extends ModelObject {
 		return this.getWindows()
 				.stream()
 				.filter(window -> window.getId() == id)
-				.findFirst()
-				.orElse(null);
-	}
-	
-	/**
-	 * Finds a person with the corresponding id.
-	 * @param id Searched person's id
-	 * @return Found person
-	 */
-	@Nullable
-	public Person findPerson(int id) {
-		return this.getPersons()
-				.stream()
-				.filter(person -> person.getId() == id)
 				.findFirst()
 				.orElse(null);
 	}
@@ -113,20 +90,4 @@ public class Room extends ModelObject {
 		);
 	}
 	
-	/**
-	 * Adds a person to the person list
-	 * @param personInput person input
-	 */
-	public Integer addPerson(PersonInput personInput) {
-		Integer id = this.getPersonId().newId();
-		
-		this.getPersons().add(
-				Person.builder()
-						.id(id)
-						.name(personInput.getName())
-						.build()
-		);
-		
-		return id;
-	}
 }

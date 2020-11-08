@@ -1,3 +1,9 @@
+.HeaderDiv {
+  font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+  height: 0;
+}
+
 .HeaderText {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
@@ -44,9 +50,6 @@
   display: inline-block;
   width: 600px;
   height: 500px;
-}
-
-.ModulesCol {
 }
 
 .HouseLayoutContainer {

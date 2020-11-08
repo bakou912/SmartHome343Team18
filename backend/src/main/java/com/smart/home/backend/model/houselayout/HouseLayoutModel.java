@@ -1,14 +1,14 @@
 package com.smart.home.backend.model.houselayout;
 
 import com.smart.home.backend.constant.WindowState;
+import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
-import com.smart.home.backend.model.simulationparameters.location.Location;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocation;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
-
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import lombok.*;
 
 import java.beans.PropertyChangeListener;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -28,19 +29,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class HouseLayoutModel implements BaseModel {
 	
+	private static final String BACKYARD = "Backyard";
+	private static final String ENTRANCE = "Entrance";
+	
+	private Integer nbPersonsInside;
 	private List<RoomRow> rows;
-	private Outside outside;
+	private OutsideLocation entrance;
+	private OutsideLocation backyard;
 	
 	private PropertyChangeSupport support;
 
 	/**
 	 * Default constructor.
 	 */
-	public HouseLayoutModel() {
+	@Autowired
+	public HouseLayoutModel(SecurityModel securityModel) {
+		nbPersonsInside = 0;
 		this.rows = new ArrayList<>();
-		this.outside = new Outside();
+		this.backyard = new OutsideLocation(BACKYARD);
+		this.entrance = new OutsideLocation(ENTRANCE);
 		this.support = new PropertyChangeSupport(this);
-		this.support.addPropertyChangeListener(new SecurityModel(false, false, null));
+		this.addPropertyChangeListener(securityModel);
 	}
 	
 	/**
@@ -65,16 +74,16 @@ public class HouseLayoutModel implements BaseModel {
 	
 	/**
 	 * Finds a room with the corresponding row and room ids.
-	 * @param location row's location
+	 * @param locationPosition row's location
 	 * @return Found room
 	 */
 	@Nullable
-	public Room findRoom(Location location) {
-		RoomRow foundRow = this.findRow(location.getRowId());
+	public Room findRoom(LocationPosition locationPosition) {
+		RoomRow foundRow = this.findRow(locationPosition.getRowId());
 		Room foundRoom = null;
 		
 		if (foundRow != null) {
-			foundRoom = foundRow.findRoom(location.getRoomId());
+			foundRoom = foundRow.findRoom(locationPosition.getRoomId());
 		}
 		
 		return foundRoom;
@@ -86,7 +95,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Found door
 	 */
 	@Nullable
-	public Door findDoor(RoomItemLocation location) {
+	public Door findDoor(RoomItemLocationPosition location) {
 		Room foundRoom = this.findRoom(location);
 		Door foundDoor = null;
 		
@@ -103,7 +112,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Found window
 	 */
 	@Nullable
-	public Window findWindow(RoomItemLocation location) {
+	public Window findWindow(RoomItemLocationPosition location) {
 		Room foundRoom = this.findRoom(location);
 		Window foundWindow = null;
 		
@@ -140,7 +149,7 @@ public class HouseLayoutModel implements BaseModel {
 	 * @return Modified window. Null if not found
 	 */
 	public Window modifyWindowState(WindowInput windowInput) {
-		RoomItemLocation location = windowInput.getLocation();
+		RoomItemLocationPosition location = windowInput.getLocation();
 		Window targetWindow = this.findWindow(location);
 		
 		if (targetWindow == null) {
@@ -161,14 +170,91 @@ public class HouseLayoutModel implements BaseModel {
 		return targetWindow;
 	}
 	
+	/**
+	 * Checks if a person is in the house.
+	 * @param personName person's name
+	 * @return Wether the person is in the house or not
+	 */
+	public boolean isInHouse(String personName) {
+		boolean present = false;
+		
+		for (RoomRow roomRow: this.getRows()) {
+			for (Room room: roomRow.getRooms()) {
+				if (room.getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+					return true;
+				}
+			}
+		}
+		
+		if (this.getBackyard().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+			present = true;
+		}
+		
+		if (this.getEntrance().getPersons().stream().anyMatch(p -> p.getName().equals(personName))) {
+			present = true;
+		}
+		
+		return present;
+	}
+	
+	/**
+	 * Adding a person to the layout.
+	 * @param location the person's desired location
+	 * @param personInput person input
+	 * @return person's id
+	 */
+	public Integer addPerson(Location location, PersonInput personInput) {
+		if (!(location instanceof OutsideLocation)) {
+			this.incrementNbPersonsInside();
+		}
+		
+		return location.addPerson(personInput);
+	}
+	
+	/**
+	 * Removing a person from the layout.
+	 * @param location the person's desired location
+	 * @param personId person's id
+	 * @return Wether the person was removed from the location or not
+	 */
+	public boolean removePerson(Location location, int personId) {
+		boolean removed = location.getPersons().removeIf(person -> person.getId().equals(personId));
+		
+		if (!(location instanceof OutsideLocation)) {
+			this.decrementNbPersonsInside();
+		}
+		
+		return removed;
+	}
+	/**
+	 * Incrementing the number of persons inside the house
+	 */
+	private void incrementNbPersonsInside() {
+		int oldValue = this.getNbPersonsInside();
+		int newValue = oldValue + 1;
+		this.updateNbPersons(oldValue, newValue);
+	}
+	
+	/**
+	 * Decrementing the number of persons inside the house
+	 */
+	private void decrementNbPersonsInside() {
+		int oldValue = this.getNbPersonsInside();
+		if (oldValue > 0) {
+			int newValue = oldValue - 1;
+			this.updateNbPersons(oldValue, newValue);
+		}
+	}
+	
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());
-		this.setOutside(new Outside());
+		this.setBackyard(new OutsideLocation(BACKYARD));
+		this.setEntrance(new OutsideLocation(ENTRANCE));
 	}
 
 	/**
-	 * Add a PropertyChangeListener, essentially an observable due to deprecation
+	 * Adds a PropertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl property change listener
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
@@ -176,7 +262,7 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Remove a propertyChangeListener, essentially an observable due to deprecation
+	 * Removes a propertyChangeListener, essentially an observable due to deprecation
 	 * @param pcl property change listener
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pcl) {
@@ -184,34 +270,35 @@ public class HouseLayoutModel implements BaseModel {
     }
 	
 	/**
-	 * Update all propteryChangeListeners of change in awayMode only if no one is home.
-	 * @param activate wether to activate or deactivate away mode
+	 * Updating all propertyChangeListeners of change in nbPersons
 	 */
-	public void updateAwayMode(boolean activate){
-
-		for (RoomRow row: this.getRows()) {
-			for (Room room : row.getRooms()) {
-				if (!room.getPersons().isEmpty()) {
-					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
-				}
-			}
-		}
-		
-		if(activate) {
-			System.out.println("Deactivating Away mode.");
-		} else {
-			System.out.println("Activating Away mode!");
-		}
-		
-		this.support.firePropertyChange("awayMode", null, activate);
+	public void updateNbPersons(int oldValue, int newValue){
+		this.setNbPersonsInside(newValue);
+		this.support.firePropertyChange("nbPersonsInside", oldValue, newValue);
 	}
 	
-
+	
 	/**
-	 * update duration of auhtoritiesTimer
-	 * @param duration duration to alert authoratities
+	 * Updates all propteryChangeListeners of change in DetectedPerson
+	 * @param detected wether someone was detected or not
 	 */
-	public void updateAuthoritiesTimer(java.time.Duration duration){
-		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
+	public void updateDetectedPerson(boolean detected){
+		this.support.firePropertyChange("detectedPerson", null, detected);
 	}
+	
+	/**
+	 * Retrieves an outside location using its name.
+	 * @param locationName location's name
+	 * @return Corresponding outside location
+	 */
+	public OutsideLocation getOutsideLocation(String locationName) {
+		OutsideLocation outsideLocation = this.getBackyard();
+		
+		if (locationName.equals(ENTRANCE)) {
+			outsideLocation = this.getEntrance();
+		}
+		
+		return outsideLocation;
+	}
+	
 }

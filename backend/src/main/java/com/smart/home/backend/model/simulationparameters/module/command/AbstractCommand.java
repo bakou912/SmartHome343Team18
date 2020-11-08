@@ -3,6 +3,8 @@ package com.smart.home.backend.model.simulationparameters.module.command;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+
 @Getter
 public abstract class AbstractCommand<X, Y, Z> implements Command<X, Y, Z> {
 	

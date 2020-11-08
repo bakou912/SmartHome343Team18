@@ -10,11 +10,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RoomItemLocation extends Location {
+public class RoomItemLocationPosition extends LocationPosition {
     
     private Integer itemId;
     
-    public RoomItemLocation(Integer rowId, Integer roomId, Integer itemId) {
+    public RoomItemLocationPosition(Integer rowId, Integer roomId, Integer itemId) {
         super(rowId, roomId, false);
         this.itemId = itemId;
     }

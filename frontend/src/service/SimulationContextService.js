@@ -17,12 +17,7 @@ class SimulationContextService {
 
     async addPersonOutside(person) {
         const path = `context/layout/outside/persons`
-        return httpClient.post(path, { name: person.name });
-    }
-
-    async modifyPerson(rowId, roomId, oldName, person) {
-        const path = `context/layout/rows/${rowId}/rooms/${roomId}/persons/${oldName}`
-        return httpClient.put(path, { name: person.name });
+        return httpClient.post(path, person);
     }
 
     async removePersonFromRoom(rowId, roomId, personId) {
@@ -30,14 +25,9 @@ class SimulationContextService {
         return httpClient.delete(path);
     }
 
-    async blockWindow(rowId, roomId, windowId) {
-        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/block`
-        return httpClient.put(path);
-    }
-
-    async unblockWindow(rowId, roomId, windowId) {
-        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
-        return httpClient.put(path);
+    async removePersonFromOutside(personId) {
+        const path = `context/layout/outside/persons/${personId}`
+        return httpClient.delete(path);
     }
 
     async modifyUser(userInput) {

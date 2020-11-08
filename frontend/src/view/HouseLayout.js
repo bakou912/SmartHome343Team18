@@ -42,11 +42,11 @@ export default class HouseLayout extends React.Component {
         this.layoutModel = (await HouseLayoutService.getLayout()).data;
 
         if (this.layoutModel && Array.isArray(this.layoutModel.rows)) {
-            this.setState(this.createRooms());
+            this.setState(this.createLocations());
         }
     }
 
-    createRooms() {
+    createLocations() {
         const rows = this.layoutModel.rows;
         const rooms = [];
         let doors = [];
@@ -84,6 +84,16 @@ export default class HouseLayout extends React.Component {
                 }
             }
         }
+
+        const backyardPosition = { x: 0, y: -layoutHeight / 2 };
+        const entrancePosition = { x: 0, y: layoutHeight};
+        const outsideDimensions = { width: nbRoomsMax * this.roomDimensions.width, height: layoutHeight / 2};
+
+        lights = lights.concat(LightsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
+        persons = persons.concat(PersonsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
+
+        lights = lights.concat(LightsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
+        persons = persons.concat(PersonsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
 
         return {
             rooms: rooms,

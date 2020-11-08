@@ -53,7 +53,6 @@ export class EditUserProfiles extends React.Component {
         await this.setState({
             [component]: evt.value
         });
-        console.log(this.state.selectedCommand);
     }
 
     permissionDefaultValue(restriction) {
@@ -170,6 +169,7 @@ export class EditUserProfiles extends React.Component {
                                 this.state.selectedProfile && this.state.selectedModule && this.state.selectedCommand ?
                                     <div key={this.state.selectedCommand.name} onChange={this.onChangePermission}>
                                         <input type="radio" value="NONE" name="permission" defaultChecked={this.permissionDefaultValue("NONE")}/> Authorized
+                                        <br/>
                                         {
                                             this.state.selectedCommand.locationDependent === true ? <div>
                                                 <input type="radio" value="INSIDE" name="permission" defaultChecked={this.permissionDefaultValue("INSIDE")}/> Authorized Inside

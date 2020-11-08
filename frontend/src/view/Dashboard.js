@@ -40,7 +40,7 @@ export default class Dashboard extends React.Component {
     render() {
         return (
             <Container fluid className="Dashboard">
-                <header className="Header">
+                <header className="Header HeaderDiv">
                     <h1 className="HeaderText">
                         Smart Home Simulator
                     </h1>
@@ -69,7 +69,7 @@ export default class Dashboard extends React.Component {
                     </Col>
                     <Col md={4} className="ModulesContainer">
                         <Row className="ModulesRow">
-                            <Col className="ModulesCol">
+                            <Col>
                                 <Container>
                                     <h2 className="SectionHeader ModulesHeader">
                                         Modules

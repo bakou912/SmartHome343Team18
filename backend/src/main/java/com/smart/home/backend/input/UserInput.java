@@ -1,7 +1,7 @@
 package com.smart.home.backend.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.smart.home.backend.model.simulationparameters.location.PersonLocation;
+import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.permission.CommandPermission;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class UserInput {
     private String name;
     
     @JsonProperty("location")
-    private PersonLocation location;
+    private PersonLocationPosition location;
     
     @JsonProperty("permissions")
     private List<CommandPermission> commandPermissions = new ArrayList<>();
