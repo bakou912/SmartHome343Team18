@@ -2,10 +2,8 @@ package com.smart.home.backend.model.smarthomesecurity;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import com.smart.home.backend.service.OutputConsole;
 import lombok.AllArgsConstructor;
@@ -26,28 +24,31 @@ public class SecurityModel implements PropertyChangeListener{
     private Boolean awayMode;
     private Duration alertAuthoritiesTime;
     private Integer nbPersonsInside;
+    private Boolean alertDetected;
     
     /**
      * Default constructor.
      */
     public SecurityModel() {
         this.awayMode = false;
+        this.alertDetected = false;
         this.nbPersonsInside = 0;
-        this.alertAuthoritiesTime = Duration.ZERO;
+        this.alertAuthoritiesTime = Duration.ofSeconds(10);
     }
     
     /**
      * Handling property changes from observed objects.
      * @param evt property change event
      */
+    @SneakyThrows
     public void propertyChange(PropertyChangeEvent evt) {
-        
-        switch((evt.getPropertyName())) {
-            case "nbPersonsInside":
-                this.setNbPersonsInside((Integer) evt.getNewValue());
-                break;
-            default:
-                break;
+    
+        if("nbPersonsInside".equals((evt.getPropertyName()))) {
+            this.setNbPersonsInside((Integer) evt.getNewValue());
+            
+            if (this.awayMode.equals(true)) {
+                this.sendNotification();
+            }
         }
         
     }
@@ -72,26 +73,20 @@ public class SecurityModel implements PropertyChangeListener{
      */
     public void setLightsDuringAway(){
         //TODO : tell SHC module to turn on the light in specific rooms
-
     }
 
     /**
      * Send notification of a person detected to the console and to authorities.
      */
-    public void sendNotification() throws IOException {
-        if (this.getAlertAuthoritiesTime() != null) {
-           OutputConsole.log("Alerting authorities in: " + this.getAlertAuthoritiesTime().toString());
-            Timer timer = new Timer();
-            timer.schedule(
-                    new TimerTask() {
-                        @SneakyThrows
-                        @Override
-                        public void run(){
-                            OutputConsole.log("Alerting authorities");
-                        }
-                    },
-                    this.getAlertAuthoritiesTime().getSeconds()
+    public void sendNotification() {
+        if (this.getAlertDetected().equals(false)) {
+            this.setAlertDetected(true);
+            OutputConsole.log(
+                    "SHP | A person was detected inside the house. Alerting authorities in "
+                            + this.getAlertAuthoritiesTime().getSeconds() + " seconds"
             );
+            Timer timer = new Timer();
+            timer.schedule(new AuthoritiesCallTask(this), this.getAlertAuthoritiesTime().getSeconds() * 1000);
         }
     }
 

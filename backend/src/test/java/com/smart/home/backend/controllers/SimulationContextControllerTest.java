@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,6 +40,9 @@ import static org.mockito.Mockito.when;
 class SimulationContextControllerTest {
     
     final String PROFILE_NAME = "profile_name";
+    
+    @Mock
+    UserProfiles userProfiles;
     
     @Mock
     HouseLayoutModel houseLayoutModel;
@@ -88,6 +90,8 @@ class SimulationContextControllerTest {
             when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUser()).thenReturn(
                     new User(new UserProfile(PROFILE_NAME, new ArrayList<>()), "oldname", new PersonLocationPosition())
             );
+            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles()).thenReturn(userProfiles);
+            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles().get(any())).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
             
             UserInput modifyInput = new UserInput();
             PersonLocationPosition newLocation = new PersonLocationPosition();
@@ -182,12 +186,12 @@ class SimulationContextControllerTest {
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(LocationPosition.class))).thenReturn(foundRoom);
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().addPerson(any(), any())).thenReturn(0).thenReturn(1).thenReturn(2);
             
-            PersonInput personInput = new PersonInput();
+            RoomPersonInput personInput = new RoomPersonInput();
             personInput.setName("personname");
             
-            assertEquals(0, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
-            assertEquals(1, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
-            assertEquals(2, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
+            assertEquals(0, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
         }
     
         /**
@@ -195,6 +199,7 @@ class SimulationContextControllerTest {
          */
         @Test
         void validAddPersonOutside() {
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutsideLocation(any())).thenReturn(new OutsideLocation(""));
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().addPerson(any(), any())).thenReturn(0).thenReturn(1).thenReturn(2);
         
             OutsidePersonInput personInput = new OutsidePersonInput();
@@ -212,10 +217,10 @@ class SimulationContextControllerTest {
         void invalidAddPerson() {
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(LocationPosition.class))).thenReturn(null);
     
-            PersonInput personInput = new PersonInput();
+            RoomPersonInput personInput = new RoomPersonInput();
             personInput.setName("personname");
             
-            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput);
+            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput);
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

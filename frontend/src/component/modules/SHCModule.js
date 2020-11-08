@@ -5,6 +5,7 @@ import Select from "react-select";
 import {Container, Button, Col, Row, ListGroup} from "react-bootstrap";
 import ParametersService from "../../service/ParametersService";
 import Command from "./Command";
+import Switch from "react-switch";
 
 const ITEMS = ["Window", "Light", "Door"];
 const OUTSIDE = ["Backyard", "Entrance"];
@@ -25,8 +26,9 @@ export default class SHCModule extends React.Component {
         this.openCloseWindow = this.openCloseWindow.bind(this);
         this.modifyLightState = this.modifyLightState.bind(this);
         this.openCloseDoor = this.openCloseDoor.bind(this);
-        this.autoMode = this.autoMode.bind(this);
+        this.setAutoMode = this.setAutoMode.bind(this);
 		this.onSelectedItem = this.onSelectedItem.bind(this);
+		this.setAutoMode = this.setAutoMode.bind(this);
     }
 
     async componentDidMount() {
@@ -97,11 +99,8 @@ export default class SHCModule extends React.Component {
     }
 
     async openCloseWindow(windowState) {
-        if (windowState === "OPEN") {
-            await HouseLayoutService.openWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-        } else {
-            await HouseLayoutService.unblockWindow(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id)
-        }
+        await HouseLayoutService.changeWindowState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, this.state.selectedWindow.value.id, windowState);
+
         this.setState({
             selectedWindow: {
                 ...this.state.selectedWindow,
@@ -126,6 +125,7 @@ export default class SHCModule extends React.Component {
                 selectedLocation: {
                     ...this.state.selectedLocation,
                     light: {
+                        ...this.state.selectedLocation.light,
                         state: lightState
                     }
                 }
@@ -157,12 +157,28 @@ export default class SHCModule extends React.Component {
 		window.dispatchEvent(new Event("updateLayout"));
     }
 
-    async autoMode(mode) {
-        if (mode) {
-            console.log("automode set");
-        } else {
-            console.log("automode removed");
-        }
+    async setAutoMode(setOn) {
+        const light = { location: this.state.selectedLocation.label, autoMode: setOn };
+
+        const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
+            async () => HouseLayoutService.modifyOutsideLightState(light)
+            :
+            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, light)
+
+        await action().then(async response =>{
+            await this.setState({
+                selectedLocation: {
+                    ...this.state.selectedLocation,
+                    light: {
+                        ...this.state.selectedLocation.light,
+                        autoMode: setOn,
+                        state: response.data.state
+                    }
+                }
+            });
+        });
+
+        window.dispatchEvent(new Event("updateLayout"));
     }
 
     async itemSelected(item) {
@@ -288,20 +304,36 @@ export default class SHCModule extends React.Component {
 															{
 																this.state.selectedLocation.light.state === "OFF" ?
 																	<div>
-																		<Button onClick={() => this.modifyLightState("ON")}
-																				variant="secondary" size="md">On</Button>
+																		<Button
+                                                                            onClick={() => this.modifyLightState("ON")}
+                                                                            variant="secondary" size="md"
+                                                                            disabled={this.state.selectedLocation.light.autoMode}
+                                                                        >
+                                                                            On
+																		</Button>
 																	</div>
 																	:
 																	<div>
-																		<Button onClick={() => this.modifyLightState("OFF")}
-																				variant="secondary" size="md">Off</Button>
+																		<Button
+                                                                            onClick={() => this.modifyLightState("OFF")}
+                                                                            variant="secondary" size="md"
+                                                                            disabled={this.state.selectedLocation.light.autoMode}
+                                                                        >
+                                                                            Off
+																		</Button>
 																	</div>
 															}
 														</Col>
 														<Col>
 															<div style={{margin: "25px"}}>
-																<input type="checkbox" id="autoMode" name="autoMode" value="true"/>
-																<label>Enable Auto Mode</label>
+                                                                <label>Enable Auto Mode</label>
+                                                                &nbsp;
+                                                                <Switch
+                                                                    height={20}
+                                                                    width={48}
+                                                                    onChange={this.setAutoMode}
+                                                                    checked={this.state.selectedLocation.light.autoMode}
+                                                                />
 															</div>
 														</Col>
 													</Row>

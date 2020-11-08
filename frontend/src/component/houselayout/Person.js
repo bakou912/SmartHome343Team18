@@ -10,9 +10,9 @@ export default class Person extends React.Component {
         this.state = {
             x: props.x,
             y: props.y,
-            state: props.state
         };
     }
+
     render() {
         return (
             <image

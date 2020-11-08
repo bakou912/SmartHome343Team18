@@ -6,7 +6,6 @@ import HouseLayoutService from "../service/HouseLayoutService";
 import Select from "react-select";
 import ParametersService from "../service/ParametersService";
 import {EditUserProfiles} from "../component/EditUserProfiles";
-import Command from "../component/modules/Command";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
@@ -206,10 +205,10 @@ export default class SimulationContext extends React.Component {
         let windowState;
         if (block === true) {
             windowState = "BLOCKED";
-            await HouseLayoutService.blockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.blockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
         } else {
             windowState = "CLOSED";
-            await HouseLayoutService.unblockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.unblockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
         }
 
         this.setState({
@@ -262,13 +261,13 @@ export default class SimulationContext extends React.Component {
 
     async removePerson() {
         const action = OUTSIDE.includes(this.state.selectedContextLocation.label) ?
-            async () => SimulationContextService.removePersonFromOutside(this.state.selectedPerson.value.id)
+            async () => SimulationContextService.removePersonFromOutside(this.state.selectedContextLocation.label, this.state.selectedPerson.value.id)
             :
             async () => SimulationContextService.removePersonFromRoom(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedPerson.value.id);
 
         await action().then(async () =>{
             await this.setState({
-                persons: this.state.persons.filter(person => person.value.id !== this.state.selectedPerson.value.id),
+                persons: this.state.persons.filter(person => person.value.name !== this.state.selectedPerson.value.name),
                 personUpdateKey: this.state.personUpdateKey + 1,
                 selectedPerson: null
             });
@@ -457,17 +456,20 @@ export default class SimulationContext extends React.Component {
                                                                         {
                                                                             this.state.addingPerson ?
                                                                                 <div>
-                                                                                    <input type="text" placeholder="Name" maxLength="20"
-                                                                                           value={this.state.personName}
-                                                                                           onChange={this.handlePersonNameChange}/>
-                                                                                    <Button onClick={this.addPerson} variant="secondary"
-                                                                                            size="sm">Save</Button>
+                                                                                    <input
+                                                                                        type="text" placeholder="Name" maxLength="20"
+                                                                                        value={this.state.personName}
+                                                                                        onChange={this.handlePersonNameChange}
+                                                                                    />
+                                                                                    <Button onClick={async () => await this.setState({ addingPerson: false })} variant="dark" size="sm">
+                                                                                        X
+                                                                                    </Button>
+                                                                                    <Button onClick={this.addPerson} variant="secondary" size="sm">
+                                                                                        Save
+                                                                                    </Button>
                                                                                 </div>
                                                                                 :
-                                                                                <Command
-                                                                                    name="Person management"
-                                                                                    location={this.state.selectedLocation}
-                                                                                >
+                                                                                <div>
                                                                                     <Button onClick={() => this.setEditing(true)} variant="secondary"
                                                                                             size="sm">Add</Button>
                                                                                     {
@@ -476,8 +478,7 @@ export default class SimulationContext extends React.Component {
                                                                                                     size="sm">Remove</Button>
                                                                                             : null
                                                                                     }
-                                                                                </Command>
-
+                                                                                </div>
                                                                         }
                                                                     </Col>
                                                                 </Row>

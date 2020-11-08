@@ -6,6 +6,7 @@ import "../style/Dashboard.css";
 import SimulationContextService from "../service/SimulationContextService";
 import SimulationContext from "./SimulationContext";
 import Modules from "../component/modules/Modules";
+import Console from "../component/modules/Console";
 
 export default class Dashboard extends React.Component {
 
@@ -86,6 +87,10 @@ export default class Dashboard extends React.Component {
                                     House Layout
                                 </h2>
                                 <HouseLayout/>
+                                <h5 className="SectionHeader ConsoleHeader">
+                                    Console
+                                </h5>
+                                <Console/>
                             </Row>
                         </Container>
                     </Col>

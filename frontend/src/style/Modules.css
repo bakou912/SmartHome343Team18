@@ -33,6 +33,21 @@
   background-color: #282c34;
   color: white;
 }
+
 .ItemsTable{
   text-align: left;
+}
+
+.ConsoleLines {
+  padding: 5px;
+  text-align: left;
+  height: 200px;
+  width: 600px;
+  overflow-y: auto;
+  font-size: 11px;
+  scroll-behavior: smooth;
+}
+
+.Console {
+  background-color: white;
 }

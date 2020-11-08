@@ -14,7 +14,6 @@ export default class PersonsFactory {
                     key={`${i}`}
                     x={i * Person.dimension}
                     y="0"
-                    state={personModels[i].state}
                 />
             );
         }

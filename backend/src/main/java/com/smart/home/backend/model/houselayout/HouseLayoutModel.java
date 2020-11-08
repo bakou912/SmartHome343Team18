@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
@@ -144,6 +145,17 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
+	 * Setting a location's light's auto mode value
+	 * @param location location where to change light
+	 * @param activated auto mode value
+	 */
+	public void setAutoMode(Location location, boolean activated) {
+		boolean oldValue = location.getLight().getAutoMode();
+		location.getLight().setAutoMode(activated);
+		this.support.firePropertyChange("lightAutoMode", oldValue, activated);
+	}
+	
+	/**
 	 * Modifies a Window.
 	 * @param windowInput window input
 	 * @return Modified window. Null if not found
@@ -208,6 +220,10 @@ public class HouseLayoutModel implements BaseModel {
 			this.incrementNbPersonsInside();
 		}
 		
+		if (location.getLight().getAutoMode().equals(true)) {
+			location.getLight().setState(LightState.ON);
+		}
+		
 		return location.addPerson(personInput);
 	}
 	
@@ -215,17 +231,31 @@ public class HouseLayoutModel implements BaseModel {
 	 * Removing a person from the layout.
 	 * @param location the person's desired location
 	 * @param personId person's id
-	 * @return Wether the person was removed from the location or not
+	 * @return Removed person's name
 	 */
-	public boolean removePerson(Location location, int personId) {
-		boolean removed = location.getPersons().removeIf(person -> person.getId().equals(personId));
+	public String removePerson(Location location, int personId) {
+		String personName = null;
+		Person person = location.getPersons().stream().filter(p -> p.getId().equals(personId)).findFirst().orElse(null);
 		
-		if (!(location instanceof OutsideLocation)) {
-			this.decrementNbPersonsInside();
+		if (person != null) {
+			personName = person.getName();
 		}
 		
-		return removed;
+		boolean removed = location.getPersons().removeIf(p -> p.getId().equals(personId));
+		
+		if (removed) {
+			if (location.getLight().getAutoMode().equals(true) && location.getPersons().isEmpty()) {
+				location.getLight().setState(LightState.OFF);
+			}
+			if (!(location instanceof OutsideLocation)) {
+				this.decrementNbPersonsInside();
+			}
+		}
+		
+		
+		return personName;
 	}
+	
 	/**
 	 * Incrementing the number of persons inside the house
 	 */
@@ -275,15 +305,6 @@ public class HouseLayoutModel implements BaseModel {
 	public void updateNbPersons(int oldValue, int newValue){
 		this.setNbPersonsInside(newValue);
 		this.support.firePropertyChange("nbPersonsInside", oldValue, newValue);
-	}
-	
-	
-	/**
-	 * Updates all propteryChangeListeners of change in DetectedPerson
-	 * @param detected wether someone was detected or not
-	 */
-	public void updateDetectedPerson(boolean detected){
-		this.support.firePropertyChange("detectedPerson", null, detected);
 	}
 	
 	/**

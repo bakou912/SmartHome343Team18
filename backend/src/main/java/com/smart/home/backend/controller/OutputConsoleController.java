@@ -1,5 +1,6 @@
 package com.smart.home.backend.controller;
 
+import com.smart.home.backend.input.ConsoleLineInput;
 import com.smart.home.backend.service.OutputConsole;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,12 +28,12 @@ public class OutputConsoleController {
 	}
 	
 	/**
-	 * Retrieving the console lines.
-	 * @return The console lines
+	 * Logging a line to the output console.
+	 * @return The new line
 	 */
 	@PostMapping("console/lines")
-	public ResponseEntity<List<String>> logLine(@RequestBody String line) {
-		OutputConsole.log(line);
+	public ResponseEntity<List<String>> logLine(@RequestBody ConsoleLineInput input) {
+		OutputConsole.log(input.getLine());
 		return new ResponseEntity<>(OutputConsole.getLines(), HttpStatus.OK);
 	}
 	

@@ -10,7 +10,18 @@ class SmartHomeSecurityService {
     async getAwayModeState() {
         const path = "security/awaymode"
         return httpClient.get(path);
-    }     
+    }
+
+    async getAuthoritiesTimer() {
+        const path = "security/authoritiestime"
+        return httpClient.get(path);
+    }
+
+    async modifyAuthoritiesTimer(duration) {
+        const path = "security/authoritiestime"
+        return httpClient.put(path, { duration: duration });
+    }
+
 }
 
 export default new SmartHomeSecurityService();

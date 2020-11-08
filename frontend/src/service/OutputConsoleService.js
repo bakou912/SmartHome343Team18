@@ -4,7 +4,7 @@ class OutputConsoleService {
 
     async logLine(line) {
         const path = `console/lines`;
-        return httpClient.post(path, line);
+        return httpClient.post(path, { line: line });
      }
 
     async getLines() {

@@ -1,19 +1,14 @@
 package com.smart.home.backend.model.simulationparameters.module.command.shp;
 
 import com.smart.home.backend.input.AwayModeInput;
-import com.smart.home.backend.model.simulationparameters.module.command.AbstractCommand;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
-
-import com.smart.home.backend.service.OutputConsole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.io.IOException;
 
 /**
  * Away mode management command.
  */
-public class AwayModeManagementCommand extends AbstractCommand<SecurityModel, AwayModeInput, Boolean>{
+public class AwayModeManagementCommand extends SHPAbstractCommand<SecurityModel, AwayModeInput, Boolean>{
     
     /**
      * Default constructor.
@@ -24,14 +19,21 @@ public class AwayModeManagementCommand extends AbstractCommand<SecurityModel, Aw
 
     @Override
     public ResponseEntity<Boolean> execute(SecurityModel securityModel, AwayModeInput awayModeInput){
+        String stateString = awayModeInput.getState().equals(true) ? "ON" : "OFF";
+        
         if (!securityModel.setAwayMode(awayModeInput.getState())) {
-            OutputConsole.log("Away mode could not be set to " + awayModeInput.getState().toString());
+            String errorString = "Away mode could not be turned " + stateString;
             
             if (awayModeInput.getState().equals(true)) {
-                OutputConsole.log("There are people inside the house");
+                errorString += ": there are people inside the house";
             }
+    
+            this.logAction(errorString);
+    
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    
+        this.logAction("Away mode turned " + stateString);
     
         return new ResponseEntity<>(securityModel.getAwayMode(), HttpStatus.OK);
     }

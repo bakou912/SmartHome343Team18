@@ -35,12 +35,13 @@ public class OutputConsole {
 	/**
 	 * Logging a line to the console
 	 * @param line line to add
-	 * @throws IOException Thrown when reading the file fails
 	 */
 	public static void log(String line) {
 		try {
-			lines.add(line);
-			objectMapper.writer(new DefaultPrettyPrinter()).writeValue(outputConsoleFile, lines);
+			if (getLines().isEmpty() || !line.equals(OutputConsole.getLines().get(OutputConsole.getLines().size() - 1))) {
+				lines.add(line);
+				objectMapper.writer(new DefaultPrettyPrinter()).writeValue(outputConsoleFile, lines);
+			}
 		} catch(Exception ignored){}
 	}
 	

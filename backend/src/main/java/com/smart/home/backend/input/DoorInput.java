@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 
+import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +17,6 @@ public class DoorInput {
 
     @JsonProperty("state")
     private DoorState state;
+    
+    private RoomItemLocationPosition location;
 }

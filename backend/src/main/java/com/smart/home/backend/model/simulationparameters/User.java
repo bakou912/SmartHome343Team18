@@ -27,17 +27,4 @@ public class User {
         this.setLocation(location);
     }
     
-    /**
-     * Mutator for location
-     * @param location location value to be assigned
-     */
-    public void setLocation(PersonLocationPosition location) {
-        if (location.getOutside() != null && (location.getOutside() || location.getName().equals("Outside"))) {
-            this.location.setOutside(true);
-        } else {
-            this.location = location;
-            this.location.setOutside(false);
-        }
-    }
-    
 }

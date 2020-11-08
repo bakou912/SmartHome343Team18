@@ -82,3 +82,9 @@
   text-align: center;
   min-width: 600px;
 }
+
+.ConsoleHeader {
+  text-align: center;
+  min-width: 600px;
+  margin-top: 10px;
+}

@@ -2,6 +2,7 @@ package com.smart.home.backend.controller;
 
 import java.time.Duration;
 
+import com.smart.home.backend.input.AuthoritiesTimerInput;
 import com.smart.home.backend.input.AwayModeInput;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AuthorityTimerManagementCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeManagementCommand;
@@ -53,15 +54,24 @@ public class SmartHomeSecurityController {
 	public ResponseEntity<Boolean> setAwayMode(@RequestBody AwayModeInput awayModeInput) {
 		return new AwayModeManagementCommand().execute(this.getSecurityModel(), awayModeInput);
 	}
+	
+	/**
+	 * Retrieving duration for authoritiesTimer while on away mode
+	 * @return Duration for authoritiesTimer while on away mod
+	 */
+	@GetMapping("security/authoritiestime")
+	public ResponseEntity<Duration> getAuthorityTimerDuration() {
+		return new ResponseEntity<>(this.getSecurityModel().getAlertAuthoritiesTime(), HttpStatus.OK);
+	}
 
 	/**
 	 * Setting duration for authorityTimer while on away mode
-	 * @param duration new duration
+	 * @param authoritiesTimerInput new duration input
 	 * @return Updated duration
 	 */
-	@PutMapping("security/authoritytime/{duration}")
-	public ResponseEntity<Duration> setAuthorityTimerDuration(@PathVariable(value="duration") Duration duration) {
-		return new AuthorityTimerManagementCommand().execute(this.getSecurityModel(), duration);
+	@PutMapping("security/authoritiestime")
+	public ResponseEntity<Integer> setAuthorityTimerDuration(@RequestBody AuthoritiesTimerInput authoritiesTimerInput) {
+		return new AuthorityTimerManagementCommand().execute(this.getSecurityModel(), authoritiesTimerInput.getDuration());
 	}
 	
 }
