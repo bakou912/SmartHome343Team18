@@ -36,3 +36,8 @@
 .ItemsTable{
   text-align: left;
 }
+.styleText{
+  align-items: right;
+  height: 5em;
+  width:  15em;
+}
