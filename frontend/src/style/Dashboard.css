@@ -1,3 +1,9 @@
+.HeaderDiv {
+  font-family: 'Open Sans', sans-serif;
+  display: inline-block;
+  height: 0;
+}
+
 .HeaderText {
   font-family: 'Open Sans', sans-serif;
   display: inline-block;
@@ -46,9 +52,6 @@
   height: 500px;
 }
 
-.ModulesCol {
-}
-
 .HouseLayoutContainer {
   height: 500px;
   display: inline-block;
@@ -78,4 +81,10 @@
 .ModulesHeader {
   text-align: center;
   min-width: 600px;
+}
+
+.ConsoleHeader {
+  text-align: center;
+  min-width: 600px;
+  margin-top: 10px;
 }

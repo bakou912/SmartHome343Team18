@@ -5,6 +5,9 @@ import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.simulationparameters.*;
 import com.smart.home.backend.model.simulationparameters.module.Module;
+import com.smart.home.backend.model.simulationparameters.module.command.shs.AddPermissionCommand;
+import com.smart.home.backend.model.simulationparameters.module.command.shs.ModifyPermissionCommand;
+import com.smart.home.backend.model.simulationparameters.module.command.shs.RemovePermissionCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +26,11 @@ import java.util.List;
 @RestController
 public class SimulationParametersController {
     
-    private SimulationParametersModel model;
+    private SimulationParametersModel simulationParametersModel;
     
     @Autowired
-    public SimulationParametersController(SimulationParametersModel model) {
-        this.model = model;
+    public SimulationParametersController(SimulationParametersModel simulationParametersModel) {
+        this.simulationParametersModel = simulationParametersModel;
     }
 
     /**
@@ -38,8 +41,8 @@ public class SimulationParametersController {
     @PostMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> editSimulationParameters(@RequestBody EditParametersInput parameters){
         if (this.areParametersValid(parameters)){
-            this.getModel().editModel(parameters);
-            return new ResponseEntity<>(model, HttpStatus.OK);
+            this.getSimulationParametersModel().editModel(parameters);
+            return new ResponseEntity<>(simulationParametersModel, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -50,7 +53,7 @@ public class SimulationParametersController {
      */
     @GetMapping("/parameters")
     public ResponseEntity<SimulationParametersModel> getSimulationParameters(){
-        return new ResponseEntity<>(model, HttpStatus.OK);
+        return new ResponseEntity<>(simulationParametersModel, HttpStatus.OK);
     }
     
     /**
@@ -59,7 +62,7 @@ public class SimulationParametersController {
      */
     @GetMapping("/parameters/profiles")
     public ResponseEntity<List<UserProfile>> getProfiles(){
-        return new ResponseEntity<>(model.getUserProfiles().getProfiles(), HttpStatus.OK);
+        return new ResponseEntity<>(simulationParametersModel.getUserProfiles().getProfiles(), HttpStatus.OK);
     }
     
     /**
@@ -70,14 +73,9 @@ public class SimulationParametersController {
      */
     @PostMapping("/parameters/profiles/{profileName}/permissions")
     public ResponseEntity<UserProfiles> addPermission(@PathVariable String profileName, @RequestBody CommandPermissionInput permissionInput){
+        permissionInput.setProfileName(profileName);
         
-        boolean permissionAdded = this.getModel().getUserProfiles().addPermissionToProfile(profileName, permissionInput);
-        
-        if (!permissionAdded) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        
-        return new ResponseEntity<>(this.getModel().getUserProfiles(), HttpStatus.OK);
+        return new AddPermissionCommand().execute(this.getSimulationParametersModel(), permissionInput);
     }
     
     /**
@@ -88,14 +86,11 @@ public class SimulationParametersController {
      */
     @DeleteMapping("/parameters/profiles/{profileName}/permissions/{permissionName}")
     public ResponseEntity<UserProfiles> removePermission(@PathVariable String profileName, @PathVariable String permissionName) {
+        CommandPermissionInput commandPermissionInput = new CommandPermissionInput();
+        commandPermissionInput.setProfileName(profileName);
+        commandPermissionInput.setName(permissionName);
         
-        boolean permissionAdded = this.getModel().getUserProfiles().removePermissionFromProfile(profileName, permissionName);
-        
-        if (!permissionAdded) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        
-        return new ResponseEntity<>(this.getModel().getUserProfiles(), HttpStatus.OK);
+        return new RemovePermissionCommand().execute(this.getSimulationParametersModel(), commandPermissionInput);
     }
     
     /**
@@ -108,13 +103,9 @@ public class SimulationParametersController {
     @PutMapping("/parameters/profiles/{profileName}/permissions/{commandName}")
     public ResponseEntity<UserProfiles> modifyPermission(@PathVariable String profileName, @PathVariable String commandName, @RequestBody CommandPermissionInput permissionInput){
         permissionInput.setName(commandName);
-        boolean permissionModified = this.getModel().getUserProfiles().modifyPermissionFromProfile(profileName, permissionInput);
+        permissionInput.setProfileName(profileName);
         
-        if (!permissionModified) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        
-        return new ResponseEntity<>(this.getModel().getUserProfiles(), HttpStatus.OK);
+        return new ModifyPermissionCommand().execute(this.getSimulationParametersModel(), permissionInput);
     }
     
     /**
@@ -123,7 +114,7 @@ public class SimulationParametersController {
      */
     @DeleteMapping("/parameters")
     public ResponseEntity<HouseLayoutModel> resetLayout() {
-        this.getModel().reset();
+        this.getSimulationParametersModel().reset();
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
@@ -133,7 +124,7 @@ public class SimulationParametersController {
      */
     @GetMapping("/parameters/modules")
     public ResponseEntity<List<Module>> getModules(){
-        return new ResponseEntity<>(model.getModules().getModules(), HttpStatus.OK);
+        return new ResponseEntity<>(simulationParametersModel.getModules().getModules(), HttpStatus.OK);
     }
     
     /**

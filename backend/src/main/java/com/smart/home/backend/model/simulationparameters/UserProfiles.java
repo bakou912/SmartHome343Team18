@@ -83,8 +83,8 @@ public class UserProfiles {
 	 * @param permissionInput restriction input
 	 * @return Wether the restriction was added or not
 	 */
-	public boolean addPermissionToProfile(String profileName, CommandPermissionInput permissionInput) {
-		UserProfile foundProfile = this.get(profileName);
+	public boolean addPermissionToProfile(CommandPermissionInput permissionInput) {
+		UserProfile foundProfile = this.get(permissionInput.getProfileName());
 		
 		if (foundProfile == null || foundProfile.getCommandPermissions().stream().anyMatch(r -> r.getName().equals(permissionInput.getName()))) {
 			return false;
@@ -102,8 +102,8 @@ public class UserProfiles {
 	 * @param permissionInput permission input
 	 * @return Wether the permission was added or not
 	 */
-	public boolean modifyPermissionFromProfile(String profileName, CommandPermissionInput permissionInput) {
-		UserProfile foundProfile = this.get(profileName);
+	public boolean modifyPermissionFromProfile(CommandPermissionInput permissionInput) {
+		UserProfile foundProfile = this.get(permissionInput.getProfileName());
 		CommandPermission commandPermission;
 		
 		if (foundProfile == null || (commandPermission = foundProfile.getCommandPermissions().stream().filter(r -> r.getName().equals(permissionInput.getName())).findFirst().orElse(null)) == null) {
@@ -119,13 +119,13 @@ public class UserProfiles {
 	
 	/**
 	 * Removing a command permission from a profile.
-	 * @param permissionName permission name
+	 * @param commandPermissionInput permission input
 	 * @return Wether the permission was removed or not
 	 */
-	public boolean removePermissionFromProfile(String profileName, String permissionName) {
-		UserProfile foundProfile = this.get(profileName);
+	public boolean removePermissionFromProfile(CommandPermissionInput commandPermissionInput) {
+		UserProfile foundProfile = this.get(commandPermissionInput.getProfileName());
 		
-		if (foundProfile == null || !foundProfile.getCommandPermissions().removeIf(r -> r.getName().equals(permissionName))) {
+		if (foundProfile == null || !foundProfile.getCommandPermissions().removeIf(r -> r.getName().equals(commandPermissionInput.getName()))) {
 			return false;
 		}
 		

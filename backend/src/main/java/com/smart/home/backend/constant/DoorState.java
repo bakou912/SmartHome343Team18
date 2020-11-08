@@ -17,10 +17,5 @@ public enum DoorState {
 	DoorState(String text) {
 		this.text = text;
 	}
-	
-	@Override
-	public String toString() {
-		return text;
-	}
 
 }

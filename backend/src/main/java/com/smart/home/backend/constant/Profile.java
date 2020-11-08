@@ -9,6 +9,7 @@ import java.util.Arrays;
  */
 @Getter
 public enum Profile {
+    
     PARENT("PARENT"),
     CHILD("CHILD"),
     VISITOR("VISITOR"),

@@ -2,16 +2,16 @@ package com.smart.home.backend.controller;
 
 import java.time.Duration;
 
-import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
-import com.smart.home.backend.model.smarthomesecurity.Security;
+import com.smart.home.backend.input.AuthoritiesTimerInput;
+import com.smart.home.backend.input.AwayModeInput;
+import com.smart.home.backend.model.simulationparameters.module.command.shp.AuthorityTimerManagementCommand;
+import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeManagementCommand;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,48 +24,54 @@ import lombok.Setter;
 @RestController
 public class SmartHomeSecurityController {
     
-    private SimulationContextModel simulationContextModel;
-	private HouseLayoutController houseLayoutController;
-	private Security security;
-
-	@Autowired
-	public SmartHomeSecurityController(SimulationContextModel simulationContextModel, HouseLayoutController houseLayoutController) {
-		this.simulationContextModel = simulationContextModel;
-		this.houseLayoutController = houseLayoutController;
-		this.security = new Security(false, false, null);
-		this.houseLayoutController.getHouseLayoutModel().addPropertyChangeListener(security);
-	}
-
-    /**
-	 * Activating or deactivating AwayMode
-	 * @param state away mode state
-	 * @return New away mode value
-	 */
-	@PutMapping("context/awayMode/{state}")
-	public ResponseEntity<Boolean> setAwayMode(@PathVariable(value = "state") boolean state){
-		this.houseLayoutController.getHouseLayoutModel().updateAwayMode(state);
-		this.getSecurity().setAwayMode(state);
-		return new ResponseEntity<>(this.getSecurity().getAwayMode(), HttpStatus.OK);
-	}
-
+	private SecurityModel securityModel;
+	
 	/**
-	 * Setting duration for authorityTimer while on away mode
-	 * @param duration new duration
-	 * @return Updated duration
+	 * 1-parameter constructor
+	 * @param securityModel security model
 	 */
-	@PutMapping("context/authoritiyTimer/{duration}")
-	public ResponseEntity<Duration> setAuthorityTimerDuration(@PathVariable(value="duration") Duration duration){
-		this.houseLayoutController.getHouseLayoutModel().updateAuthoritiesTimer(duration);
-		return new ResponseEntity<>(this.getSecurity().getAlertAuthoritiesTime(), HttpStatus.OK);
+	@Autowired
+	public SmartHomeSecurityController(SecurityModel securityModel) {
+		this.securityModel = securityModel;
 	}
+	
 	
 	/**
 	 * Retrieving the away mode state.
 	 * @return Wether the away mode is on or not
 	 */
-	@GetMapping("context/awayMode/state")
+	@GetMapping("security/awaymode")
 	public ResponseEntity<Boolean> getAwayMode(){
-		return new ResponseEntity<>(this.getSecurity().getAwayMode(), HttpStatus.OK);
+		return new ResponseEntity<>(this.getSecurityModel().getAwayMode(), HttpStatus.OK);
+	}
+
+    /**
+	 * Activating or deactivating AwayMode
+	 * @param awayModeInput away mode input containing the new state
+	 * @return New away mode state
+	 */
+	@PutMapping("security/awaymode")
+	public ResponseEntity<Boolean> setAwayMode(@RequestBody AwayModeInput awayModeInput) {
+		return new AwayModeManagementCommand().execute(this.getSecurityModel(), awayModeInput);
+	}
+	
+	/**
+	 * Retrieving duration for authoritiesTimer while on away mode
+	 * @return Duration for authoritiesTimer while on away mod
+	 */
+	@GetMapping("security/authoritiestime")
+	public ResponseEntity<Duration> getAuthorityTimerDuration() {
+		return new ResponseEntity<>(this.getSecurityModel().getAlertAuthoritiesTime(), HttpStatus.OK);
+	}
+
+	/**
+	 * Setting duration for authorityTimer while on away mode
+	 * @param authoritiesTimerInput new duration input
+	 * @return Updated duration
+	 */
+	@PutMapping("security/authoritiestime")
+	public ResponseEntity<Integer> setAuthorityTimerDuration(@RequestBody AuthoritiesTimerInput authoritiesTimerInput) {
+		return new AuthorityTimerManagementCommand().execute(this.getSecurityModel(), authoritiesTimerInput.getDuration());
 	}
 	
 }

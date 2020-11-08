@@ -1,23 +1,36 @@
 import React from "react";
 import "../../style/Modules.css";
+import ParametersService from "../../service/ParametersService";
+import OutputConsoleService from "../../service/OutputConsoleService";
+
+const OUTSIDE = ["Backyard", "Entrance"];
 
 export default class Command extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this.isCommandAuthorized = this.isCommandAuthorized.bind(this);
-
         this.state = {
-            commandAuthorized: this.isCommandAuthorized()
-        };
+            loaded: false
+        }
+
+        this.isCommandAuthorized = this.isCommandAuthorized.bind(this);
     }
 
-    isCommandAuthorized() {
-        let authorized = false;
+    async componentDidMount() {
+        await this.setState({
+            commandAuthorized: await this.isCommandAuthorized(),
+            loaded: true
+        });
+    }
 
-        const commandPermission = this.props.user.profile.commandPermissions.find(cp => cp.name === this.props.name);
-        const { rowId, roomId } = this.props.user.location;
+    async isCommandAuthorized() {
+        let authorized = false;
+        let logString = "";
+
+        const user = await ParametersService.getUser();
+
+        const commandPermission = user.profile.commandPermissions.find(cp => cp.name === this.props.name);
 
         if (commandPermission) {
             switch(commandPermission.locationRestriction) {
@@ -25,23 +38,32 @@ export default class Command extends React.Component {
                     authorized = true;
                     break;
                 case "INSIDE":
-                    authorized = this.props.user.location.outside === false
+                    authorized = !OUTSIDE.includes(user.location.name);
+                    logString = " when outside";
                     break;
                 case "OUTSIDE":
-                    authorized = this.props.user.location.outside === true
+                    authorized = OUTSIDE.includes(user.location.name);
+                    logString = " when inside";
                     break;
                 case "ROOM":
-                    authorized = this.props.location.rowId === rowId && this.props.location.roomId === roomId;
+                    authorized = this.props.location.rowId === user.location.rowId && this.props.location.roomId === user.location.roomId;
+                    logString = " if not in the same room";
                     break;
                 default:
             }
+        }
+
+        if (!authorized) {
+            await OutputConsoleService.logLine(
+                `Profile ${user.profile.name} does not have permission to use the ${this.props.name.toLowerCase()} command${logString}`
+            );
         }
 
         return authorized;
     }
 
     render() {
-        return (
+        return this.state.loaded === true ?
             <div>
                 {
                     this.state.commandAuthorized ?
@@ -50,7 +72,7 @@ export default class Command extends React.Component {
                         null
                 }
             </div>
-        );
+            : null;
     }
 
 }

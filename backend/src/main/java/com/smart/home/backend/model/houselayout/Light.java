@@ -14,11 +14,13 @@ import com.smart.home.backend.constant.LightState;
 @AllArgsConstructor
 public class Light {
 	
-	public Light() {
-		this(LightState.OFF);
-	}
-	
 	@NonNull
 	private LightState state;
+	
+	private Boolean autoMode;
+	
+	public Light() {
+		this(LightState.OFF, false);
+	}
 	
 }

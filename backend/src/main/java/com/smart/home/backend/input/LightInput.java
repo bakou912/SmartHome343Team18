@@ -14,4 +14,7 @@ public class LightInput {
     @JsonProperty("state")
     private LightState state;
     
+    @JsonProperty("autoMode")
+    private Boolean autoMode;
+    
 }

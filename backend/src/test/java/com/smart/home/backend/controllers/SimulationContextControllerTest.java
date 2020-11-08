@@ -42,6 +42,9 @@ class SimulationContextControllerTest {
     final String PROFILE_NAME = "profile_name";
     
     @Mock
+    UserProfiles userProfiles;
+    
+    @Mock
     HouseLayoutModel houseLayoutModel;
     
     @Mock
@@ -87,6 +90,8 @@ class SimulationContextControllerTest {
             when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUser()).thenReturn(
                     new User(new UserProfile(PROFILE_NAME, new ArrayList<>()), "oldname", new PersonLocationPosition())
             );
+            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles()).thenReturn(userProfiles);
+            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles().get(any())).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
             
             UserInput modifyInput = new UserInput();
             PersonLocationPosition newLocation = new PersonLocationPosition();
@@ -178,19 +183,15 @@ class SimulationContextControllerTest {
         @Test
         void validAddPersonToRoom() {
             Room foundRoom = Room.builder().id(0).build();
-            when(
-                    simulationContextController
-                            .getSimulationContextModel()
-                            .getHouseLayoutModel()
-                            .findRoom(any(LocationPosition.class))
-            ).thenReturn(foundRoom);
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(LocationPosition.class))).thenReturn(foundRoom);
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().addPerson(any(), any())).thenReturn(0).thenReturn(1).thenReturn(2);
             
-            PersonInput personInput = new PersonInput();
+            RoomPersonInput personInput = new RoomPersonInput();
             personInput.setName("personname");
             
-            assertEquals(0, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
-            assertEquals(1, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
-            assertEquals(2, simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput).getBody());
+            assertEquals(0, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
+            assertEquals(1, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
+            assertEquals(2, simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput).getBody());
         }
     
         /**
@@ -198,12 +199,11 @@ class SimulationContextControllerTest {
          */
         @Test
         void validAddPersonOutside() {
-            OutsideLocation outsideLocation = new OutsideLocation("");
-            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutsideLocation("")).thenReturn(outsideLocation);
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().getOutsideLocation(any())).thenReturn(new OutsideLocation(""));
+            when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().addPerson(any(), any())).thenReturn(0).thenReturn(1).thenReturn(2);
         
             OutsidePersonInput personInput = new OutsidePersonInput();
             personInput.setName("personname");
-            personInput.setLocation("");
         
             assertEquals(0, simulationContextController.addPersonOutside(personInput).getBody());
             assertEquals(1, simulationContextController.addPersonOutside(personInput).getBody());
@@ -217,10 +217,10 @@ class SimulationContextControllerTest {
         void invalidAddPerson() {
             when(simulationContextController.getSimulationContextModel().getHouseLayoutModel().findRoom(any(LocationPosition.class))).thenReturn(null);
     
-            PersonInput personInput = new PersonInput();
+            RoomPersonInput personInput = new RoomPersonInput();
             personInput.setName("personname");
             
-            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new LocationPosition(0, 0, false), personInput);
+            ResponseEntity<Integer> responseEntity = simulationContextController.addPersonToRoom(new LocationPosition(0, 0), personInput);
         
             assertNotNull(responseEntity);
             assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

@@ -12,6 +12,8 @@ public class CommandPermissionInput {
 	@JsonProperty("name")
 	String name;
 	
+	String profileName;
+	
 	@JsonProperty("locationRestriction")
 	LocationRestriction locationRestriction;
 	

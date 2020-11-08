@@ -5,11 +5,6 @@
     },
     {
         "name": "Child",
-        "commandPermissions": [
-            {
-                "name": "Window obstruction",
-                "locationRestriction": "INSIDE"
-            }
-        ]
+        "commandPermissions": []
     }
 ]

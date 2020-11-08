@@ -60,21 +60,6 @@ public class SimulationContextModel implements BaseModel {
 	 }
 	
 	/**
-	 * Removes a person from outside.
-	 * @param id person id
-	 * @return Wether the person was removed or not
-	 */
-	 public boolean removePersonOutside(Integer id) {
-	 	boolean removed = this.getHouseLayoutModel().getBackyard().getPersons().removeIf(person -> person.getId().equals(id));
-		 
-		 if (!removed) {
-			 removed = this.getHouseLayoutModel().getEntrance().getPersons().removeIf(person -> person.getId().equals(id));
-		 }
-		 
-		 return removed;
-	 }
-	
-	/**
 	 * Toggling simulation state.
 	 * @return New state
 	 */
@@ -85,7 +70,7 @@ public class SimulationContextModel implements BaseModel {
 			this.setState(SimulationState.ON);
 		}
 	 	return this.getState();
-	 }
+	}
 	
 	public void reset() {
 	 	this.setState(SimulationState.OFF);

@@ -25,8 +25,8 @@ class SimulationContextService {
         return httpClient.delete(path);
     }
 
-    async removePersonFromOutside(personId) {
-        const path = `context/layout/outside/persons/${personId}`
+    async removePersonFromOutside(location,personId) {
+        const path = `context/layout/outside/${location}/persons/${personId}`
         return httpClient.delete(path);
     }
 
@@ -42,6 +42,16 @@ class SimulationContextService {
 
     async resetContext() {
         return httpClient.delete("context");
+    }
+
+    async blockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/block`
+        return httpClient.put(path);
+    }
+
+    async unblockWindow(rowId, roomId, windowId) {
+        const path = `context/layout/rows/${rowId}/rooms/${roomId}/windows/${windowId}/unblock`
+        return httpClient.put(path);
     }
 
 }

@@ -6,6 +6,7 @@ import "../style/Dashboard.css";
 import SimulationContextService from "../service/SimulationContextService";
 import SimulationContext from "./SimulationContext";
 import Modules from "../component/modules/Modules";
+import Console from "../component/modules/Console";
 
 export default class Dashboard extends React.Component {
 
@@ -40,7 +41,7 @@ export default class Dashboard extends React.Component {
     render() {
         return (
             <Container fluid className="Dashboard">
-                <header className="Header">
+                <header className="Header HeaderDiv">
                     <h1 className="HeaderText">
                         Smart Home Simulator
                     </h1>
@@ -69,7 +70,7 @@ export default class Dashboard extends React.Component {
                     </Col>
                     <Col md={4} className="ModulesContainer">
                         <Row className="ModulesRow">
-                            <Col className="ModulesCol">
+                            <Col>
                                 <Container>
                                     <h2 className="SectionHeader ModulesHeader">
                                         Modules
@@ -86,6 +87,10 @@ export default class Dashboard extends React.Component {
                                     House Layout
                                 </h2>
                                 <HouseLayout/>
+                                <h5 className="SectionHeader ConsoleHeader">
+                                    Console
+                                </h5>
+                                <Console/>
                             </Row>
                         </Container>
                     </Col>

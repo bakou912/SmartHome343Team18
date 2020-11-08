@@ -1,10 +1,13 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
+import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import lombok.*;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -29,20 +33,24 @@ public class HouseLayoutModel implements BaseModel {
 	private static final String BACKYARD = "Backyard";
 	private static final String ENTRANCE = "Entrance";
 	
+	private Integer nbPersonsInside;
 	private List<RoomRow> rows;
 	private OutsideLocation entrance;
 	private OutsideLocation backyard;
 	
 	private PropertyChangeSupport support;
-	
+
 	/**
 	 * Default constructor.
 	 */
-	public HouseLayoutModel() {
+	@Autowired
+	public HouseLayoutModel(SecurityModel securityModel) {
+		nbPersonsInside = 0;
 		this.rows = new ArrayList<>();
 		this.backyard = new OutsideLocation(BACKYARD);
 		this.entrance = new OutsideLocation(ENTRANCE);
 		this.support = new PropertyChangeSupport(this);
+		this.addPropertyChangeListener(securityModel);
 	}
 	
 	/**
@@ -137,6 +145,17 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
+	 * Setting a location's light's auto mode value
+	 * @param location location where to change light
+	 * @param activated auto mode value
+	 */
+	public void setAutoMode(Location location, boolean activated) {
+		boolean oldValue = location.getLight().getAutoMode();
+		location.getLight().setAutoMode(activated);
+		this.support.firePropertyChange("lightAutoMode", oldValue, activated);
+	}
+	
+	/**
 	 * Modifies a Window.
 	 * @param windowInput window input
 	 * @return Modified window. Null if not found
@@ -190,6 +209,73 @@ public class HouseLayoutModel implements BaseModel {
 		return present;
 	}
 	
+	/**
+	 * Adding a person to the layout.
+	 * @param location the person's desired location
+	 * @param personInput person input
+	 * @return person's id
+	 */
+	public Integer addPerson(Location location, PersonInput personInput) {
+		if (!(location instanceof OutsideLocation)) {
+			this.incrementNbPersonsInside();
+		}
+		
+		if (location.getLight().getAutoMode().equals(true)) {
+			location.getLight().setState(LightState.ON);
+		}
+		
+		return location.addPerson(personInput);
+	}
+	
+	/**
+	 * Removing a person from the layout.
+	 * @param location the person's desired location
+	 * @param personId person's id
+	 * @return Removed person's name
+	 */
+	public String removePerson(Location location, int personId) {
+		String personName = null;
+		Person person = location.getPersons().stream().filter(p -> p.getId().equals(personId)).findFirst().orElse(null);
+		
+		if (person != null) {
+			personName = person.getName();
+		}
+		
+		boolean removed = location.getPersons().removeIf(p -> p.getId().equals(personId));
+		
+		if (removed) {
+			if (location.getLight().getAutoMode().equals(true) && location.getPersons().isEmpty()) {
+				location.getLight().setState(LightState.OFF);
+			}
+			if (!(location instanceof OutsideLocation)) {
+				this.decrementNbPersonsInside();
+			}
+		}
+		
+		
+		return personName;
+	}
+	
+	/**
+	 * Incrementing the number of persons inside the house
+	 */
+	private void incrementNbPersonsInside() {
+		int oldValue = this.getNbPersonsInside();
+		int newValue = oldValue + 1;
+		this.updateNbPersons(oldValue, newValue);
+	}
+	
+	/**
+	 * Decrementing the number of persons inside the house
+	 */
+	private void decrementNbPersonsInside() {
+		int oldValue = this.getNbPersonsInside();
+		if (oldValue > 0) {
+			int newValue = oldValue - 1;
+			this.updateNbPersons(oldValue, newValue);
+		}
+	}
+	
 	@Override
 	public void reset() {
 		this.setRows(new ArrayList<>());
@@ -214,42 +300,11 @@ public class HouseLayoutModel implements BaseModel {
     }
 	
 	/**
-	 * Updates all propteryChangeListeners of change in awayMode only if no one is home.
-	 * @param activate wether to activate or deactivate away mode
+	 * Updating all propertyChangeListeners of change in nbPersons
 	 */
-	public void updateAwayMode(boolean activate){
-
-		for (RoomRow row: this.getRows()) {
-			for (Room room : row.getRooms()) {
-				if (!room.getPersons().isEmpty()) {
-					System.out.println("Cannot activate Away mode because there are still people home. Please remove them to activate AwayMode.");
-				}
-			}
-		}
-		
-		if(activate) {
-			System.out.println("Deactivating Away mode.");
-		} else {
-			System.out.println("Activating Away mode!");
-		}
-		
-		this.support.firePropertyChange("awayMode", null, activate);
-	}
-	
-	/**
-	 * Updates all propteryChangeListeners of change in DetectedPerson
-	 * @param detected wether someone was detected or not
-	 */
-	public void updateDetectedPerson(boolean detected){
-		this.support.firePropertyChange("detectedPerson", null, detected);
-	}
-
-	/**
-	 * Updates duration of auhtoritiesTimer
-	 * @param duration duration to alert authoratities
-	 */
-	public void updateAuthoritiesTimer(java.time.Duration duration){
-		this.support.firePropertyChange("alertAuthoritiesTime", null, duration);
+	public void updateNbPersons(int oldValue, int newValue){
+		this.setNbPersonsInside(newValue);
+		this.support.firePropertyChange("nbPersonsInside", oldValue, newValue);
 	}
 	
 	/**

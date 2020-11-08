@@ -2,6 +2,8 @@ package com.smart.home.backend.model.simulationparameters.module.command;
 
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+
 public interface Command<X, Y, Z> {
 	
 	/**
