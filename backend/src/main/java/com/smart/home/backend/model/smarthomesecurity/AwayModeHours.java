@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.time.LocalTime;
 
+/**
+ * Class for the hours of away mode.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
