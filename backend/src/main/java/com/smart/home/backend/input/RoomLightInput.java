@@ -1,7 +1,7 @@
 package com.smart.home.backend.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +11,6 @@ import lombok.Setter;
 public class RoomLightInput extends LightInput {
     
     @JsonProperty("location")
-    private RoomItemLocationPosition location;
+    private LocationPosition location;
     
 }
