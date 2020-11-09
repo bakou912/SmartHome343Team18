@@ -35,6 +35,7 @@ public class SecurityModel implements PropertyChangeListener{
     private AwayModeHours awayModeHours;
     private LocalTime currentTime;
     private List<Light> awayModeLights;
+    private AwayModeNotifier awayModeNotifier;
     
     /**
      * 1-parameter constructor.
@@ -99,8 +100,8 @@ public class SecurityModel implements PropertyChangeListener{
             for (Light light: this.getAwayModeLights()) {
                 light.setState(lightState);
             }
-    
-            new AwayModeNotifier().notifyAwayModeOn();
+
+            (this.awayModeNotifier == null ? new AwayModeNotifier() : this.awayModeNotifier).notifyAwayModeOn();
         }
         
         return true;
@@ -108,7 +109,7 @@ public class SecurityModel implements PropertyChangeListener{
     
     /**
      * Checking that the current time is in the lights on hours.
-     * @return Wether lights should be on or not.
+     * @return Whether lights should be on or not.
      */
     private boolean isLightOnTime() {
         return this.getCurrentTime().compareTo(this.getAwayModeHours().getFrom()) >= 0 && this.getCurrentTime().compareTo(this.getAwayModeHours().getTo()) < 0;

@@ -22,12 +22,12 @@ public class AwayModeHoursManagementCommand extends SHPAbstractCommand<SecurityM
     @Override
     public ResponseEntity<AwayModeHours> execute(SecurityModel securityModel, AwayModeHours awayModeHours) {
         if (awayModeHours.getFrom() != null) {
-            awayModeHours.setFrom(awayModeHours.getFrom());
+            securityModel.getAwayModeHours().setFrom(awayModeHours.getFrom());
             this.logAction("Away mode light start hour changed to " + awayModeHours.getFrom());
         }
         
         if (awayModeHours.getTo() != null) {
-            awayModeHours.setTo(awayModeHours.getTo());
+            securityModel.getAwayModeHours().setTo(awayModeHours.getTo());
             this.logAction("Away mode light stop hour changed to " + awayModeHours.getTo());
         }
         

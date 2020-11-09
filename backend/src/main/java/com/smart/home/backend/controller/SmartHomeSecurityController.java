@@ -72,7 +72,7 @@ public class SmartHomeSecurityController {
 	 * @return Updated duration
 	 */
 	@PutMapping("security/authoritiestime")
-	public ResponseEntity<Integer> setAuthorityTimerDuration(@RequestBody AuthoritiesTimerInput authoritiesTimerInput) {
+	public ResponseEntity<Integer> setAwayModeHours(@RequestBody AuthoritiesTimerInput authoritiesTimerInput) {
 		return new AuthorityTimerManagementCommand().execute(this.getSecurityModel(), authoritiesTimerInput.getDuration());
 	}
 	
@@ -91,7 +91,7 @@ public class SmartHomeSecurityController {
 	 * @return Updated awayModeHours
 	 */
 	@PutMapping("security/hours")
-	public ResponseEntity<AwayModeHours> setAuthorityTimerDuration(@RequestBody AwayModeHours awayModeHours) {
+	public ResponseEntity<AwayModeHours> setAwayModeHours(@RequestBody AwayModeHours awayModeHours) {
 		return new AwayModeHoursManagementCommand().execute(this.getSecurityModel(), awayModeHours);
 	}
 	
