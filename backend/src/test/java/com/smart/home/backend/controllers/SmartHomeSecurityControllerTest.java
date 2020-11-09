@@ -3,6 +3,7 @@ package com.smart.home.backend.controllers;
 import com.smart.home.backend.controller.SmartHomeSecurityController;
 import com.smart.home.backend.input.AuthoritiesTimerInput;
 import com.smart.home.backend.input.AwayModeInput;
+import com.smart.home.backend.model.smarthomesecurity.AwayModeHours;
 import com.smart.home.backend.model.smarthomesecurity.AwayModeNotifier;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.ResponseEntity;
+
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -68,11 +71,24 @@ class SmartHomeSecurityControllerTest {
      */
     @Test
     void setAuthoritiesTimer(){
-        ResponseEntity<Integer> authoritiesTimer = controller.setAuthorityTimerDuration(instantiateAuthoritiesTimerInput(4));
-        assertEquals(4,authoritiesTimer.getBody().intValue());
+        ResponseEntity<Integer> authoritiesTimer = controller.setAwayModeHours(instantiateAuthoritiesTimerInput(4));
+        assertEquals(4, authoritiesTimer.getBody().intValue());
 
-        authoritiesTimer = controller.setAuthorityTimerDuration(instantiateAuthoritiesTimerInput(10000));
-        assertEquals(10000,authoritiesTimer.getBody().intValue());
+        authoritiesTimer = controller.setAwayModeHours(instantiateAuthoritiesTimerInput(10000));
+        assertEquals(10000, controller.getAuthorityTimerDuration().getBody().getSeconds());
+    }
+
+    /**
+     * Test setting the awayModeHours
+     */
+    @Test
+    void setAwayModeHoursTest(){
+        ResponseEntity<AwayModeHours> setAwayModeHours = controller.setAwayModeHours(new AwayModeHours(LocalTime.NOON,LocalTime.MIDNIGHT));
+        assertEquals(LocalTime.NOON, setAwayModeHours.getBody().getFrom());
+        assertEquals(LocalTime.MIDNIGHT, setAwayModeHours.getBody().getTo());
+
+        assertEquals(LocalTime.NOON, controller.getAwayModeHours().getBody().getFrom());
+        assertEquals(LocalTime.MIDNIGHT, controller.getAwayModeHours().getBody().getTo());
     }
     /**
      * Helper Method to instantiate AwayModeInput

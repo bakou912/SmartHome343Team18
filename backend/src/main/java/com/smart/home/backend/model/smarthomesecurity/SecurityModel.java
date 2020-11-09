@@ -109,7 +109,7 @@ public class SecurityModel implements PropertyChangeListener{
     
     /**
      * Checking that the current time is in the lights on hours.
-     * @return Wether lights should be on or not.
+     * @return Whether lights should be on or not.
      */
     private boolean isLightOnTime() {
         return this.getCurrentTime().compareTo(this.getAwayModeHours().getFrom()) >= 0 && this.getCurrentTime().compareTo(this.getAwayModeHours().getTo()) < 0;
