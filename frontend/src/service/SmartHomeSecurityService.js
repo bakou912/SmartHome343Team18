@@ -12,6 +12,16 @@ class SmartHomeSecurityService {
         return httpClient.get(path);
     }
 
+    async getAwayModeHours() {
+        const path = "security/hours"
+        return httpClient.get(path);
+    }
+
+    async modifyAwayModeHours(hours) {
+        const path = "security/hours"
+        return httpClient.put(path, hours);
+    }
+
     async getAuthoritiesTimer() {
         const path = "security/authoritiestime"
         return httpClient.get(path);

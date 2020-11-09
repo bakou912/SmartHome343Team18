@@ -2,9 +2,9 @@ package com.smart.home.backend.model.smarthomesecurity;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -33,7 +33,7 @@ public class SecurityModel implements PropertyChangeListener{
     private Integer nbPersonsInside;
     private Boolean alertDetected;
     private AwayModeHours awayModeHours;
-    private Time currentTime;
+    private LocalTime currentTime;
     private List<Light> awayModeLights;
     
     /**
@@ -41,12 +41,12 @@ public class SecurityModel implements PropertyChangeListener{
      */
     @Autowired
     public SecurityModel() {
-        awayModeHours = new AwayModeHours();
+        awayModeHours = new AwayModeHours(LocalTime.parse("06:00:00"), LocalTime.parse("18:00:00"));
         this.awayMode = false;
         this.alertDetected = false;
         this.nbPersonsInside = 0;
         this.alertAuthoritiesTime = Duration.ofSeconds(10);
-        this.currentTime = Time.valueOf("12:00:00");
+        this.currentTime = LocalTime.parse("12:00:00");
         this.awayModeLights = new ArrayList<>();
     }
     
@@ -58,7 +58,7 @@ public class SecurityModel implements PropertyChangeListener{
     public void propertyChange(PropertyChangeEvent evt) {
         switch(evt.getPropertyName()) {
             case "date":
-                this.setCurrentTime(Time.valueOf(((LocalDateTime) evt.getNewValue()).toLocalTime()));
+                this.setCurrentTime(LocalTime.from(((LocalDateTime) evt.getNewValue()).toLocalTime()));
                 break;
             case "nbPersonsInside":
                 this.setNbPersonsInside((Integer) evt.getNewValue());
@@ -112,13 +112,6 @@ public class SecurityModel implements PropertyChangeListener{
      */
     private boolean isLightOnTime() {
         return this.getCurrentTime().compareTo(this.getAwayModeHours().getFrom()) >= 0 && this.getCurrentTime().compareTo(this.getAwayModeHours().getTo()) < 0;
-    }
-    
-    /**
-     * Set specific lights on
-     */
-    public void setLightsDuringAway(){
-        //TODO : tell SHC module to turn on the light in specific rooms
     }
 
     /**

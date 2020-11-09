@@ -18,7 +18,8 @@ export default class SHPModule extends React.Component {
         this.state = {
             awayMode: false,
             authoritiesTimer: 0,
-            selectedLocation: null
+            awayModeHours: null,
+            selectedLocation: null,
         };
         this.onAwayModeChange = this.onAwayModeChange.bind(this);
         this.onAuthoritiesTimerChange = this.onAuthoritiesTimerChange.bind(this);
@@ -35,8 +36,9 @@ export default class SHPModule extends React.Component {
         await this.setState({
             locations: await HouseLayoutService.getAllLocations(),
             awayMode: (await SmartHomeSecurityService.getAwayModeState()).data,
-            authoritiesTimer: authoritiesTimer
-        })
+            authoritiesTimer: authoritiesTimer,
+            awayModeHours: (await SmartHomeSecurityService.getAwayModeHours()).data
+        });
     }
 
     async onAwayModeChange(checked) {
@@ -60,12 +62,10 @@ export default class SHPModule extends React.Component {
     }
 
     async setLightAwayMode(setOn) {
-        const light = { location: this.state.selectedLocation.name, awayMode: setOn };
-
         const action = OUTSIDE.includes(this.state.selectedLocation.name) ?
-            async () => HouseLayoutService.modifyOutsideLightState(light)
+            async () => HouseLayoutService.modifyOutsideLightState({ location: this.state.selectedLocation.name, awayMode: setOn })
             :
-            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, light)
+            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { awayMode: setOn })
 
         await action().then(async () => {
             await this.setState({
@@ -90,6 +90,14 @@ export default class SHPModule extends React.Component {
 
         await this.setState({
             selectedLocation: evt.value
+        });
+    }
+
+    async onTimeSelected(evt, type) {
+        await SmartHomeSecurityService.modifyAwayModeHours({ [type]: evt.target.value.toString() }).then(async response => {
+            await this.setState({
+                awayModeHours: response.data
+            });
         });
     }
 
@@ -124,24 +132,46 @@ export default class SHPModule extends React.Component {
                                     Save
                                 </Button>
                             </label>
-
                         </Command>
                     </Col>
                 </Row>
                 <Row disabled={this.state.awayMode}>
                     <div className="Module">
                         <br/>
-                        Locations
-                        <Select
-                            styles={{
-                                option: provided => ({...provided, width: "200px"}),
-                                menu: provided => ({...provided, width: "200px"}),
-                                control: provided => ({...provided, width: "200px"}),
-                                singleValue: provided => provided
-                            }}
-                            options={this.state.locations}
-                            onChange={this.onSelectedLocation}
-                        />
+                        <Row>
+                            {
+                                this.state.awayModeHours && <Command name="Away mode light hours management">
+                                    <Col>
+                                        <label>
+                                            Lights on start time&nbsp;
+                                            <input type="time" name="fromTime" defaultValue={this.state.awayModeHours.from} onChange={async evt => this.onTimeSelected(evt, "from")}/>
+                                        </label>
+                                        <br/>
+                                        <label>
+                                            Lights on stop time&nbsp;
+                                            <input type="time" name="toTime" defaultValue={this.state.awayModeHours.to} onChange={async evt => this.onTimeSelected(evt, "to")}/>
+                                        </label>
+                                    </Col>
+                                </Command>
+                            }
+                        </Row>
+                        <br/>
+                        <Row>
+                            <Col>
+                                Locations
+                                <Select
+                                    styles={{
+                                        option: provided => ({...provided, width: "200px"}),
+                                        menu: provided => ({...provided, width: "200px"}),
+                                        control: provided => ({...provided, width: "200px"}),
+                                        singleValue: provided => provided
+                                    }}
+                                    options={this.state.locations}
+                                    onChange={this.onSelectedLocation}
+                                />
+                                <br/>
+                            </Col>
+                        </Row>
                         {
                             this.state.selectedLocation !== null ?
                                 <Container>
