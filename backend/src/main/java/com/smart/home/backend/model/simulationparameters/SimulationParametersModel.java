@@ -33,8 +33,10 @@ public class SimulationParametersModel implements BaseModel {
     
     
     /**
-     * 1-parameter constructor.
+     * 3-parameter constructor.
      * @param userProfiles user profiles
+     * @param modules modules
+     * @param securityModel security model
      */
     @Autowired
     public SimulationParametersModel(UserProfiles userProfiles, Modules modules, SecurityModel securityModel) {
@@ -43,16 +45,6 @@ public class SimulationParametersModel implements BaseModel {
         this.support = new PropertyChangeSupport(this);
         this.support.addPropertyChangeListener(securityModel);
         this.reset();
-    }
-
-    /**
-     * 2- parameter constructor.
-     * @param user user
-     * @param sysParams system parameters
-     */
-    public SimulationParametersModel(User user, SystemParameters sysParams) {
-        this.user = user;
-        this.sysParams = sysParams;
     }
     
     /**

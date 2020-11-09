@@ -1,7 +1,5 @@
 package com.smart.home.backend.controller;
 
-import com.smart.home.backend.constant.Direction;
-import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.*;
 import com.smart.home.backend.model.houselayout.directional.Door;
@@ -221,7 +219,7 @@ public class HouseLayoutController {
 	 * @return updated light. returns null if light, room, or row does not exist.
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/light")
-	public ResponseEntity<Light> modifyRoomLight(RoomItemLocationPosition location, @RequestBody RoomLightInput lightInput){
+	public ResponseEntity<Light> modifyRoomLight(LocationPosition location, @RequestBody RoomLightInput lightInput){
 		lightInput.setLocation(location);
 		return new LightManagementCommand().execute(this.getHouseLayoutModel(), lightInput);
 	}

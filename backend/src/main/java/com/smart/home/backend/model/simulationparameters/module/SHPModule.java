@@ -7,8 +7,14 @@ import com.smart.home.backend.model.simulationparameters.module.command.shp.Away
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AuthorityTimerManagementCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.LightAwayModeManagementCommand;
 
+/**
+ * SHP module class. Contains the list of commands for this module.
+ */
 public class SHPModule extends Module {
-
+    
+    /**
+     * Default constructor
+     */
     public SHPModule() {
         super("SHP", new ArrayList<>());
         this.getCommands().add(new AwayModeManagementCommand());

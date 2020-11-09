@@ -5,7 +5,7 @@ import com.smart.home.backend.model.simulationparameters.module.command.shc.*;
 import java.util.ArrayList;
 
 /**
- * The SHC module.
+ * SHC module class. Contains the list of commands for this module.
  */
 public class SHCModule extends Module {
 	

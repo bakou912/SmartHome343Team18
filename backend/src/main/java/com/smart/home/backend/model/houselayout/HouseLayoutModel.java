@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@Lazy
 @Component
 public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
 	
