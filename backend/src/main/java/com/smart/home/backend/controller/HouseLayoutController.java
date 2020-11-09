@@ -1,7 +1,5 @@
 package com.smart.home.backend.controller;
 
-import com.smart.home.backend.constant.Direction;
-import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.*;
 import com.smart.home.backend.model.houselayout.directional.Door;
