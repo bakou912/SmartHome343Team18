@@ -12,7 +12,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
@@ -39,19 +39,18 @@ class SmartHomeSecurityControllerTest {
     @Test
     void defaultAwayMode(){
         ResponseEntity<Boolean> awayModeBool = controller.getAwayMode();
-        assertEquals(false,awayModeBool.getBody().booleanValue());
+        assertFalse(awayModeBool.getBody());
     }
 
     /**
      * Test that once activated the away mode is set true
-     * @throws Exception
      */
     @Test
-    void ActivateAwayMode() throws Exception {
+    void ActivateAwayMode() {
         AwayModeNotifier awayModeNotifier = mock(AwayModeNotifier.class);
         this.securityModel.setAwayModeNotifier(awayModeNotifier);
         ResponseEntity<Boolean> awayModeBool = controller.setAwayMode(instantiateAwayModeInput(true));
-        assertEquals(true, awayModeBool.getBody().booleanValue());
+        assertTrue(awayModeBool.getBody());
         verify(awayModeNotifier).notifyAwayModeOn();
     }
 
@@ -61,7 +60,7 @@ class SmartHomeSecurityControllerTest {
     @Test
     void DeactivateAwayMode(){
         ResponseEntity<Boolean> awayModeBool = controller.setAwayMode(instantiateAwayModeInput(false));
-        assertEquals(false,awayModeBool.getBody().booleanValue());
+        assertFalse(awayModeBool.getBody().booleanValue());
     }
 
     /**
