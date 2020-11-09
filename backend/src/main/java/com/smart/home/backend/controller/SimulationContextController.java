@@ -64,7 +64,7 @@ public class SimulationContextController {
 	public ResponseEntity<User> modifyUser(@RequestBody UserInput userInput) {
 		User user = this.getSimulationContextModel().getSimulationParametersModel().getUser();
 		
-		if (user == null) {
+		if (user == null || userInput == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -92,21 +92,11 @@ public class SimulationContextController {
 	public ResponseEntity<SystemParameters> modifyParams(@RequestBody ParametersInput parametersInput) {
 		SystemParameters params = this.getSimulationContextModel().getSimulationParametersModel().getSysParams();
 		
-		if (params == null) {
+		if (params == null || parametersInput == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		if (parametersInput.getInsideTemp() != null) {
-			params.setInsideTemp(parametersInput.getInsideTemp());
-		}
-		
-		if (parametersInput.getOutsideTemp() != null) {
-			params.setOutsideTemp(parametersInput.getOutsideTemp());
-		}
-		
-		if (parametersInput.getDate() != null) {
-			params.setDate(parametersInput.getDate());
-		}
+		this.getSimulationContextModel().getSimulationParametersModel().setSysParams(parametersInput);
 		
 		return new ResponseEntity<>(params, HttpStatus.OK);
 	}

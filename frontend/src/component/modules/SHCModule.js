@@ -28,7 +28,6 @@ export default class SHCModule extends React.Component {
         this.openCloseDoor = this.openCloseDoor.bind(this);
         this.setAutoMode = this.setAutoMode.bind(this);
 		this.onSelectedItem = this.onSelectedItem.bind(this);
-		this.setAutoMode = this.setAutoMode.bind(this);
     }
 
     async componentDidMount() {
@@ -114,7 +113,6 @@ export default class SHCModule extends React.Component {
     }
 
     async modifyLightState(lightState) {
-
         const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
             async () => HouseLayoutService.modifyOutsideLightState({ location: this.state.selectedLocation.label, state: lightState })
             :
@@ -158,12 +156,10 @@ export default class SHCModule extends React.Component {
     }
 
     async setAutoMode(setOn) {
-        const light = { location: this.state.selectedLocation.label, autoMode: setOn };
-
         const action = OUTSIDE.includes(this.state.selectedLocation.label) ?
-            async () => HouseLayoutService.modifyOutsideLightState(light)
+            async () => HouseLayoutService.modifyOutsideLightState({ location: this.state.selectedLocation.label, autoMode: setOn })
             :
-            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, light)
+            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { autoMode: setOn })
 
         await action().then(async response =>{
             await this.setState({

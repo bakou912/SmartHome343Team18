@@ -5,7 +5,9 @@ import java.time.Duration;
 import com.smart.home.backend.input.AuthoritiesTimerInput;
 import com.smart.home.backend.input.AwayModeInput;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AuthorityTimerManagementCommand;
+import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeHoursManagementCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeManagementCommand;
+import com.smart.home.backend.model.smarthomesecurity.AwayModeHours;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,25 @@ public class SmartHomeSecurityController {
 	@PutMapping("security/authoritiestime")
 	public ResponseEntity<Integer> setAuthorityTimerDuration(@RequestBody AuthoritiesTimerInput authoritiesTimerInput) {
 		return new AuthorityTimerManagementCommand().execute(this.getSecurityModel(), authoritiesTimerInput.getDuration());
+	}
+	
+	/**
+	 * Retrieving away mode light hours
+	 * @return Away mode light hours
+	 */
+	@GetMapping("security/hours")
+	public ResponseEntity<AwayModeHours> getAwayModeHours() {
+		return new ResponseEntity<>(this.getSecurityModel().getAwayModeHours(), HttpStatus.OK);
+	}
+	
+	/**
+	 * Setting away mode light hours.
+	 * @param awayModeHours new awayModeHours input
+	 * @return Updated awayModeHours
+	 */
+	@PutMapping("security/hours")
+	public ResponseEntity<AwayModeHours> setAuthorityTimerDuration(@RequestBody AwayModeHours awayModeHours) {
+		return new AwayModeHoursManagementCommand().execute(this.getSecurityModel(), awayModeHours);
 	}
 	
 }

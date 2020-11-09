@@ -17,4 +17,7 @@ public class LightInput {
     @JsonProperty("autoMode")
     private Boolean autoMode;
     
+    @JsonProperty("awayMode")
+    private Boolean awayMode;
+    
 }

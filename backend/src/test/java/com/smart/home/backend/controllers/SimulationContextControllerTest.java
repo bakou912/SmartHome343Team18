@@ -14,12 +14,13 @@ import com.smart.home.backend.model.simulationparameters.*;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
+import com.smart.home.backend.model.simulationparameters.module.Modules;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -42,15 +43,19 @@ class SimulationContextControllerTest {
     final String PROFILE_NAME = "profile_name";
     
     @Mock
+    SecurityModel securityModel;
+    
+    @Mock
+    Modules modules;
+    
+    @Mock
     UserProfiles userProfiles;
     
     @Mock
     HouseLayoutModel houseLayoutModel;
     
-    @Mock
     SimulationParametersModel simulationParametersModel;
     
-    @InjectMocks
     SimulationContextController simulationContextController;
     
     /**
@@ -62,11 +67,9 @@ class SimulationContextControllerTest {
     
         @BeforeEach
         void beforeEach() {
+            simulationParametersModel = new SimulationParametersModel(userProfiles, modules, securityModel);
             simulationContextController = new SimulationContextController(
-                    new SimulationContextModel(
-                            houseLayoutModel,
-                            simulationParametersModel
-                    )
+                    new SimulationContextModel(houseLayoutModel, simulationParametersModel)
             );
         }
     
@@ -87,12 +90,9 @@ class SimulationContextControllerTest {
          */
         @Test
         void validModifyUser() {
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUser()).thenReturn(
-                    new User(new UserProfile(PROFILE_NAME, new ArrayList<>()), "oldname", new PersonLocationPosition())
-            );
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles()).thenReturn(userProfiles);
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUserProfiles().get(any())).thenReturn(new UserProfile(PROFILE_NAME, new ArrayList<>()));
-            
+            UserProfile userProfile = new UserProfile(PROFILE_NAME, new ArrayList<>());
+            when(userProfiles.get(PROFILE_NAME)).thenReturn(userProfile);
+            simulationParametersModel.setUser(new User(userProfile, "oldname", new PersonLocationPosition()));
             UserInput modifyInput = new UserInput();
             PersonLocationPosition newLocation = new PersonLocationPosition();
             newLocation.setName("newroom");
@@ -115,8 +115,6 @@ class SimulationContextControllerTest {
          */
         @Test
         void invalidModifyUser() {
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getUser()).thenReturn(null);
-        
             ResponseEntity<User> responseEntity = simulationContextController.modifyUser(null);
         
             assertNotNull(responseEntity);
@@ -128,10 +126,6 @@ class SimulationContextControllerTest {
          */
         @Test
         void validModifySystemParameters() {
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getSysParams()).thenReturn(
-                    new SystemParameters(0.0, 0.0, LocalDateTime.now())
-            );
-        
             ParametersInput modifyInput = new ParametersInput();
             LocalDateTime newDate = LocalDateTime.parse("2020-04-08T12:30");
             modifyInput.setDate(newDate);
@@ -151,8 +145,6 @@ class SimulationContextControllerTest {
          */
         @Test
         void invalidModifySystemParameters() {
-            when(simulationContextController.getSimulationContextModel().getSimulationParametersModel().getSysParams()).thenReturn(null);
-        
             ResponseEntity<SystemParameters> responseEntity = simulationContextController.modifyParams(null);
         
             assertNotNull(responseEntity);
