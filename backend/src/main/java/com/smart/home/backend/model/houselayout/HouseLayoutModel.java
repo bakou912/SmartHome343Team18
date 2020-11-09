@@ -1,5 +1,6 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.PersonInput;
@@ -10,8 +11,10 @@ import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
+import com.smart.home.backend.service.OutputConsole;
 import lombok.*;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +31,9 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
+@Lazy
 @Component
-public class HouseLayoutModel implements BaseModel {
+public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
 	
 	private static final String BACKYARD = "Backyard";
 	private static final String ENTRANCE = "Entrance";
@@ -145,14 +150,23 @@ public class HouseLayoutModel implements BaseModel {
 	}
 	
 	/**
-	 * Setting a location's light's auto mode value
+	 * Setting a location's light's away mode value
 	 * @param location location where to change light
-	 * @param activated auto mode value
+	 * @param activated away mode value
 	 */
-	public void setAutoMode(Location location, boolean activated) {
-		boolean oldValue = location.getLight().getAutoMode();
-		location.getLight().setAutoMode(activated);
-		this.support.firePropertyChange("lightAutoMode", oldValue, activated);
+	public void setAwayMode(Location location, boolean activated) {
+		Light oldValue = null;
+		Light newValue = null;
+		
+		location.getLight().setAwayMode(activated);
+		
+		if (activated) {
+			newValue = location.getLight();
+		} else {
+			oldValue = location.getLight();
+		}
+		
+		this.support.firePropertyChange("lightAwayMode", oldValue, newValue);
 	}
 	
 	/**
@@ -322,4 +336,31 @@ public class HouseLayoutModel implements BaseModel {
 		return outsideLocation;
 	}
 	
+	/**
+	 * Activating a room's away mode state.
+	 * @param room targeted room
+	 */
+	private void activateRoomAwayMode(Room room) {
+		for (Window window: room.getWindows()) {
+			if (window.getState().equals(WindowState.BLOCKED)) {
+				OutputConsole.log("SHC | " + room.getName() + "'s " + window.getDirection() + " window could not be closed, because it is obstructed");
+			} else {
+				window.setState(WindowState.CLOSED);
+			}
+		}
+		for (Door door: room.getDoors()) {
+			door.setState(DoorState.LOCKED);
+		}
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals("awayModeOn")) {
+			for (RoomRow roomRow: this.getRows()) {
+				for (Room room: roomRow.getRooms()) {
+					this.activateRoomAwayMode(room);
+				}
+			}
+		}
+	}
 }

@@ -221,8 +221,9 @@ public class HouseLayoutController {
 	 * @return updated light. returns null if light, room, or row does not exist.
 	 */
 	@PutMapping("/layout/rows/{rowId}/rooms/{roomId}/light")
-	public ResponseEntity<Light> modifyRoomLight(RoomItemLocationPosition location, @RequestBody LightInput lightInput){
-		return new LightManagementCommand().execute(this.getHouseLayoutModel().findRoom(location), lightInput);
+	public ResponseEntity<Light> modifyRoomLight(RoomItemLocationPosition location, @RequestBody RoomLightInput lightInput){
+		lightInput.setLocation(location);
+		return new LightManagementCommand().execute(this.getHouseLayoutModel(), lightInput);
 	}
 	
 	/**
@@ -231,7 +232,7 @@ public class HouseLayoutController {
 	 */
 	@PutMapping("layout/outside/light")
 	public ResponseEntity<Light> modifyOutsideLight(@RequestBody OutsideLightInput lightInput) {
-		return new LightManagementCommand().execute(this.getHouseLayoutModel().getOutsideLocation(lightInput.getLocation()), lightInput);
+		return new LightManagementCommand().execute(this.getHouseLayoutModel(), lightInput);
 	}
 	
 }

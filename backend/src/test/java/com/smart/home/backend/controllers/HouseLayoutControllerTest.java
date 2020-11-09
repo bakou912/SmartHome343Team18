@@ -11,6 +11,7 @@ import com.smart.home.backend.input.HouseLayoutInput;
 import com.smart.home.backend.input.RoomInput;
 import com.smart.home.backend.input.RoomRowInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
+import com.smart.home.backend.model.smarthomesecurity.AwayModeNotifier;
 import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

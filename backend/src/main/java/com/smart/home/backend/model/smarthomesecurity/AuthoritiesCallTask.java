@@ -9,7 +9,7 @@ import java.util.TimerTask;
  */
 public class AuthoritiesCallTask extends TimerTask {
 	
-	private SecurityModel securityModel;
+	private final SecurityModel securityModel;
 	
 	/**
 	 * 1-parameter constructor.
@@ -21,7 +21,7 @@ public class AuthoritiesCallTask extends TimerTask {
 	
 	@Override
 	public void run() {
-		if (securityModel.getNbPersonsInside() > 0) {
+		if (securityModel.getNbPersonsInside() > 0 && securityModel.getAwayMode().equals(true)) {
 			OutputConsole.log("SHP | Alerting authorities");
 		} else {
 			OutputConsole.log("SHP | The house is now empty. Alert dismissed");

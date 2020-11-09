@@ -28,7 +28,6 @@ export default class SHCModule extends React.Component {
         this.openCloseDoor = this.openCloseDoor.bind(this);
         this.setAutoMode = this.setAutoMode.bind(this);
 		this.onSelectedItem = this.onSelectedItem.bind(this);
-		this.setAutoMode = this.setAutoMode.bind(this);
     }
 
     async componentDidMount() {

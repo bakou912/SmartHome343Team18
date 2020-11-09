@@ -18,9 +18,10 @@ public class Light {
 	private LightState state;
 	
 	private Boolean autoMode;
+	private Boolean awayMode;
 	
 	public Light() {
-		this(LightState.OFF, false);
+		this(LightState.OFF, false, false);
 	}
 	
 }

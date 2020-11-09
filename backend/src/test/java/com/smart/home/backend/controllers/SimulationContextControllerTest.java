@@ -14,12 +14,12 @@ import com.smart.home.backend.model.simulationparameters.*;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
+import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -42,6 +42,9 @@ class SimulationContextControllerTest {
     final String PROFILE_NAME = "profile_name";
     
     @Mock
+    SecurityModel securityModel;
+    
+    @Mock
     UserProfiles userProfiles;
     
     @Mock
@@ -50,7 +53,6 @@ class SimulationContextControllerTest {
     @Mock
     SimulationParametersModel simulationParametersModel;
     
-    @InjectMocks
     SimulationContextController simulationContextController;
     
     /**

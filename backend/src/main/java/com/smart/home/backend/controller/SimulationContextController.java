@@ -96,17 +96,7 @@ public class SimulationContextController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		if (parametersInput.getInsideTemp() != null) {
-			params.setInsideTemp(parametersInput.getInsideTemp());
-		}
-		
-		if (parametersInput.getOutsideTemp() != null) {
-			params.setOutsideTemp(parametersInput.getOutsideTemp());
-		}
-		
-		if (parametersInput.getDate() != null) {
-			params.setDate(parametersInput.getDate());
-		}
+		this.getSimulationContextModel().getSimulationParametersModel().setSysParams(parametersInput);
 		
 		return new ResponseEntity<>(params, HttpStatus.OK);
 	}
