@@ -40,6 +40,9 @@ class HouseLayoutControllerTest {
             houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
         }
     
+        /**
+         * Test for the house layout loading.
+         */
         @Test
         void loadLayout() {
             ResponseEntity<HouseLayoutModel> loadResponse = houseLayoutController.loadLayout(createValidLayout());
@@ -49,6 +52,9 @@ class HouseLayoutControllerTest {
             assertEquals(2, loadResponse.getBody().getRows().get(0).getRooms().get(0).getWindows().size());
         }
     
+        /**
+         * Test for retrieving the house layout.
+         */
         @Test
         void getLayout() {
             houseLayoutController.loadLayout(createValidLayout());
@@ -73,7 +79,10 @@ class HouseLayoutControllerTest {
             houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
             houseLayoutController.loadLayout(createValidLayout());
         }
-        
+    
+        /**
+         * Test for the modification of a light.
+         */
         @Test
         void modifyLight() {
             Light modifiedLight;
@@ -107,6 +116,9 @@ class HouseLayoutControllerTest {
             assertEquals(true, houseLayoutController.getHouseLayoutModel().findRoom(locationPosition).getLight().getAwayMode());
         }
     
+        /**
+         * Test for the modification of a door's state.
+         */
         @Test
         void modifyDoorState() {
             RoomItemLocationPosition locationPosition = new RoomItemLocationPosition(0,0,0);
@@ -118,6 +130,9 @@ class HouseLayoutControllerTest {
             assertEquals(DoorState.LOCKED, houseLayoutController.getHouseLayoutModel().findDoor(locationPosition).getState());
         }
     
+        /**
+         * Test for the modification of a window's state.
+         */
         @Test
         void modifyWindowState() {
             RoomItemLocationPosition locationPosition = new RoomItemLocationPosition(0,1,0);
