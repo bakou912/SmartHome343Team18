@@ -25,5 +25,8 @@ public class ParametersInput {
 
     @JsonProperty("dateTime")
     private LocalDateTime date;
-
+    
+    @JsonProperty("timeSpeed")
+    private Integer timeSpeed;
+    
 }

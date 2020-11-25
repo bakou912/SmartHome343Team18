@@ -59,7 +59,7 @@ public class SimulationParametersModel implements BaseModel {
     
     public void reset() {
         this.setUser(new User(this.getUserProfiles().get(0), "", new PersonLocationPosition()));
-        this.setSysParams(new ParametersInput(0.0, 0.0, LocalDateTime.now()));
+        this.setSysParams(new ParametersInput(0.0, 0.0, LocalDateTime.now(), 1));
     }
     
     /**
@@ -79,6 +79,10 @@ public class SimulationParametersModel implements BaseModel {
             if (parametersInput.getDate() != null) {
                 this.support.firePropertyChange("date", this.getSysParams().getDate(), parametersInput.getDate());
                 this.getSysParams().setDate(parametersInput.getDate());
+            }
+    
+            if (parametersInput.getTimeSpeed() != null) {
+                this.getSysParams().setTimeSpeed(parametersInput.getTimeSpeed());
             }
         } else {
             this.sysParams = new SystemParameters(parametersInput);
