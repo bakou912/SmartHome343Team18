@@ -14,17 +14,20 @@ import java.time.LocalDateTime;
 public class SystemParameters {
     private Double outsideTemp;
     private Double insideTemp;
+    private Integer timeSpeed;
     private LocalDateTime date;
 
     /**
-     * 3-parameter constructor.
+     * 4-parameter constructor.
      * @param outsideTemp outside temperature
      * @param insideTemp inside temperature
+     * @param timeSpeed time speed
      * @param date Date and time
      */
-    public SystemParameters(Double outsideTemp, Double insideTemp, LocalDateTime date) {
+    public SystemParameters(Double outsideTemp, Double insideTemp, Integer timeSpeed, LocalDateTime date) {
         this.outsideTemp = outsideTemp;
         this.insideTemp = insideTemp;
+        this.timeSpeed = timeSpeed;
         this.date = date;
     }
     
@@ -36,6 +39,7 @@ public class SystemParameters {
         this(
                 parameters.getOutsideTemp(),
                 parameters.getInsideTemp(),
+                parameters.getTimeSpeed(),
                 parameters.getDate()
         );
     }
