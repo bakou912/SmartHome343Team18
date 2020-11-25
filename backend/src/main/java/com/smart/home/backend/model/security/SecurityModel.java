@@ -1,4 +1,4 @@
-package com.smart.home.backend.model.smarthomesecurity;
+package com.smart.home.backend.model.security;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Security module that listens to the SHS for intruders during away mode
+ * Security model that listens to the SHS for intruders during away mode.
  */
 @AllArgsConstructor
 @Getter

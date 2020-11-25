@@ -1,4 +1,4 @@
-package com.smart.home.backend.model.smarthomesecurity;
+package com.smart.home.backend.model.security;
 
 import com.smart.home.backend.service.OutputConsole;
 

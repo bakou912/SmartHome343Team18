@@ -8,7 +8,7 @@ import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.SecurityModel;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import com.smart.home.backend.service.OutputConsole;

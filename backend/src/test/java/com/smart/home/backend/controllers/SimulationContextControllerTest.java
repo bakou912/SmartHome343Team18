@@ -15,7 +15,7 @@ import com.smart.home.backend.model.simulationparameters.location.LocationPositi
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

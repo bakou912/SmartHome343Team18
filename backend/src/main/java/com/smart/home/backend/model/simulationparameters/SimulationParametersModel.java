@@ -5,7 +5,7 @@ import com.smart.home.backend.input.ParametersInput;
 import com.smart.home.backend.model.BaseModel;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.SecurityModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.smart.home.backend.model.smarthomesecurity;
+package com.smart.home.backend.model.security;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
