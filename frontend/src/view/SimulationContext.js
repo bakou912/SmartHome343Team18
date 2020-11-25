@@ -28,7 +28,7 @@ export default class SimulationContext extends React.Component {
             selectedPerson: null,
             addingPerson: false,
             personUpdateKey: 0,
-            timeSpeed: 5
+            timeSpeed: 1
         };
 
         this.handleNameChange = this.handleNameChange.bind(this);
