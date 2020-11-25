@@ -14,7 +14,6 @@ export default class SimulationContext extends React.Component {
     contextModel = {};
     dateTime = new Date();
     profiles = {}
-
     constructor(props) {
         super(props);
 
@@ -26,7 +25,9 @@ export default class SimulationContext extends React.Component {
             selectedWindow: null,
             selectedPerson: null,
             addingPerson: false,
-            personUpdateKey: 0
+            personUpdateKey: 0,
+            timeSpeed: 1,
+            simulatorTimeHandler: null
         };
 
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -40,10 +41,13 @@ export default class SimulationContext extends React.Component {
         this.tempChangeHandler = this.tempChangeHandler.bind(this);
         this.onDateSelected = this.onDateSelected.bind(this);
         this.onTimeSelected = this.onTimeSelected.bind(this);
+        this.onTimeSpeedSelected = this.onTimeSpeedSelected.bind(this);
         this.onSelectedItem = this.onSelectedItem.bind(this);
         this.blockWindow = this.blockWindow.bind(this);
         this.saveEdit = this.saveEdit.bind(this);
         this.toggleSimulationState = this.toggleSimulationState.bind(this);
+        this.simulatorTime = this.simulatorTime.bind(this);
+        
     }
 
     async componentDidMount() {
@@ -59,6 +63,9 @@ export default class SimulationContext extends React.Component {
             simulationState: this.contextModel.state,
             date: this.dateTime.toISOString().substring(0, 10),
             time: this.dateTime.toISOString().substring(11, 19),
+            hour: parseInt(this.dateTime.toISOString().substring(11, 13)),
+            minute: parseInt(this.dateTime.toISOString().substring(14, 16)),
+            second: parseInt(this.dateTime.toISOString().substring(17, 19)),
             rooms: await HouseLayoutService.getAllLocations(this.contextModel.layout)
         });
 
@@ -173,6 +180,12 @@ export default class SimulationContext extends React.Component {
         });
     }
 
+    async onTimeSpeedSelected(evt) {
+        await this.setState({
+            timeSpeed: evt.target.value
+        });
+    }
+
     async saveEdit() {
         const userInput = {
             ...this.state.user,
@@ -184,7 +197,6 @@ export default class SimulationContext extends React.Component {
             dateTime: this.state.date + "T" + this.state.time + (this.state.time.length === 5 ? ":00" : ""),
             outsideTemp: this.state.outsideTemp
         });
-
         await window.location.reload();
     }
 
@@ -198,6 +210,15 @@ export default class SimulationContext extends React.Component {
             .catch(() => {
                 alert("Simulation state could not be changed");
             })
+        
+        if (this.state.simulationState === "ON"){
+            this.simulatorTimeHandler=setInterval(this.simulatorTime,1000/this.state.timeSpeed);
+        }
+        else{
+            clearInterval(this.simulatorTimeHandler);
+        }
+        
+        
     }
 
 
@@ -281,6 +302,21 @@ export default class SimulationContext extends React.Component {
             addingPerson: value
         });
     }
+    
+    async simulatorTime() {
+        this.state.firstState.second++;
+        if (this.state.firstState.second >= 60){
+            this.state.firstState.second=0;
+            this.state.firstState.minute++;
+        }
+        if (this.state.firstState.minute >= 60){
+            this.state.firstState.minute=0;
+            this.state.firstState.hour++;
+        }
+        if (this.state.firstState.hour >= 24){
+            this.state.firstState.hour=0;
+        }
+    }
 
     render() {
         return (
@@ -313,7 +349,9 @@ export default class SimulationContext extends React.Component {
                             <br/>
                             {this.dateTime.toDateString()}
                             <br/>
-                            {this.state.firstState.time}
+                            {(this.state.firstState.hour < 10)? "0"+this.state.firstState.hour : this.state.firstState.hour}:{(this.state.firstState.minute < 10)? "0"+this.state.firstState.minute : this.state.firstState.minute}:{(this.state.firstState.second < 10)? "0"+this.state.firstState.second : this.state.firstState.second}
+                            <br/>
+                            Time Speed: x{this.state.firstState.timeSpeed}
                             <br/>
                             <br/>
                             <Modal show={this.state.editingParameters} onHide={() => this.setModal("Parameters", false)}>
@@ -372,6 +410,11 @@ export default class SimulationContext extends React.Component {
                                                 <label>Time</label>
                                                 <br/>
                                                 <input type="time" name="time" value={this.state.time} onChange={this.onTimeSelected}/>
+                                            </Col>
+                                            <Col>
+                                                <label>Time Speed</label>
+                                                <br/>
+                                                <input type="text" name="timespeed" value={this.state.timeSpeed} onChange={this.onTimeSpeedSelected}/>
                                             </Col>
                                         </Row>
                                     </div>
