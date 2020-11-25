@@ -213,7 +213,6 @@ export default class SimulationContext extends React.Component {
         
         if (this.state.simulationState === "ON"){
             this.simulatorTimeHandler=setInterval(this.simulatorTime,1000/this.state.timeSpeed);
-            //this.simulatorTimeHandler=setInterval(this.simulatorTime,1000);
         }
         else{
             clearInterval(this.simulatorTimeHandler);
