@@ -2,7 +2,7 @@ package com.smart.home.backend.model.simulationparameters;
 
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
-import com.smart.home.backend.model.BaseModel;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
 import com.smart.home.backend.model.security.SecurityModel;
@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.time.LocalDateTime;
 
@@ -22,15 +23,12 @@ import java.time.LocalDateTime;
 @Setter
 @Component
 @NoArgsConstructor
-public class SimulationParametersModel implements BaseModel {
+public class SimulationParametersModel extends AbstractBaseModel {
     
     private User user;
     private SystemParameters sysParams;
     private Modules modules;
     private UserProfiles userProfiles;
-    
-    private PropertyChangeSupport support;
-    
     
     /**
      * 3-parameter constructor.
@@ -90,4 +88,10 @@ public class SimulationParametersModel implements BaseModel {
         }
     }
     
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("timeSpeed")) {
+        
+        }
+    }
 }

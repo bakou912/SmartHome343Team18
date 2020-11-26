@@ -1,6 +1,8 @@
 package com.smart.home.backend.model;
 
-public interface BaseModel {
+import java.beans.PropertyChangeListener;
+
+public interface BaseModel extends PropertyChangeListener {
 	
 	/**
 	 * Resets the model's values.

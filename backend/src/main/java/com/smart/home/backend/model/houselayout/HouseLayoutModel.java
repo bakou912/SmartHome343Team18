@@ -5,7 +5,7 @@ import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
-import com.smart.home.backend.model.BaseModel;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.security.SecurityModel;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
+public class HouseLayoutModel extends AbstractBaseModel {
 	
 	private static final String BACKYARD = "Backyard";
 	private static final String ENTRANCE = "Entrance";

@@ -2,7 +2,7 @@ package com.smart.home.backend.model.simulationcontext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.SimulationState;
-import com.smart.home.backend.model.BaseModel;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
@@ -15,10 +15,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyChangeEvent;
+
 @Getter
 @Setter
 @Component
-public class SimulationContextModel implements BaseModel {
+public class SimulationContextModel extends AbstractBaseModel {
 	
 	@JsonProperty("layout")
 	private HouseLayoutModel houseLayoutModel;
@@ -76,5 +78,10 @@ public class SimulationContextModel implements BaseModel {
 	 	this.setState(SimulationState.OFF);
 		this.getHouseLayoutModel().reset();
 		this.getSimulationParametersModel().reset();
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// Potentially TBD
 	}
 }
