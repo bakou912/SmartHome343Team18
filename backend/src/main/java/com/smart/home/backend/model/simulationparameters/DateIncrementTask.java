@@ -1,37 +1,27 @@
 package com.smart.home.backend.model.simulationparameters;
 
-import com.smart.home.backend.config.SpringUtils;
-import com.smart.home.backend.model.heating.HeatingModel;
-import com.smart.home.backend.model.houselayout.HouseLayoutModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.smart.home.backend.model.AbstractNotifier;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
-
-import java.beans.PropertyChangeSupport;
-import java.time.LocalDateTime;
-import java.util.TimerTask;
 
 /**
  * Timed task to alert authorities.
  */
-public class DateIncrementTask extends TimerTask {
+@Component
+public class DateIncrementTask extends AbstractNotifier implements Runnable {
 	
-	private LocalDateTime date;
-	private final PropertyChangeSupport support;
-	
-	/**
-	 * 1-parameter constructor.
-	 * @param date date
-	 */
-	public DateIncrementTask(LocalDateTime date) {
-		this.date = date;
-		this.support = new PropertyChangeSupport(this);
-		support.addPropertyChangeListener(SpringUtils.getBean(HeatingModel.class));
-	}
+	@Getter
+	@Setter
+	private SystemParameters systemParameters;
 	
 	@Override
 	public void run() {
-		this.date = this.date.plusSeconds(1);
-		this.support.firePropertyChange("timeIncrement", null, this.date);
+		if (this.systemParameters.isIncrementing()) {
+			this.systemParameters.setDate(this.systemParameters.getDate().plusSeconds(1));
+			this.support.firePropertyChange("timeIncrement", null, this.systemParameters.getDate());
+			this.support.firePropertyChange("date", null, this.systemParameters.getDate());
+		}
 	}
 	
 }

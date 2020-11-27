@@ -37,7 +37,7 @@ class HouseLayoutControllerTest {
     
         @BeforeEach
         void beforeEach() {
-            houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
+            houseLayoutController = new HouseLayoutController(new HouseLayoutModel());
         }
     
         /**
@@ -76,7 +76,7 @@ class HouseLayoutControllerTest {
         
         @BeforeEach
         void beforeEach() {
-            houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
+            houseLayoutController = new HouseLayoutController(new HouseLayoutModel());
             houseLayoutController.loadLayout(createValidLayout());
         }
     

@@ -20,7 +20,7 @@ public class SpringUtils implements BeanFactoryPostProcessor {
 	/**
 	 * Retrieving a type's bean.
 	 * @param clz class type
-	 * @param <T>
+	 * @param <T> returned bean's class
 	 * @return Found bean
 	 */
 	public static <T> T getBean(Class<T> clz) {

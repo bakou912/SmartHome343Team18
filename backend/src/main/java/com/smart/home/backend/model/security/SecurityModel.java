@@ -1,7 +1,6 @@
 package com.smart.home.backend.model.security;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Timer;
 
 import com.smart.home.backend.constant.LightState;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.Light;
 import com.smart.home.backend.service.OutputConsole;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class SecurityModel implements PropertyChangeListener{
+public class SecurityModel extends AbstractBaseModel {
     
     private Boolean awayMode;
     private Duration alertAuthoritiesTime;
@@ -35,7 +35,8 @@ public class SecurityModel implements PropertyChangeListener{
     private AwayModeHours awayModeHours;
     private LocalTime currentTime;
     private List<Light> awayModeLights;
-    private AwayModeNotifier awayModeNotifier;
+    private int timeSpeed;
+    private boolean updatingTime;
     
     /**
      * 1-parameter constructor.
@@ -49,6 +50,13 @@ public class SecurityModel implements PropertyChangeListener{
         this.alertAuthoritiesTime = Duration.ofSeconds(10);
         this.currentTime = LocalTime.parse("12:00:00");
         this.awayModeLights = new ArrayList<>();
+        this.timeSpeed = 1;
+        this.updatingTime = false;
+    }
+    
+    @Override
+    public void reset() {
+        // Complying with parent class
     }
     
     /**
@@ -60,6 +68,13 @@ public class SecurityModel implements PropertyChangeListener{
         switch(evt.getPropertyName()) {
             case "date":
                 this.setCurrentTime(LocalTime.from(((LocalDateTime) evt.getNewValue()).toLocalTime()));
+                this.setAwayMode(this.getAwayMode());
+                break;
+            case "timeSpeed":
+                this.setTimeSpeed((int) evt.getNewValue());
+                break;
+            case "simulationState":
+                this.setUpdatingTime((boolean) evt.getNewValue());
                 break;
             case "nbPersonsInside":
                 this.setNbPersonsInside((Integer) evt.getNewValue());
@@ -100,8 +115,8 @@ public class SecurityModel implements PropertyChangeListener{
             for (Light light: this.getAwayModeLights()) {
                 light.setState(lightState);
             }
-
-            (this.awayModeNotifier == null ? new AwayModeNotifier() : this.awayModeNotifier).notifyAwayModeOn();
+    
+            this.support.firePropertyChange("awayModeOn", null, true);
         }
         
         return true;
@@ -126,7 +141,8 @@ public class SecurityModel implements PropertyChangeListener{
                             + this.getAlertAuthoritiesTime().getSeconds() + " seconds"
             );
             Timer timer = new Timer();
-            timer.schedule(new AuthoritiesCallTask(this), this.getAlertAuthoritiesTime().getSeconds() * 1000);
+            long delay = this.getAlertAuthoritiesTime().getSeconds() * 1000 / this.getTimeSpeed();
+            timer.schedule(new AuthoritiesCallTask(this, timer), delay, delay);
         }
     }
 

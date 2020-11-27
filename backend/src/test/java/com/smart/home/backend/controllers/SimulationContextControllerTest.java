@@ -46,6 +46,11 @@ class SimulationContextControllerTest {
     SecurityModel securityModel;
     
     @Mock
+    DateIncrementTask dateIncrementTask;
+    
+    SystemParameters systemParameters;
+    
+    @Mock
     Modules modules;
     
     @Mock
@@ -67,7 +72,7 @@ class SimulationContextControllerTest {
     
         @BeforeEach
         void beforeEach() {
-            simulationParametersModel = new SimulationParametersModel(userProfiles, modules, securityModel);
+            simulationParametersModel = new SimulationParametersModel(userProfiles, modules, new SystemParameters(dateIncrementTask));
             simulationContextController = new SimulationContextController(
                     new SimulationContextModel(houseLayoutModel, simulationParametersModel)
             );

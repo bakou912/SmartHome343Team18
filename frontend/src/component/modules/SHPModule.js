@@ -6,6 +6,8 @@ import {Button, Col, Container, Row} from "react-bootstrap";
 import Command from "./Command";
 import Select from "react-select";
 import HouseLayoutService from "../../service/HouseLayoutService";
+import ParametersService from "../../service/ParametersService";
+import SimulationContextService from "../../service/SimulationContextService";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
@@ -26,13 +28,15 @@ export default class SHPModule extends React.Component {
         this.saveAuthoritiesTimer = this.saveAuthoritiesTimer.bind(this);
         this.setLightAwayMode = this.setLightAwayMode.bind(this);
         this.onSelectedLocation = this.onSelectedLocation.bind(this);
+        this.intervalHandler = this.intervalHandler.bind(this);
     }
 
     async componentDidMount() {
         let authoritiesTimer = (await SmartHomeSecurityService.getAuthoritiesTimer()).data;
         authoritiesTimer = authoritiesTimer.substr(2);
         authoritiesTimer = authoritiesTimer.substr(0, authoritiesTimer.length - 1);
-        this.interval = setInterval(() => window.dispatchEvent(new Event("updateConsole")), authoritiesTimer * 1000);
+        const timeSpeed = (await ParametersService.getParams()).data.sysParams.timeSpeed;
+        this.interval = setInterval(async () => await this.intervalHandler(), authoritiesTimer * 1000 / timeSpeed);
         await this.setState({
             locations: await HouseLayoutService.getAllLocations(),
             awayMode: (await SmartHomeSecurityService.getAwayModeState()).data,
@@ -49,6 +53,16 @@ export default class SHPModule extends React.Component {
         });
 
         window.dispatchEvent(new Event("updateLayout"));
+
+        const timeSpeed = (await ParametersService.getParams()).data.sysParams.timeSpeed;
+        clearInterval(this.interval);
+        this.interval = setInterval(async () => await this.intervalHandler(), this.state.authoritiesTimer * 1000 / timeSpeed);
+    }
+
+    async intervalHandler() {
+        if ((await SimulationContextService.getContext()).data.state === "ON" && this.state.awayMode === true) {
+            window.dispatchEvent(new Event("updateConsole"))
+        }
     }
 
     async onAuthoritiesTimerChange(evt) {
@@ -80,6 +94,9 @@ export default class SHPModule extends React.Component {
         });
 
         window.dispatchEvent(new Event("updateLayout"));
+        if (setOn === true) {
+            window.dispatchEvent(new Event("awayModeOn"));
+        }
     }
 
     async onSelectedLocation(evt) {
@@ -140,16 +157,17 @@ export default class SHPModule extends React.Component {
                         <br/>
                         <Row>
                             {
-                                this.state.awayModeHours && <Command name="Away mode light hours management">
+                                this.state.awayModeHours &&
+                                <Command name="Away mode light hours management">
                                     <Col>
                                         <label>
                                             Lights on start time&nbsp;
-                                            <input type="time" name="fromTime" defaultValue={this.state.awayModeHours.from} onChange={async evt => this.onTimeSelected(evt, "from")}/>
+                                            <input disabled={this.state.awayMode} type="time" name="fromTime" defaultValue={this.state.awayModeHours.from} onChange={async evt => this.onTimeSelected(evt, "from")}/>
                                         </label>
                                         <br/>
                                         <label>
                                             Lights on stop time&nbsp;
-                                            <input type="time" name="toTime" defaultValue={this.state.awayModeHours.to} onChange={async evt => this.onTimeSelected(evt, "to")}/>
+                                            <input disabled={this.state.awayMode} type="time" name="toTime" defaultValue={this.state.awayModeHours.to} onChange={async evt => this.onTimeSelected(evt, "to")}/>
                                         </label>
                                     </Col>
                                 </Command>

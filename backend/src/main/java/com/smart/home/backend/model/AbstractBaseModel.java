@@ -1,15 +1,12 @@
 package com.smart.home.backend.model;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
-public abstract class AbstractBaseModel implements PropertyChangeListener {
-	
-	protected PropertyChangeSupport support;
-	
-	protected AbstractBaseModel() {
-		this.support = new PropertyChangeSupport(this);
-	}
+import java.beans.PropertyChangeListener;
+
+/**
+ * Abstract model class.
+ */
+public abstract class AbstractBaseModel extends AbstractNotifier implements PropertyChangeListener {
 	
 	/**
 	 * Resets the model's values.

@@ -66,12 +66,20 @@ public class SimulationContextModel extends AbstractBaseModel {
 	 * @return New state
 	 */
 	public SimulationState toggleState() {
+		boolean stateBool = false;
+		
 	 	if (this.getState().equals(SimulationState.ON)){
-	 		this.setState(SimulationState.OFF);
+			this.getSimulationParametersModel().getSysParams().setIncrementing(false);
+			this.setState(SimulationState.OFF);
 		} else {
+			this.getSimulationParametersModel().getSysParams().setIncrementing(true);
 			this.setState(SimulationState.ON);
+			stateBool = true;
 		}
-	 	return this.getState();
+		
+		this.support.firePropertyChange("simulationState", null, stateBool);
+		
+		return this.getState();
 	}
 	
 	public void reset() {

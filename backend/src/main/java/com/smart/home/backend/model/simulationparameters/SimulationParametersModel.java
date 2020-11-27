@@ -5,7 +5,6 @@ import com.smart.home.backend.input.ParametersInput;
 import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
-import com.smart.home.backend.model.security.SecurityModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeSupport;
 import java.time.LocalDateTime;
 
 /**
@@ -34,14 +32,13 @@ public class SimulationParametersModel extends AbstractBaseModel {
      * 3-parameter constructor.
      * @param userProfiles user profiles
      * @param modules modules
-     * @param securityModel security model
+     * @param systemParameters system parameters
      */
     @Autowired
-    public SimulationParametersModel(UserProfiles userProfiles, Modules modules, SecurityModel securityModel) {
+    public SimulationParametersModel(UserProfiles userProfiles, Modules modules, SystemParameters systemParameters) {
         this.userProfiles = userProfiles;
         this.modules = modules;
-        this.support = new PropertyChangeSupport(this);
-        this.support.addPropertyChangeListener(securityModel);
+        this.sysParams = systemParameters;
         this.reset();
     }
     
@@ -65,33 +62,27 @@ public class SimulationParametersModel extends AbstractBaseModel {
      * @param parametersInput parameters input
      */
     public void setSysParams(ParametersInput parametersInput) {
-        if (this.getSysParams() != null) {
-            if (parametersInput.getInsideTemp() != null) {
-                this.getSysParams().setInsideTemp(parametersInput.getInsideTemp());
-            }
-    
-            if (parametersInput.getOutsideTemp() != null) {
-                this.getSysParams().setOutsideTemp(parametersInput.getOutsideTemp());
-            }
-    
-            if (parametersInput.getDate() != null) {
-                this.support.firePropertyChange("date", this.getSysParams().getDate(), parametersInput.getDate());
-                this.getSysParams().setDate(parametersInput.getDate());
-            }
-    
-            if (parametersInput.getTimeSpeed() != null) {
-                this.getSysParams().setTimeSpeed(parametersInput.getTimeSpeed());
-            }
-        } else {
-            this.sysParams = new SystemParameters(parametersInput);
-            this.support.firePropertyChange("date", null, parametersInput.getDate());
+        if (parametersInput.getInsideTemp() != null) {
+            this.getSysParams().setInsideTemp(parametersInput.getInsideTemp());
+        }
+
+        if (parametersInput.getOutsideTemp() != null) {
+            this.getSysParams().setOutsideTemp(parametersInput.getOutsideTemp());
+        }
+
+        if (parametersInput.getDate() != null) {
+            this.support.firePropertyChange("date", this.getSysParams().getDate(), parametersInput.getDate());
+            this.getSysParams().setDate(parametersInput.getDate());
+        }
+
+        if (parametersInput.getTimeSpeed() != null) {
+            this.support.firePropertyChange("timeSpeed", this.getSysParams().getTimeSpeed(), parametersInput.getTimeSpeed());
+            this.getSysParams().setTimeSpeed(parametersInput.getTimeSpeed());
         }
     }
     
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("timeSpeed")) {
-        
-        }
+        // Complying with parent class
     }
 }

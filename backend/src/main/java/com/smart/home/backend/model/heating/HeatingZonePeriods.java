@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class HeatingZonePeriods {
 	
-	private Map<HeatingZonePeriod, Double> periodMap;
+	private final Map<HeatingZonePeriod, Double> periodMap;
 	
 	public HeatingZonePeriods() {
 		this.periodMap = new EnumMap<>(HeatingZonePeriod.class);

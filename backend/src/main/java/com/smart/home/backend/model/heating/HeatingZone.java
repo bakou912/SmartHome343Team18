@@ -23,7 +23,7 @@ public class HeatingZone extends ModelObject {
 	private static final Double INCREMENT_VALUE = 0.1;
 	
 	@Builder.Default
-	private String name = "";
+	private String name;
 	
 	@Builder.Default
 	private List<Room> rooms = new ArrayList<>();

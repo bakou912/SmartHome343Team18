@@ -6,6 +6,7 @@ import HouseLayoutService from "../service/HouseLayoutService";
 import Select from "react-select";
 import ParametersService from "../service/ParametersService";
 import {EditUserProfiles} from "../component/EditUserProfiles";
+import SmartHomeSecurityService from "../service/SmartHomeSecurityService";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
@@ -14,6 +15,11 @@ export default class SimulationContext extends React.Component {
     contextModel = {};
     dateTime = new Date();
     profiles = {}
+    awayModeHours = null;
+    hoursUpdate = {
+        from: false,
+        to: false
+    };
     simulatorTimeHandler = null;
 
     constructor(props) {
@@ -47,10 +53,18 @@ export default class SimulationContext extends React.Component {
         this.blockWindow = this.blockWindow.bind(this);
         this.saveEdit = this.saveEdit.bind(this);
         this.toggleSimulationState = this.toggleSimulationState.bind(this);
+        this.setAwayModeTimes = this.setAwayModeTimes.bind(this);
         this.simulatorTime = this.simulatorTime.bind(this);
+        this.checkAwayModeHours = this.checkAwayModeHours.bind(this);
     }
 
     async componentDidMount() {
+        window.addEventListener("awayModeOn", async () => {
+            await this.setAwayModeTimes();
+        });
+
+        await this.setAwayModeTimes();
+
         this.contextModel = (await SimulationContextService.getContext()).data;
         this.profiles = await ParametersService.getProfiles(this.contextModel.parameters.userProfiles.profiles);
 
@@ -291,11 +305,14 @@ export default class SimulationContext extends React.Component {
         window.dispatchEvent(new Event("updateLayout"));
     }
 
-
     async setEditing(value) {
         await this.setState({
             addingPerson: value
         });
+    }
+
+    async setAwayModeTimes() {
+        this.awayModeHours = (await SmartHomeSecurityService.getAwayModeHours()).data;
     }
     
     async simulatorTime() {
@@ -308,6 +325,24 @@ export default class SimulationContext extends React.Component {
             date: this.dateTime.toISOString().substring(0, 10),
             time: this.dateTime.toISOString().substring(11, 19)
         });
+
+        await this.checkAwayModeHours();
+    }
+
+    async checkAwayModeHours() {
+        const time = this.dateTime.toISOString().substring(11, 19);
+
+        if (time >= this.awayModeHours.from) {
+            if (time <= this.awayModeHours.to && this.hoursUpdate.from === false && this.hoursUpdate.to === false) {
+                this.hoursUpdate.to = true;
+                await window.dispatchEvent(new Event("updateLayout"));
+            } else {
+                this.hoursUpdate.to = false;
+            }
+            this.hoursUpdate.from = true;
+        } else {
+            this.hoursUpdate.from = false;
+        }
     }
 
     render() {
@@ -404,7 +439,7 @@ export default class SimulationContext extends React.Component {
                                             <Col>
                                                 <label>Time Speed</label>
                                                 <br/>
-                                                <input type="number" name="timeSpeed" value={this.state.timeSpeed} onChange={this.onTimeSpeedSelected}/>
+                                                <input type="number" name="timeSpeed" min={1} max={500} value={this.state.timeSpeed} onChange={this.onTimeSpeedSelected}/>
                                             </Col>
                                         </Row>
                                     </div>
