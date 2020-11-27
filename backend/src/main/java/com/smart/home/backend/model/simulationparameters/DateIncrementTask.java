@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 /**
- * Timed task to alert authorities.
+ * Timed task to increment the date.
  */
 @Component
 public class DateIncrementTask extends AbstractNotifier implements Runnable {

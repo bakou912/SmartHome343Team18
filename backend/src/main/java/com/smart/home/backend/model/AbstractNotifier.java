@@ -6,7 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- * Abstract model class.
+ * Abstract notifier class.
  */
 public abstract class AbstractNotifier {
 	

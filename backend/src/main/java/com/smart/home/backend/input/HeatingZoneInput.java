@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Input for heating zones.
+ */
 @Getter
 @Setter
 public class HeatingZoneInput {
