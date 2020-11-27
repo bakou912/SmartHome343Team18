@@ -39,7 +39,7 @@ public class SecurityModel extends AbstractBaseModel {
     private boolean updatingTime;
     
     /**
-     * 1-parameter constructor.
+     * Default constructor.
      */
     @Autowired
     public SecurityModel() {

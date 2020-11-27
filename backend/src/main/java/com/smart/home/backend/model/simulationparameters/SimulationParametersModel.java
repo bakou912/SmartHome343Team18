@@ -52,6 +52,7 @@ public class SimulationParametersModel extends AbstractBaseModel {
         this.setSysParams(parameters.getParametersInput());
     }
     
+    @Override
     public void reset() {
         this.setUser(new User(this.getUserProfiles().get(0), "", new PersonLocationPosition()));
         this.setSysParams(new ParametersInput(0.0, 0.0, LocalDateTime.now(), 1));

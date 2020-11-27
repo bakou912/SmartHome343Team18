@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Configuration for the listeners within the system.
+ */
 @Configuration
 public class ListenerConfig {
 	

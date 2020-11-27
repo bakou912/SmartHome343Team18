@@ -82,6 +82,7 @@ public class SimulationContextModel extends AbstractBaseModel {
 		return this.getState();
 	}
 	
+	@Override
 	public void reset() {
 	 	this.setState(SimulationState.OFF);
 		this.getHouseLayoutModel().reset();
