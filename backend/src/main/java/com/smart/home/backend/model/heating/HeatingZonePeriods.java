@@ -5,6 +5,9 @@ import com.smart.home.backend.constant.HeatingZonePeriod;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Heating zone periods with their paired target temperature.
+ */
 public class HeatingZonePeriods {
 	
 	private final Map<HeatingZonePeriod, Double> periodMap;
