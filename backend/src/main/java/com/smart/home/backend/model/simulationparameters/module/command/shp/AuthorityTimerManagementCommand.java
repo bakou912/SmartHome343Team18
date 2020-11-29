@@ -1,6 +1,6 @@
 package com.smart.home.backend.model.simulationparameters.module.command.shp;
 
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.SecurityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

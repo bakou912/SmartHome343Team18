@@ -3,12 +3,13 @@ package com.smart.home.backend.controllers;
 import com.smart.home.backend.controller.SmartHomeSecurityController;
 import com.smart.home.backend.input.AuthoritiesTimerInput;
 import com.smart.home.backend.input.AwayModeInput;
-import com.smart.home.backend.model.smarthomesecurity.AwayModeHours;
-import com.smart.home.backend.model.smarthomesecurity.AwayModeNotifier;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.AwayModeHours;
+import com.smart.home.backend.model.security.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,6 @@ import static org.powermock.api.mockito.PowerMockito.mock;
  * Test for Use Case 3.5.1: Away mode functionality
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AwayModeNotifier.class})
 class SmartHomeSecurityControllerTest {
 
     SecurityModel securityModel;
@@ -32,7 +32,7 @@ class SmartHomeSecurityControllerTest {
 
     @BeforeEach
     void BeforeEach(){
-        securityModel = new SecurityModel();
+        securityModel = Mockito.spy(new SecurityModel());
         controller = new SmartHomeSecurityController(securityModel);
     }
 
@@ -50,11 +50,9 @@ class SmartHomeSecurityControllerTest {
      */
     @Test
     void ActivateAwayMode() {
-        AwayModeNotifier awayModeNotifier = mock(AwayModeNotifier.class);
-        this.securityModel.setAwayModeNotifier(awayModeNotifier);
         ResponseEntity<Boolean> awayModeBool = controller.setAwayMode(instantiateAwayModeInput(true));
         assertTrue(awayModeBool.getBody());
-        verify(awayModeNotifier).notifyAwayModeOn();
+        verify(securityModel).setAwayMode(true);
     }
 
     /**
@@ -63,7 +61,8 @@ class SmartHomeSecurityControllerTest {
     @Test
     void DeactivateAwayMode(){
         ResponseEntity<Boolean> awayModeBool = controller.setAwayMode(instantiateAwayModeInput(false));
-        assertFalse(awayModeBool.getBody().booleanValue());
+        assertFalse(awayModeBool.getBody());
+        verify(securityModel).setAwayMode(false);
     }
 
     /**

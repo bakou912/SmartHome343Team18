@@ -30,6 +30,9 @@ public class Room extends Location {
 	@Setter
 	@Builder.Default
 	private List<Door> doors = new ArrayList<>();
+	@Setter
+	@Builder.Default
+	private Double temperature = 0.0;
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();

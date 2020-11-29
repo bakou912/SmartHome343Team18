@@ -2,7 +2,7 @@ package com.smart.home.backend.model.simulationcontext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.SimulationState;
-import com.smart.home.backend.model.BaseModel;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Person;
 import com.smart.home.backend.model.houselayout.Room;
@@ -15,10 +15,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.beans.PropertyChangeEvent;
+
 @Getter
 @Setter
 @Component
-public class SimulationContextModel implements BaseModel {
+public class SimulationContextModel extends AbstractBaseModel {
 	
 	@JsonProperty("layout")
 	private HouseLayoutModel houseLayoutModel;
@@ -64,17 +66,31 @@ public class SimulationContextModel implements BaseModel {
 	 * @return New state
 	 */
 	public SimulationState toggleState() {
+		boolean stateBool = false;
+		
 	 	if (this.getState().equals(SimulationState.ON)){
-	 		this.setState(SimulationState.OFF);
+			this.getSimulationParametersModel().getSysParams().setIncrementing(false);
+			this.setState(SimulationState.OFF);
 		} else {
+			this.getSimulationParametersModel().getSysParams().setIncrementing(true);
 			this.setState(SimulationState.ON);
+			stateBool = true;
 		}
-	 	return this.getState();
+		
+		this.support.firePropertyChange("simulationState", null, stateBool);
+		
+		return this.getState();
 	}
 	
+	@Override
 	public void reset() {
 	 	this.setState(SimulationState.OFF);
 		this.getHouseLayoutModel().reset();
 		this.getSimulationParametersModel().reset();
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// Potentially TBD
 	}
 }

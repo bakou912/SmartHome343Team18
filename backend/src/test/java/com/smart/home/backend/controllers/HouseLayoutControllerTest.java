@@ -17,7 +17,7 @@ import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,7 +37,7 @@ class HouseLayoutControllerTest {
     
         @BeforeEach
         void beforeEach() {
-            houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
+            houseLayoutController = new HouseLayoutController(new HouseLayoutModel());
         }
     
         /**
@@ -76,7 +76,7 @@ class HouseLayoutControllerTest {
         
         @BeforeEach
         void beforeEach() {
-            houseLayoutController = new HouseLayoutController(new HouseLayoutModel(new SecurityModel()));
+            houseLayoutController = new HouseLayoutController(new HouseLayoutModel());
             houseLayoutController.loadLayout(createValidLayout());
         }
     

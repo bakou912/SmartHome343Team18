@@ -7,8 +7,8 @@ import com.smart.home.backend.input.AwayModeInput;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AuthorityTimerManagementCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeHoursManagementCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shp.AwayModeManagementCommand;
-import com.smart.home.backend.model.smarthomesecurity.AwayModeHours;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
+import com.smart.home.backend.model.security.AwayModeHours;
+import com.smart.home.backend.model.security.SecurityModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

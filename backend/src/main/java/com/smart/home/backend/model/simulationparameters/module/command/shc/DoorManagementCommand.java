@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.simulationparameters.module.command.shc;
 
-import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;

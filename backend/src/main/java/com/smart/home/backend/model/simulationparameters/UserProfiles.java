@@ -21,7 +21,7 @@ public class UserProfiles {
 	@Getter
 	private final List<UserProfile> profiles;
 	@JsonIgnore
-	private final PropertyChangeSupport support; // used to add an observer
+	private final PropertyChangeSupport support;
 	
 	@Autowired
 	public UserProfiles(UserProfileService userProfileService) throws IOException {

@@ -5,23 +5,19 @@ import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.PersonInput;
 import com.smart.home.backend.input.WindowInput;
-import com.smart.home.backend.model.BaseModel;
+import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
-import com.smart.home.backend.model.smarthomesecurity.SecurityModel;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
 import com.smart.home.backend.service.OutputConsole;
 import lombok.*;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.smart.home.backend.constant.Direction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
+public class HouseLayoutModel extends AbstractBaseModel {
 	
 	private static final String BACKYARD = "Backyard";
 	private static final String ENTRANCE = "Entrance";
@@ -40,20 +36,15 @@ public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
 	private List<RoomRow> rows;
 	private OutsideLocation entrance;
 	private OutsideLocation backyard;
-	
-	private PropertyChangeSupport support;
 
 	/**
 	 * Default constructor.
 	 */
-	@Autowired
-	public HouseLayoutModel(SecurityModel securityModel) {
+	public HouseLayoutModel() {
 		nbPersonsInside = 0;
 		this.rows = new ArrayList<>();
 		this.backyard = new OutsideLocation(BACKYARD);
 		this.entrance = new OutsideLocation(ENTRANCE);
-		this.support = new PropertyChangeSupport(this);
-		this.addPropertyChangeListener(securityModel);
 	}
 	
 	/**
@@ -294,22 +285,6 @@ public class HouseLayoutModel implements BaseModel, PropertyChangeListener {
 		this.setBackyard(new OutsideLocation(BACKYARD));
 		this.setEntrance(new OutsideLocation(ENTRANCE));
 	}
-
-	/**
-	 * Adds a PropertyChangeListener, essentially an observable due to deprecation
-	 * @param pcl property change listener
-	 */
-	public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        support.addPropertyChangeListener(pcl);
-	}
-	
-	/**
-	 * Removes a propertyChangeListener, essentially an observable due to deprecation
-	 * @param pcl property change listener
-	 */
-	public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        support.removePropertyChangeListener(pcl);
-    }
 	
 	/**
 	 * Updating all propertyChangeListeners of change in nbPersons

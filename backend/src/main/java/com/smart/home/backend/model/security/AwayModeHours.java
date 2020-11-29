@@ -1,4 +1,4 @@
-package com.smart.home.backend.model.smarthomesecurity;
+package com.smart.home.backend.model.security;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,16 +13,18 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 public class AwayModeHours {
+	
 	private LocalTime from;
 	private LocalTime to;
 	
 	/**
 	 * 2-parameter constructor
-	 * @param from
-	 * @param to
+	 * @param from beginning hour
+	 * @param to ending hour
 	 */
 	public AwayModeHours(LocalTime from, LocalTime to) {
 		this.from = from;
 		this.to = to;
 	}
+	
 }
