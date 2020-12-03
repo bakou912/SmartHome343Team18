@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -74,8 +75,10 @@ public class HeatingModel extends AbstractBaseModel {
      * Removes a zone from the zone list
      * @param zoneId zone's id
      */
-    public boolean removeZone(Integer zoneId) {
-        return this.getZones().removeIf(zone -> zone.getId().equals(zoneId));
+    public HeatingZone removeZone(Integer zoneId) {
+        HeatingZone foundZone = this.getZones().stream().filter(zone -> zone.getId().equals(zoneId)).findFirst().orElse(null);
+        this.getZones().remove(foundZone);
+        return foundZone;
     }
     
     /**
@@ -121,17 +124,19 @@ public class HeatingModel extends AbstractBaseModel {
      * Removes a room from a heating zone.
      * @param zoneId zone's id
      * @param roomLocation room's location
-     * @return Whether the room was removed from the zone or not
+     * @return removed room
      */
-    public boolean removeRoomFromZone(Integer zoneId, LocationPosition roomLocation) {
+    public Room removeRoomFromZone(Integer zoneId, LocationPosition roomLocation) {
         HeatingZone heatingZone = this.findZone(zoneId);
         Room room = this.getHouseLayoutModel().findRoom(roomLocation);
         
         if (heatingZone == null || room == null) {
-            return false;
+            return null;
         }
         
-        return heatingZone.removeRoom(room);
+        heatingZone.removeRoom(room);
+        
+        return room;
     }
     
     /**
@@ -145,19 +150,23 @@ public class HeatingModel extends AbstractBaseModel {
 
     /**
      * Get temperature for a room
-     * @param zoneId zone's id
-     * @param roomId room's id
+     * @param locationPosition room's position
      * @return temperature of room
      */
-    public Double getRoomTemperature(Integer zoneId, Integer roomId){
-        return this.getZones().get(zoneId).getRooms().get(roomId).getTemperature();
+    public Double getRoomTemperature(LocationPosition locationPosition){
+        return Objects.requireNonNull(this.getHouseLayoutModel().findRoom(locationPosition)).getTemperature();
     }
     
-    public Room overrideRoomTemeprature(Integer zoneId, Integer roomId, Double overrideTemperature){
-
-        Room FoundRoom = this.getZones().get(zoneId).getRooms().get(roomId);
-        FoundRoom.setTemperature(overrideTemperature);
-        return FoundRoom;
+    /**
+     * Override a room's temperature
+     * @param locationPosition room's location
+     * @param overrideTemperature overridden temperature
+     * @return the overridden room
+     */
+    public Room overrideRoomTemperature(LocationPosition locationPosition, Double overrideTemperature){
+        Room foundRoom = this.getHouseLayoutModel().findRoom(locationPosition);
+        foundRoom.setTemperature(overrideTemperature);
+        return foundRoom;
     }
 
     @Override

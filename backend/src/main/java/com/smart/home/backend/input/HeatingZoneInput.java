@@ -5,6 +5,7 @@ import com.smart.home.backend.model.simulationparameters.location.LocationPositi
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,6 @@ public class HeatingZoneInput {
     private String name;
     
     @JsonProperty("roomLocations")
-    private List<LocationPosition> roomLocations;
+    private List<LocationPosition> roomLocations = new ArrayList<>();
     
 }

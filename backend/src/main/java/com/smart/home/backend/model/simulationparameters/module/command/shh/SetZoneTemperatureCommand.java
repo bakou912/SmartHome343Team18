@@ -20,12 +20,11 @@ public class SetZoneTemperatureCommand extends SHHAbstractCommand<HeatingModel, 
     public ResponseEntity<Double> execute(HeatingModel heatingModel, HeatingZoneTemperatureInput heatingTemperatureInput) {
         HeatingZone heatingZone = heatingModel.setZonePeriodTargetTemperature(heatingTemperatureInput.getZoneId(), heatingTemperatureInput.getHeatingZonePeriod(), heatingTemperatureInput.getTargetTemperature() );
         if (heatingZone != null) {
-            this.logAction("Temperature has been set for zone: " + heatingZone.getName());
-        }else{
-            this.logAction("Heating zone was not found.");
+            this.logAction("Set temperature for zone " + heatingZone.getName() + " during period: " + heatingTemperatureInput.getHeatingZonePeriod());
+        } else {
+            this.logAction("Heating zone was not found");
         }
         return new ResponseEntity<>(heatingTemperatureInput.getTargetTemperature(), HttpStatus.OK);
     }
-
 
 }

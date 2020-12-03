@@ -1,6 +1,8 @@
 package com.smart.home.backend.input;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class HeatingZoneRoomTemperatureInput {
-    @JsonProperty("zoneId")
-    private Integer zoneId;
+    
+    @JsonIgnore
+    private LocationPosition locationPosition;
 
-    @JsonProperty("roomId")
-    private Integer roomId;
-
-    @JsonProperty("heatingZonePeriod")
+    @JsonProperty("temperature")
     private Double overrideTemperature;
 }

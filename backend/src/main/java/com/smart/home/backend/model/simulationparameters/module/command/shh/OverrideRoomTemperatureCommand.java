@@ -17,9 +17,10 @@ public class OverrideRoomTemperatureCommand extends SHHAbstractCommand<HeatingMo
     }
     
     @Override
-    public ResponseEntity<Double> execute(HeatingModel heatingModel,HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature ) {
-        Room FoundRoom = heatingModel.overrideRoomTemeprature(heatingZoneRoomTemperature.getZoneId(), heatingZoneRoomTemperature.getRoomId(), heatingZoneRoomTemperature.getOverrideTemperature());
-        this.logAction("Overriding temperature for room :" + FoundRoom.getName());
+    public ResponseEntity<Double> execute(HeatingModel heatingModel, HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature ) {
+        Room foundRoom = heatingModel.overrideRoomTemperature(heatingZoneRoomTemperature.getLocationPosition(), heatingZoneRoomTemperature.getOverrideTemperature());
+        this.logAction("Overriding " + foundRoom.getName() + "'s temperature to " + heatingZoneRoomTemperature.getOverrideTemperature());
         return new ResponseEntity<>(heatingZoneRoomTemperature.getOverrideTemperature(), HttpStatus.OK);
     }
+    
 }

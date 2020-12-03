@@ -1,5 +1,8 @@
 package com.smart.home.backend.model.heating;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.HeatingZonePeriod;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
@@ -11,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class for a heating zone.
@@ -23,12 +27,13 @@ public class HeatingZone extends ModelObject {
 	private static final Double INCREMENT_VALUE = 0.1;
 	
 	@Builder.Default
-	private String name;
+	private String name = "";
 	
 	@Builder.Default
 	private List<Room> rooms = new ArrayList<>();
 	
 	@Builder.Default
+	@JsonIgnore
 	private HeatingZonePeriods periods = new HeatingZonePeriods();
 	
 	/**
@@ -91,6 +96,16 @@ public class HeatingZone extends ModelObject {
 		}
 		
 		return this.getPeriods().getTargetTemperature(period);
+	}
+	
+	/**
+	 * Json creator for the period maps
+	 * @return periodMap
+	 */
+	@JsonCreator
+	@JsonProperty("periods")
+	public Map<HeatingZonePeriod, Double> getPeriodMap() {
+		return this.getPeriods().getPeriodMap();
 	}
 	
 }

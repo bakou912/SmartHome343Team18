@@ -1,6 +1,8 @@
 package com.smart.home.backend.model.heating;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.smart.home.backend.constant.HeatingZonePeriod;
+import lombok.Getter;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.Map;
  */
 public class HeatingZonePeriods {
 	
+	@Getter
 	private final Map<HeatingZonePeriod, Double> periodMap;
 	
 	public HeatingZonePeriods() {
@@ -36,4 +39,5 @@ public class HeatingZonePeriods {
 	public void setTargetTemperature(HeatingZonePeriod period, double targetTemperature) {
 		this.periodMap.put(period, targetTemperature);
 	}
+	
 }

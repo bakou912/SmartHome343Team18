@@ -10,21 +10,22 @@ import org.springframework.http.ResponseEntity;
 /**
  * Adding heating zone command
  */
-public class AddHeatingZoneCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneInput, String>{
+public class AddHeatingZoneCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneInput, HeatingZone>{
 
     public AddHeatingZoneCommand() {
-        super("add heating zone", true);
+        super("Adding heating zone", true);
     }
 
     @Override
-    public ResponseEntity<String> execute(HeatingModel heatingModel, HeatingZoneInput heatingZoneInput) {
+    public ResponseEntity<HeatingZone> execute(HeatingModel heatingModel, HeatingZoneInput heatingZoneInput) {
         HeatingZone heatingZone = heatingModel.addZone(heatingZoneInput);
-        if(heatingZone!=null){
-            this.logAction("New heating zone has been added :" + heatingZone.getName());
-        }else{
-            this.logAction("Zone already exists");
+        if (heatingZone != null) {
+            this.logAction("Added new heating zone:" + heatingZone.getName());
+        } else {
+            this.logAction("Zone " + heatingZoneInput.getName() + " already exists and was not added");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(heatingZone.getName(), HttpStatus.OK);
+        return new ResponseEntity<>(heatingZone, HttpStatus.OK);
     }
     
 }
