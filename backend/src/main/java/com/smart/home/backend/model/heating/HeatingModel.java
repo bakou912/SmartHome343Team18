@@ -47,9 +47,9 @@ public class HeatingModel extends AbstractBaseModel {
      * Adds a zone to the zone list
      * @param heatingZoneInput zone input
      */
-    public boolean addZone(HeatingZoneInput heatingZoneInput) {
+    public HeatingZone addZone(HeatingZoneInput heatingZoneInput) {
         if (this.getZones().stream().anyMatch(zone -> zone.getName().equals(heatingZoneInput.getName()))) {
-            return false;
+            return null;
         }
         
         HeatingZone newZone = HeatingZone.builder()
@@ -66,7 +66,8 @@ public class HeatingModel extends AbstractBaseModel {
                 zone -> zone.getRooms().removeIf(room -> newZone.getRooms().contains(room))
         );
         
-        return this.getZones().add(newZone);
+        this.getZones().add(newZone);
+        return newZone;
     }
     
     /**
@@ -81,21 +82,22 @@ public class HeatingModel extends AbstractBaseModel {
      * Adds a room to a heating zone.
      * @param zoneId zone's id
      * @param roomLocation room's location
-     * @return Whether the room was added to the zone or not
+     * @return found room
      */
-    public boolean addRoomToZone(Integer zoneId, LocationPosition roomLocation) {
+    public Room addRoomToZone(Integer zoneId, LocationPosition roomLocation) {
         HeatingZone heatingZone = this.findZone(zoneId);
         Room foundRoom = this.getHouseLayoutModel().findRoom(roomLocation);
         
         if (heatingZone == null || foundRoom == null) {
-            return false;
+            return null;
         }
     
         this.getZones().forEach(
                 zone -> zone.getRooms().remove(foundRoom)
         );
         
-        return heatingZone.addRoom(foundRoom);
+        heatingZone.addRoom(foundRoom);
+        return foundRoom;
     }
     
     /**
@@ -104,14 +106,15 @@ public class HeatingModel extends AbstractBaseModel {
      * @param zonePeriod zone period
      * @param targetTemperature new target temperature
      */
-    public void setZonePeriodTargetTemperature(Integer zoneId, HeatingZonePeriod zonePeriod, double targetTemperature) {
+    public HeatingZone setZonePeriodTargetTemperature(Integer zoneId, HeatingZonePeriod zonePeriod, double targetTemperature) {
         HeatingZone heatingZone = this.findZone(zoneId);
         
         if (heatingZone == null) {
-            return;
+            return null;
         }
         
         heatingZone.getPeriods().setTargetTemperature(zonePeriod, targetTemperature);
+        return heatingZone;
     }
     
     /**
@@ -150,9 +153,11 @@ public class HeatingModel extends AbstractBaseModel {
         return this.getZones().get(zoneId).getRooms().get(roomId).getTemperature();
     }
     
-    public Double overrideRoomTemeprature(Integer zoneId, Integer roomId, Double overrideTemperature){
-        this.getZones().get(zoneId).getRooms().get(roomId).setTemperature(overrideTemperature);
-        return overrideTemperature;
+    public Room overrideRoomTemeprature(Integer zoneId, Integer roomId, Double overrideTemperature){
+
+        Room FoundRoom = this.getZones().get(zoneId).getRooms().get(roomId);
+        FoundRoom.setTemperature(overrideTemperature);
+        return FoundRoom;
     }
 
     @Override

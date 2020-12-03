@@ -40,8 +40,8 @@ public class SmartHomeHeatingControllerTest {
     public void setZones(){
         HeatingZoneInput heatingZoneInput = instantiateHeatingZoneInput();
 
-        ResponseEntity<Boolean> heatingZoneAdded = smartHomeHeatingController.addHeatingZone(heatingZoneInput);
-        assertEquals(true, heatingZoneAdded.getBody());
+        ResponseEntity<String> heatingZoneAdded = smartHomeHeatingController.addHeatingZone(heatingZoneInput);
+        assertEquals(heatingZoneInput.getName(), heatingZoneAdded.getBody());
     }
 
     /**

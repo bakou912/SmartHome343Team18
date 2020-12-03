@@ -5,9 +5,10 @@ import com.smart.home.backend.input.HeatingZoneInput;
 import com.smart.home.backend.input.HeatingZoneRoomInput;
 import com.smart.home.backend.input.HeatingZoneRoomTemperatureInput;
 import com.smart.home.backend.model.heating.HeatingModel;
+import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddHeatingZoneCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddRoomToZoneCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.OverrideRoomTemperature;
+import com.smart.home.backend.model.simulationparameters.module.command.shh.OverrideRoomTemperatureCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.RemoveRoomFromZoneCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.SetZoneTemperatureCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.RemoveHeatingZoneCommand;
@@ -42,10 +43,10 @@ public class SmartHomeHeatingController {
     /**
      * add heating zone
      * @param heatingZoneInput input for a heating zone
-     * @return true if zone was added, false wotherwise
+     * @return heating zone name
      */
     @PostMapping("/heating/zone")
-    public ResponseEntity<Boolean> addHeatingZone(@RequestBody HeatingZoneInput heatingZoneInput ){
+    public ResponseEntity<String> addHeatingZone(@RequestBody HeatingZoneInput heatingZoneInput ){
         return new AddHeatingZoneCommand().execute(this.heatingModel, heatingZoneInput);
     }
 
@@ -65,7 +66,7 @@ public class SmartHomeHeatingController {
      * @return room id
      */
     @PostMapping("heating/zone/room")
-    public ResponseEntity<Integer> addRoomToZone(@RequestBody HeatingZoneRoomInput heatingZoneRoomInput){
+    public ResponseEntity<Room> addRoomToZone(@RequestBody HeatingZoneRoomInput heatingZoneRoomInput){
         return new AddRoomToZoneCommand().execute(this.heatingModel, heatingZoneRoomInput);
     }
 
@@ -108,7 +109,7 @@ public class SmartHomeHeatingController {
      */
     @PutMapping("heating/room/temperature")
     public ResponseEntity<Double> overrideRoomTemperature(@PathVariable HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature){
-        return new OverrideRoomTemperature().execute(this.heatingModel, heatingZoneRoomTemperature);
+        return new OverrideRoomTemperatureCommand().execute(this.heatingModel, heatingZoneRoomTemperature);
     }
 
 }

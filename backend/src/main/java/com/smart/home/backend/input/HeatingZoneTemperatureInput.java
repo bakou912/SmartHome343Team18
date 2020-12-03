@@ -6,6 +6,9 @@ import com.smart.home.backend.constant.HeatingZonePeriod;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * heating zone temperature input
+ */
 @Getter
 @Setter
 public class HeatingZoneTemperatureInput {
