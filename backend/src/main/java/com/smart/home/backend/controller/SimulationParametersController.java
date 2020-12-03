@@ -126,7 +126,9 @@ public class SimulationParametersController {
     public ResponseEntity<List<Module>> getModules(){
         return new ResponseEntity<>(simulationParametersModel.getModules().getModules(), HttpStatus.OK);
     }
-    
+
+    //TODO: ADD route to initialise temperatures
+
     /**
      * Validates the parameters input.
      * @param parameters parameters input

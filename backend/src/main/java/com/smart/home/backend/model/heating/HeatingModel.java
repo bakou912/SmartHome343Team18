@@ -173,7 +173,7 @@ public class HeatingModel extends AbstractBaseModel {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("timeIncrement")) {
             for (HeatingZone zone: zones) {
-                zone.adjustRoomTemperatures((LocalDateTime) evt.getNewValue());
+                zone.adjustRoomTemperatures((LocalDateTime) evt.getNewValue(),false);
             }
         }
     }

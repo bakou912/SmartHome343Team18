@@ -24,7 +24,8 @@ import java.util.Map;
 @SuperBuilder
 public class HeatingZone extends ModelObject {
 	
-	private static final Double INCREMENT_VALUE = 0.1;
+	private static final Double INCREMENT_VALUE_HAVC = 0.1;
+	private static final Double INCREMENT_VALUE = 0.05;
 	
 	@Builder.Default
 	private String name = "";
@@ -61,20 +62,20 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date) {
+	public void adjustRoomTemperatures(LocalDateTime date, boolean HAVC) {
 		double targetTemperature = this.determineTargetTemperature(date);
 		
 		for (Room room: rooms) {
 			double tempDelta = targetTemperature - room.getTemperature();
 			int multiplier = 0;
 			
-			if (tempDelta <= -INCREMENT_VALUE) {
+			if (tempDelta <= -INCREMENT_VALUE_HAVC) {
 				multiplier = -1;
-			} else if (tempDelta >= INCREMENT_VALUE) {
+			} else if (tempDelta >= INCREMENT_VALUE_HAVC) {
 				multiplier = 1;
 			}
 			
-			room.setTemperature(room.getTemperature() + multiplier * INCREMENT_VALUE);
+			room.setTemperature(room.getTemperature() + multiplier * (HAVC ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE));
 		}
 	}
 	
