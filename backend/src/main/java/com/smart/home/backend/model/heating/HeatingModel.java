@@ -139,7 +139,22 @@ public class HeatingModel extends AbstractBaseModel {
     public HeatingZone findZone(Integer zoneId) {
         return this.getZones().stream().filter(zone -> zone.getId().equals(zoneId)).findFirst().orElse(null);
     }
+
+    /**
+     * Get temperature for a room
+     * @param zoneId zone's id
+     * @param roomId room's id
+     * @return temperature of room
+     */
+    public Double getRoomTemperature(Integer zoneId, Integer roomId){
+        return this.getZones().get(zoneId).getRooms().get(roomId).getTemperature();
+    }
     
+    public Double overrideRoomTemeprature(Integer zoneId, Integer roomId, Double overrideTemperature){
+        this.getZones().get(zoneId).getRooms().get(roomId).setTemperature(overrideTemperature);
+        return overrideTemperature;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("timeIncrement")) {

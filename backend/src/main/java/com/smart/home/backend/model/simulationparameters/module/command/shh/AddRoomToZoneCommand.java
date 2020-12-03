@@ -11,7 +11,6 @@ public class AddRoomToZoneCommand extends SHHAbstractCommand<HeatingModel, Heati
 
     public AddRoomToZoneCommand() {
         super("adding room to zone", true);
-        // TODO Auto-generated constructor stub
     }
     
     @Override
