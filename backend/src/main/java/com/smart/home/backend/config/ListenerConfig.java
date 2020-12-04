@@ -50,6 +50,7 @@ public class ListenerConfig {
 		this.simulationContextModel.addListener(securityModel);
 		
 		this.securityModel.addListener(houseLayoutModel);
+		this.securityModel.addListener(heatingModel);
 		
 		this.dateIncrementTask.addListener(securityModel);
 		this.dateIncrementTask.addListener(heatingModel);

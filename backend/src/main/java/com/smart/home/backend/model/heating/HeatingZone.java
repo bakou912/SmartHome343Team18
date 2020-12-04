@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.HeatingZonePeriod;
+import com.smart.home.backend.constant.RoomHeatingMode;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
 import lombok.Builder;
@@ -52,50 +53,59 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Removes a room from the rooms list.
 	 * @param room room to remove
-	 * @return Whether the room was removed
+	 * @return Removed room
 	 */
-	public boolean removeRoom(Room room) {
-		return this.getRooms().remove(room);
+	public Room removeRoom(Room room) {
+		this.getRooms().remove(room);
+		return room;
 	}
 	
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date) {
-		double targetTemperature = this.determineTargetTemperature(date);
+	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature) {
+		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		
 		for (Room room: rooms) {
-			double tempDelta = targetTemperature - room.getTemperature();
-			int multiplier = 0;
-			
-			if (tempDelta <= -INCREMENT_VALUE) {
-				multiplier = -1;
-			} else if (tempDelta >= INCREMENT_VALUE) {
-				multiplier = 1;
+			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
+				double tempDelta = targetTemperature - room.getTemperature();
+				int multiplier = 0;
+				
+				if (tempDelta <= -INCREMENT_VALUE) {
+					multiplier = -1;
+				} else if (tempDelta >= INCREMENT_VALUE) {
+					multiplier = 1;
+				}
+				
+				room.setTemperature(room.getTemperature() + multiplier * INCREMENT_VALUE);
 			}
-			
-			room.setTemperature(room.getTemperature() + multiplier * INCREMENT_VALUE);
 		}
 	}
 	
 	/**
-	 * Determine which zone period is active at some date.
+	 * Determine which temperature to use.
 	 * @param date some date
-	 * @return Which zone period is active at some date
+	 * @return Which temperature to use
 	 */
-	private double determineTargetTemperature(LocalDateTime date) {
+	private double determineTargetTemperature(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature) {
 		int hour = date.getHour();
-		HeatingZonePeriod period;
+		double temperature;
 		
-		if (hour >= 5 && hour <= 11) {
-			period = HeatingZonePeriod.MORNING;
-		} else if (hour > 11 && hour <= 21) {
-			period = HeatingZonePeriod.AFTERNOON;
+		if (globalHeatingMode.equals(RoomHeatingMode.ZONE)) {
+			HeatingZonePeriod period;
+			if (hour >= 5 && hour <= 11) {
+				period = HeatingZonePeriod.MORNING;
+			} else if (hour > 11 && hour <= 21) {
+				period = HeatingZonePeriod.AFTERNOON;
+			} else {
+				period = HeatingZonePeriod.NIGHT;
+			}
+			temperature = this.getPeriods().getTargetTemperature(period);
 		} else {
-			period = HeatingZonePeriod.NIGHT;
+			temperature = defaultTemperature;
 		}
 		
-		return this.getPeriods().getTargetTemperature(period);
+		return temperature;
 	}
 	
 	/**

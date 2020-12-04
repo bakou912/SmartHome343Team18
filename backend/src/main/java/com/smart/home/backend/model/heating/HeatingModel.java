@@ -1,6 +1,7 @@
 package com.smart.home.backend.model.heating;
 
 import com.smart.home.backend.constant.HeatingZonePeriod;
+import com.smart.home.backend.constant.RoomHeatingMode;
 import com.smart.home.backend.input.HeatingZoneInput;
 import com.smart.home.backend.model.AbstractBaseModel;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
@@ -31,6 +32,15 @@ public class HeatingModel extends AbstractBaseModel {
     @Setter
     @Builder.Default
     private List<HeatingZone> zones = new ArrayList<>();
+    @Setter
+    @Builder.Default
+    private RoomHeatingMode heatingMode = RoomHeatingMode.ZONE;
+    @Setter
+    @Builder.Default
+    private DefaultTemperatures defaultTemperatures = new DefaultTemperatures();
+    @Setter
+    @Builder.Default
+    private SeasonDates seasonDates = new SeasonDates();
     
     private final IdUtil zoneId = new IdUtil();
     private final HouseLayoutModel houseLayoutModel;
@@ -133,10 +143,8 @@ public class HeatingModel extends AbstractBaseModel {
         if (heatingZone == null || room == null) {
             return null;
         }
-        
-        heatingZone.removeRoom(room);
-        
-        return room;
+
+        return heatingZone.removeRoom(room);
     }
     
     /**
@@ -166,16 +174,44 @@ public class HeatingModel extends AbstractBaseModel {
     public Room overrideRoomTemperature(LocationPosition locationPosition, Double overrideTemperature){
         Room foundRoom = this.getHouseLayoutModel().findRoom(locationPosition);
         foundRoom.setTemperature(overrideTemperature);
+        foundRoom.setHeatingMode(RoomHeatingMode.OVERRIDDEN);
         return foundRoom;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("timeIncrement")) {
-            for (HeatingZone zone: zones) {
-                zone.adjustRoomTemperatures((LocalDateTime) evt.getNewValue());
-            }
+        switch(evt.getPropertyName()) {
+            case "timeIncrement":
+                for  (HeatingZone zone : zones) {
+                    LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
+                    zone.adjustRoomTemperatures(currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime));
+                }
+                break;
+            case "seasonDates":
+                this.setSeasonDates((SeasonDates) evt.getNewValue());
+                break;
+            case "awayMode":
+                this.setHeatingMode((Boolean) evt.getNewValue() ? RoomHeatingMode.AWAY : RoomHeatingMode.ZONE);
+                break;
+            default:
+                break;
         }
+    }
+    
+    /**
+     * Choose which season temperature to choose using the current date.
+     * @param dateTime current date
+     * @return current season temperature
+     */
+    private double chooseDefaultSeasonTemperature(LocalDateTime dateTime) {
+        int day = dateTime.getDayOfYear();
+        LocalDateTime summerStart = this.getSeasonDates().getSummerStart();
+        LocalDateTime winterStart = this.getSeasonDates().getWinterStart();
+        double temp = this.getDefaultTemperatures().getWinterTemp();
+        if (day >= summerStart.getDayOfYear() && day < winterStart.getDayOfYear()) {
+            temp = this.getDefaultTemperatures().getSummerTemp();
+        }
+        return temp;
     }
     
     @Override
