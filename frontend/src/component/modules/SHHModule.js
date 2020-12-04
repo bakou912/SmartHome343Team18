@@ -1,9 +1,7 @@
 import React from "react";
 import SmartHomeHeaterService from "../../service/SmartHomeHeaterService";
 import "../../style/Modules.css";
-import { Button, Col, Container, Row } from "react-bootstrap";
-import Switch from "react-switch";
-import Command from "./Command";
+import { Col, Container, Row } from "react-bootstrap";
 
 export default class SHHModule extends React.Component {
     constructor(props) {
@@ -12,8 +10,7 @@ export default class SHHModule extends React.Component {
             summerDefaultTemp: null,
             winterDefaultTemp: null,
         };
-        this.summerDefaultTemp = this.summerDefaultTemp.bind(this);
-        this.winterDefaultTemp = this.winterDefaultTemp.bind(this);
+        this.defaultTempChange = this.winterDefaultTemp.bind(this);
     }
     async onSelectedItem(item, evt) {
         await this.setState({
@@ -21,15 +18,9 @@ export default class SHHModule extends React.Component {
         });
     }
 
-    async summerDefaultTemp(evt) {
+    async defaultTempChange(evt, name) {
         await this.setState({
-            summerDefaultTemp: evt.target.value,
-        });
-    }
-
-    async winterDefaultTemp(evt) {
-        await this.setState({
-            winterDefaultTemp: evt.target.value,
+            [`${name}DefaultTemp`]: evt.target.value,
         });
     }
 
@@ -46,7 +37,7 @@ export default class SHHModule extends React.Component {
                                 style={{ width: "50px" }}
                                 name="SummerTemp"
                                 type="number"
-                                onChange={this.summerDefaultTemp}
+                                onChange={async evt => await this.defaultTempChange(evt, "summer")}
                             />
                             &nbsp;
                         </label>
@@ -58,7 +49,7 @@ export default class SHHModule extends React.Component {
                                 style={{ width: "50px" }}
                                 name="WinterTemp"
                                 type="number"
-                                onChange={this.winterDefaultTemp}
+                                onChange={async evt => await this.defaultTempChange(evt, "winter")}
                             />
                             &nbsp;
                         </label>
