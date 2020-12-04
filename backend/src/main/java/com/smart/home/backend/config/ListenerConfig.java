@@ -6,6 +6,7 @@ import com.smart.home.backend.model.security.SecurityModel;
 import com.smart.home.backend.model.simulationcontext.SimulationContextModel;
 import com.smart.home.backend.model.simulationparameters.DateIncrementTask;
 import com.smart.home.backend.model.simulationparameters.SimulationParametersModel;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,6 +20,7 @@ public class ListenerConfig {
 	
 	private final HouseLayoutModel houseLayoutModel;
 	private final SimulationParametersModel simulationParametersModel;
+	private final SystemParameters systemParameters;
 	private final SimulationContextModel simulationContextModel;
 	private final SecurityModel securityModel;
 	private final HeatingModel heatingModel;
@@ -28,6 +30,7 @@ public class ListenerConfig {
 	public ListenerConfig(
 			HouseLayoutModel houseLayoutModel,
 			SimulationParametersModel simulationParametersModel,
+			SystemParameters systemParameters,
 			SimulationContextModel simulationContextModel,
 			SecurityModel securityModel,
 			HeatingModel heatingModel,
@@ -39,13 +42,15 @@ public class ListenerConfig {
 		this.securityModel = securityModel;
 		this.heatingModel = heatingModel;
 		this.dateIncrementTask = dateIncrementTask;
+		this.systemParameters = systemParameters;
 	}
 	
 	@PostConstruct
 	public void addListeners() {
 		this.houseLayoutModel.addListener(securityModel);
 		
-		this.simulationParametersModel.addListener(securityModel);
+		this.systemParameters.addListener(securityModel);
+		this.systemParameters.addListener(heatingModel);
 		
 		this.simulationContextModel.addListener(securityModel);
 		

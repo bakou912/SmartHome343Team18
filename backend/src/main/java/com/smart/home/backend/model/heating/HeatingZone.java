@@ -67,11 +67,11 @@ public class HeatingZone extends ModelObject {
 	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		for (Room room: rooms) {
-			boolean havc = Double.compare(room.getTemperature(), targetTemperature) < 0.1 && (Double.compare(room.getTemperature(), outsideTemp) > 0.25 || Double.compare(room.getTemperature(), outsideTemp) < -0.25);
+			room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = (havc ? targetTemperature : outsideTemp) - room.getTemperature();
+				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
-				double increment = (havc ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
+				double increment = (room.getHavc() ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
 				if (tempDelta <= -increment) {
 					multiplier = -1;
 				} else if (tempDelta >= increment) {
@@ -81,6 +81,19 @@ public class HeatingZone extends ModelObject {
 				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
 		}
+	}
+	
+	/**
+	 *
+	 * @param outsideTemp
+	 * @param targetTemperature
+	 * @param room
+	 * @return
+	 */
+	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
+		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
+		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
+		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
 	}
 	
 	/**
