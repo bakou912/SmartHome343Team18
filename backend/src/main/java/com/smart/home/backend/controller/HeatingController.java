@@ -200,7 +200,6 @@ public class HeatingController {
      */
     @PostMapping("heating/temperature/init")
     public void initTemperature(){
-        //TODO: change the double to outside temperature
         heatingModel.getHouseLayoutModel().getAllRooms().stream()
                 .forEach(room -> room.setTemperature(sysParams.getOutsideTemp()));
     }
