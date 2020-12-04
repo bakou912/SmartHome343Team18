@@ -8,6 +8,7 @@ import com.smart.home.backend.input.HeatingZoneRoomTemperatureInput;
 import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddHeatingZoneCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddRoomToZoneCommand;
@@ -39,10 +40,12 @@ import java.util.List;
 public class HeatingController {
     
     private HeatingModel heatingModel;
+    private SystemParameters sysParams;
 
     @Autowired
-    public HeatingController(HeatingModel heatingModel) {
+    public HeatingController(HeatingModel heatingModel, SystemParameters sysParams) {
         this.heatingModel = heatingModel;
+        this.sysParams = sysParams;
     }
     
     /**
@@ -148,6 +151,17 @@ public class HeatingController {
     public ResponseEntity<Double> overrideRoomTemperature(LocationPosition locationPosition, @RequestBody HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature) {
         heatingZoneRoomTemperature.setLocationPosition(locationPosition);
         return new OverrideRoomTemperatureCommand().execute(this.heatingModel, heatingZoneRoomTemperature);
+    }
+
+    /**
+     * Initialize temperature of all rooms to be equal to the outside temperature
+     * @return
+     */
+    @PostMapping("heating/temperature/init")
+    public void initTemperature(){
+        //TODO: change the double to outside temperature
+        heatingModel.getHouseLayoutModel().getAllRooms().stream()
+                .forEach(room -> room.setTemperature(sysParams.getOutsideTemp()));
     }
 
 }

@@ -83,7 +83,21 @@ public class HouseLayoutModel extends AbstractBaseModel {
 		
 		return foundRoom;
 	}
-	
+
+	/**
+	 * gets all the rooms in the house layout
+	 * @return list of all rooms
+	 */
+	@Nullable
+	public List<Room> getAllRooms(){
+		List<Room> rooms = new ArrayList<>();
+		for (int i = 0; i<rows.size(); i++){
+			for (int j = 0; j<rows.get(i).getRooms().size();j++){
+				rooms.add(rows.get(i).getRooms().get(j));
+			}
+		}
+		return rooms;
+	}
 	/**
 	 * Finds a door with the corresponding row, room and door ids.
 	 * @param location door's location

@@ -127,8 +127,6 @@ public class SimulationParametersController {
         return new ResponseEntity<>(simulationParametersModel.getModules().getModules(), HttpStatus.OK);
     }
 
-    //TODO: ADD route to initialise temperatures
-
     /**
      * Validates the parameters input.
      * @param parameters parameters input
@@ -143,4 +141,5 @@ public class SimulationParametersController {
         return insideTemp != null && outsideTemp != null && profile != null && !profile.equals("") && date != null
                 && insideTemp > -20 && insideTemp <= 30 && outsideTemp > -60 && outsideTemp < 50;
     }
+
 }
