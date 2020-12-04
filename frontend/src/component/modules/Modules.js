@@ -2,6 +2,7 @@ import React from "react";
 import "../../style/Modules.css";
 import SHCModule from "./SHCModule";
 import SHPModule from "./SHPModule";
+import SHHModule from "./SHHModule";
 
 export default class Modules extends React.Component {
 
@@ -12,6 +13,7 @@ export default class Modules extends React.Component {
 
         this.modules.set("SHC", <SHCModule/>);
         this.modules.set("SHP", <SHPModule/>);
+        this.modules.set("SHH", <SHHModule/>);
 
         this.state = {
             selectedTab: Array.from(this.modules.keys())[0]
