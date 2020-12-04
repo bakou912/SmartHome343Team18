@@ -2,6 +2,8 @@ package com.smart.home.backend.model.simulationparameters;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smart.home.backend.input.ParametersInput;
+import com.smart.home.backend.model.AbstractNotifier;
+import com.smart.home.backend.model.heating.SeasonDates;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -18,12 +20,13 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter
 @Component
-public class SystemParameters {
+public class SystemParameters extends AbstractNotifier {
     
     private Double outsideTemp;
     private Double insideTemp;
     private Integer timeSpeed;
     private LocalDateTime date;
+    private SeasonDates seasonDates;
     private long delay;
     private boolean incrementing;
     
@@ -46,16 +49,36 @@ public class SystemParameters {
     }
     
     /**
-     * 1-parameter constructor.
-     * @param parameters parameters input
+     * Modify parameters.
+     * @param parametersInput parameters input
      */
-    public void modifyParameters(ParametersInput parameters) {
-        this.setOutsideTemp(parameters.getOutsideTemp());
-        this.setInsideTemp(parameters.getInsideTemp());
-        this.setTimeSpeed(parameters.getTimeSpeed());
-        this.setDate(parameters.getDate());
+    public void modifyParameters(ParametersInput parametersInput) {
+    
+        if (parametersInput.getInsideTemp() != null) {
+            this.setInsideTemp(parametersInput.getInsideTemp());
+        }
+    
+        if (parametersInput.getOutsideTemp() != null) {
+            this.setOutsideTemp(parametersInput.getOutsideTemp());
+        }
+    
+        if (parametersInput.getDate() != null) {
+            this.support.firePropertyChange("date", this.getDate(), parametersInput.getDate());
+            this.setDate(parametersInput.getDate());
+        }
+    
+        if (parametersInput.getSeasonDates() != null) {
+            this.support.firePropertyChange("seasonDates", this.getSeasonDates(), parametersInput.getSeasonDates());
+            this.setSeasonDates(parametersInput.getSeasonDates());
+        }
+    
+        if (parametersInput.getTimeSpeed() != null) {
+            this.support.firePropertyChange("timeSpeed", this.getTimeSpeed(), parametersInput.getTimeSpeed());
+            this.setTimeSpeed(parametersInput.getTimeSpeed());
+        }
+
         this.setDelay(1000L / this.getTimeSpeed());
-        this.scheduledFuture = this.executorService.scheduleAtFixedRate(this.getDateIncrementTask(), this.getDelay(), this.getDelay(),TimeUnit.MILLISECONDS);
+        this.resetTimer();
     }
     
     /**
@@ -65,7 +88,6 @@ public class SystemParameters {
     public void setTimeSpeed(Integer timeSpeed) {
         this.timeSpeed = timeSpeed;
         this.setDelay(1000L / timeSpeed);
-        this.resetTimer();
     }
     
     /**

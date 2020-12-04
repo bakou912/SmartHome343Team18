@@ -3,6 +3,7 @@ package com.smart.home.backend.model.simulationparameters;
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
 import com.smart.home.backend.model.AbstractBaseModel;
+import com.smart.home.backend.model.heating.SeasonDates;
 import com.smart.home.backend.model.simulationparameters.location.PersonLocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.Modules;
 import lombok.Getter;
@@ -55,7 +56,7 @@ public class SimulationParametersModel extends AbstractBaseModel {
     @Override
     public void reset() {
         this.setUser(new User(this.getUserProfiles().get(0), "", new PersonLocationPosition()));
-        this.setSysParams(new ParametersInput(0.0, 0.0, LocalDateTime.now(), 1));
+        this.setSysParams(new ParametersInput(0.0, 0.0, LocalDateTime.now(), 1, new SeasonDates()));
     }
     
     /**
@@ -63,23 +64,7 @@ public class SimulationParametersModel extends AbstractBaseModel {
      * @param parametersInput parameters input
      */
     public void setSysParams(ParametersInput parametersInput) {
-        if (parametersInput.getInsideTemp() != null) {
-            this.getSysParams().setInsideTemp(parametersInput.getInsideTemp());
-        }
-
-        if (parametersInput.getOutsideTemp() != null) {
-            this.getSysParams().setOutsideTemp(parametersInput.getOutsideTemp());
-        }
-
-        if (parametersInput.getDate() != null) {
-            this.support.firePropertyChange("date", this.getSysParams().getDate(), parametersInput.getDate());
-            this.getSysParams().setDate(parametersInput.getDate());
-        }
-
-        if (parametersInput.getTimeSpeed() != null) {
-            this.support.firePropertyChange("timeSpeed", this.getSysParams().getTimeSpeed(), parametersInput.getTimeSpeed());
-            this.getSysParams().setTimeSpeed(parametersInput.getTimeSpeed());
-        }
+        this.getSysParams().modifyParameters(parametersInput);
     }
     
     @Override

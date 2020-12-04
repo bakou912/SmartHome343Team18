@@ -1,6 +1,7 @@
 package com.smart.home.backend.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.smart.home.backend.model.heating.SeasonDates;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,5 +29,8 @@ public class ParametersInput {
     
     @JsonProperty("timeSpeed")
     private Integer timeSpeed;
+    
+    @JsonProperty("seasonDates")
+    private SeasonDates seasonDates;
     
 }

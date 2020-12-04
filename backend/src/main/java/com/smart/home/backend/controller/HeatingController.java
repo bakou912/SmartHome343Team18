@@ -5,6 +5,7 @@ import com.smart.home.backend.input.HeatingZoneTemperatureInput;
 import com.smart.home.backend.input.HeatingZoneInput;
 import com.smart.home.backend.input.HeatingZoneRoomInput;
 import com.smart.home.backend.input.HeatingZoneRoomTemperatureInput;
+import com.smart.home.backend.model.heating.DefaultTemperatures;
 import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.Room;
@@ -46,6 +47,15 @@ public class HeatingController {
     public HeatingController(HeatingModel heatingModel, SystemParameters sysParams) {
         this.heatingModel = heatingModel;
         this.sysParams = sysParams;
+    }
+    
+    /**
+     * Retrieving the heating model
+     * @return heating model
+     */
+    @GetMapping("/heating")
+    public ResponseEntity<HeatingModel> getModel() {
+        return new ResponseEntity<>(this.getHeatingModel(), HttpStatus.OK);
     }
     
     /**
@@ -151,6 +161,37 @@ public class HeatingController {
     public ResponseEntity<Double> overrideRoomTemperature(LocationPosition locationPosition, @RequestBody HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature) {
         heatingZoneRoomTemperature.setLocationPosition(locationPosition);
         return new OverrideRoomTemperatureCommand().execute(this.heatingModel, heatingZoneRoomTemperature);
+    }
+    
+    /**
+     * Retrieve the default temperatures for seasons in away mode
+     * @return default temperatures
+     */
+    @GetMapping("heating/awaymode")
+    public ResponseEntity<DefaultTemperatures> getDefaultTemperatures() {
+        return new ResponseEntity<>(this.getHeatingModel().getDefaultTemperatures(), HttpStatus.OK);
+    }
+    
+    /**
+     * Set default temperature for the winter season
+     * @param temperatureInput new temperature input
+     * @return new winter temperature
+     */
+    @PutMapping("/heating/awaymode/winter/temperature")
+    public ResponseEntity<Double> setWinterTemperature(@RequestBody TemperatureInput temperatureInput) {
+        this.getHeatingModel().getDefaultTemperatures().setWinterTemp(temperatureInput.getTemperature());
+        return new ResponseEntity<>(temperatureInput.getTemperature(), HttpStatus.OK);
+    }
+    
+    /**
+     * Set default temperature for the summer season
+     * @param temperatureInput new temperature input
+     * @return new summer temperature
+     */
+    @PutMapping("/heating/awaymode/summer/temperature")
+    public ResponseEntity<Double> setSummerTemperature(@RequestBody TemperatureInput temperatureInput) {
+        this.getHeatingModel().getDefaultTemperatures().setSummerTemp(temperatureInput.getTemperature());
+        return new ResponseEntity<>(temperatureInput.getTemperature(), HttpStatus.OK);
     }
 
     /**
