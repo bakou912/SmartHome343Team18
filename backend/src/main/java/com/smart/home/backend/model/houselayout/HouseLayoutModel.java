@@ -328,10 +328,12 @@ public class HouseLayoutModel extends AbstractBaseModel {
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("awayModeOn")) {
-			for (RoomRow roomRow: this.getRows()) {
-				for (Room room: roomRow.getRooms()) {
-					this.activateRoomAwayMode(room);
+		if (evt.getPropertyName().equals("awayMode")) {
+			if ((boolean) evt.getNewValue()) {
+				for (RoomRow roomRow: this.getRows()) {
+					for (Room room: roomRow.getRooms()) {
+						this.activateRoomAwayMode(room);
+					}
 				}
 			}
 		}

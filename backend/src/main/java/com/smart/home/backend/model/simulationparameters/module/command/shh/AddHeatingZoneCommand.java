@@ -20,7 +20,7 @@ public class AddHeatingZoneCommand extends SHHAbstractCommand<HeatingModel, Heat
     public ResponseEntity<HeatingZone> execute(HeatingModel heatingModel, HeatingZoneInput heatingZoneInput) {
         HeatingZone heatingZone = heatingModel.addZone(heatingZoneInput);
         if (heatingZone != null) {
-            this.logAction("Added new heating zone:" + heatingZone.getName());
+            this.logAction("Added new heating zone: " + heatingZone.getName());
         } else {
             this.logAction("Zone " + heatingZoneInput.getName() + " already exists and was not added");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

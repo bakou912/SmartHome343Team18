@@ -1,5 +1,7 @@
 package com.smart.home.backend.model.houselayout;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smart.home.backend.constant.RoomHeatingMode;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
@@ -33,6 +35,10 @@ public class Room extends Location {
 	@Setter
 	@Builder.Default
 	private Double temperature = 0.0;
+	@Setter
+	@Builder.Default
+	@JsonIgnore
+	private RoomHeatingMode heatingMode = RoomHeatingMode.ZONE;
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();

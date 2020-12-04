@@ -115,10 +115,9 @@ public class SecurityModel extends AbstractBaseModel {
             for (Light light: this.getAwayModeLights()) {
                 light.setState(lightState);
             }
-    
-            this.support.firePropertyChange("awayModeOn", null, true);
         }
-        
+         this.support.firePropertyChange("awayMode", null, this.getAwayMode());
+    
         return true;
     }
     
