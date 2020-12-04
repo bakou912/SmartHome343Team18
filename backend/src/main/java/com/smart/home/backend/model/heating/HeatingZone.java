@@ -67,18 +67,18 @@ public class HeatingZone extends ModelObject {
 	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		for (Room room: rooms) {
-			boolean HAVC = Double.compare(room.getTemperature(), targetTemperature) != 0 && (Double.compare(room.getTemperature(), outsideTemp) > 0.25 || Double.compare(room.getTemperature(), outsideTemp) < -0.25);
+			boolean havc = Double.compare(room.getTemperature(), targetTemperature) < 0.1 && (Double.compare(room.getTemperature(), outsideTemp) > 0.25 || Double.compare(room.getTemperature(), outsideTemp) < -0.25);
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = targetTemperature - room.getTemperature();
+				double tempDelta = (havc ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
-				
-				if (tempDelta <= - (HAVC ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE)) {
+				double increment = (havc ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
+				if (tempDelta <= -increment) {
 					multiplier = -1;
-				} else if (tempDelta >= (HAVC ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE)) {
+				} else if (tempDelta >= increment) {
 					multiplier = 1;
 				}
 				
-				room.setTemperature(room.getTemperature() + multiplier * (HAVC ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE));
+				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
 		}
 	}
