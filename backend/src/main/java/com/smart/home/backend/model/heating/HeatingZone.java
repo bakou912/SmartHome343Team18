@@ -84,7 +84,9 @@ public class HeatingZone extends ModelObject {
 	
 	/**
 	 * Determine which temperature to use.
-	 * @param date some date
+	 * @param date current date
+	 * @param globalHeatingMode the system's current global heating mode
+	 * @param defaultTemperature default temperature for AWAY mode
 	 * @return Which temperature to use
 	 */
 	private double determineTargetTemperature(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature) {
