@@ -84,11 +84,11 @@ public class HeatingZone extends ModelObject {
 	}
 	
 	/**
-	 *
+	 * Method to determine if the HAVC should be on or off
 	 * @param outsideTemp
 	 * @param targetTemperature
 	 * @param room
-	 * @return
+	 * @return true if HAVC should on and false if it should be off
 	 */
 	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
 		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
