@@ -69,15 +69,7 @@ public class HeatingZone extends ModelObject {
 	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp, boolean isSummer) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		for (Room room: rooms) {
-			if (!isSummerBreeze(outsideTemp, room, isSummer)){
-				room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
-			}
-			else{
-				room.setHavc(false);
-				for (Window window : room.getWindows()) {
-					window.setState(WindowState.OPEN);
-				}
-			}
+			room.adjustRoomSummerBreeze(outsideTemp, isSummer, targetTemperature);
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
 				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
@@ -91,31 +83,6 @@ public class HeatingZone extends ModelObject {
 				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
 		}
-	}
-	
-	/**
-	 * Method to determine if the HAVC should be on or off
-	 * @param outsideTemp
-	 * @param targetTemperature
-	 * @param room
-	 * @return true if HAVC should on and false if it should be off
-	 */
-	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
-		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
-		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
-		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
-	}
-
-	private boolean isSummerBreeze(Double outsideTemp, Room room, boolean isSummer){
-		if (isSummer && (outsideTemp - room.getTemperature() < 0) && room.getHeatingMode() != RoomHeatingMode.AWAY){
-			for (Window window : room.getWindows()) {
-				if (window.getState() == WindowState.BLOCKED){
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
 	}
 	
 	/**
