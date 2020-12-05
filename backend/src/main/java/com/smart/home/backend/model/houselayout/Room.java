@@ -105,10 +105,10 @@ public class Room extends Location {
 	}
 	
 	/**
-	 *
-	 * @param outsideTemp
-	 * @param isSummer
-	 * @param targetTemperature
+	 * Adjusts the room temperature during summer time
+	 * @param outsideTemp outside temperature
+	 * @param isSummer true if its summer time false if its not summer time
+	 * @param targetTemperature target temperature
 	 */
 	public void adjustRoomSummerBreeze(Double outsideTemp, boolean isSummer, double targetTemperature) {
 		boolean summerBreeze = isSummerBreeze(outsideTemp, targetTemperature, isSummer);
@@ -126,10 +126,11 @@ public class Room extends Location {
 	}
 	
 	/**
-	 *
-	 * @param outsideTemp
-	 * @param targetTemperature
-	 * @param isSummer
+	 * Decides whether the windows should be open or not during summer.
+	 * Handles issues with windows
+	 * @param outsideTemp outside temperature
+	 * @param targetTemperature target temperature
+	 * @param isSummer true if its summer time false if its not summer time
 	 * @return whether to open windows or not
 	 */
 	private boolean isSummerBreeze(Double outsideTemp, Double targetTemperature, boolean isSummer){
