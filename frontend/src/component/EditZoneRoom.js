@@ -1,6 +1,7 @@
 import React from "react";
-import {Image, ListGroup, Modal} from "react-bootstrap";
+import {Button, Col, Image, ListGroup, Modal, Row} from "react-bootstrap";
 import SmartHomeHeaterService from "../service/SmartHomeHeaterService";
+import SHHModule from "./modules/SHHModule";
 
 export class EditZoneRoom extends React.Component {
     constructor(props) {
@@ -15,6 +16,8 @@ export class EditZoneRoom extends React.Component {
 
         this.hideReset = this.hideReset.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.overrideTempChange = this.overrideTempChange.bind(this);
+        this.removeOverride = this.removeOverride.bind(this);
     }
 
     async componentDidMount() {
@@ -41,6 +44,31 @@ export class EditZoneRoom extends React.Component {
                 currentZoneLabel: item.label
             });
         });
+        window.dispatchEvent(new Event("updateSelectedZone"));
+    }
+
+    async overrideTempChange(evt, limits) {
+        const limitedTemp = SHHModule.adjustTempWithLimits(evt.target.value, limits);
+        await SmartHomeHeaterService.overrideRoomTemp(this.state.room.rowId, this.state.room.id, limitedTemp).then(async() => {
+            await this.setState({
+                room: {
+                    ...this.state.room,
+                    heatingMode: "OVERRIDDEN",
+                    temperature: limitedTemp
+                }
+            });
+        })
+    }
+
+    async removeOverride() {
+        await SmartHomeHeaterService.removeRoomOverride(this.state.room.rowId, this.state.room.id).then(async response => {
+            await this.setState({
+                room: {
+                    ...this.state.room,
+                    heatingMode: response.data
+                }
+            });
+        });
     }
 
     render() {
@@ -51,26 +79,51 @@ export class EditZoneRoom extends React.Component {
                 </div>
                 <Modal show={this.state.editingZoneRoom} onHide={this.hideReset}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Room Zone Editing</Modal.Title>
+                        <Modal.Title>{`Edit ${this.state.room.name}`}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <ListGroup>
-                            {
-                                this.state.zones.map((item) =>
-                                    <ListGroup.Item
-                                        key={this.state.zones.indexOf(item)} className="ItemsTable"
-                                        bsPrefix="list-group-item py-1" action
-                                        variant="dark"
-                                        active={item.label === this.state.currentZoneLabel}
-                                        onClick={async () => this.handleClick(item)}
-                                    >
-                                        <div>
-                                            {item.label}
-                                        </div>
-                                    </ListGroup.Item>
-                                )
-                            }
-                        </ListGroup>
+                        <Row>
+                            <Col md={4}>
+                                <ListGroup>
+                                    Choose zone
+                                    {
+                                        this.state.zones.map((item) =>
+                                            <ListGroup.Item
+                                                style={{textAlign: "center"}}
+                                                key={this.state.zones.indexOf(item)}
+                                                className="ItemsTable"
+                                                bsPrefix="list-group-item py-1" action
+                                                variant="dark"
+                                                active={item.label === this.state.currentZoneLabel}
+                                                onClick={async () => this.handleClick(item)}
+                                            >
+                                                <div>
+                                                    {item.label}
+                                                </div>
+                                            </ListGroup.Item>
+                                        )
+                                    }
+                                </ListGroup>
+                            </Col>
+                            <Col md={8}>
+                                Override Temperature (&deg;C):&nbsp;
+                                <input
+                                    style={{ width: "50px" }}
+                                    name="SummerTemp"
+                                    type="number"
+                                    value={this.state.room.temperature}
+                                    onChange={async evt => await this.overrideTempChange(evt, { min: 15, max: 30})}
+                                    min={15} max={30}
+                                />
+                                &nbsp;
+                                {
+                                    this.state.room.heatingMode === "OVERRIDDEN" &&
+                                    <Button onClick={this.removeOverride} variant="dark" size="sm">
+                                        X
+                                    </Button>
+                                }
+                            </Col>
+                        </Row>
                     </Modal.Body>
                 </Modal>
             </div>

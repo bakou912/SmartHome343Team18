@@ -64,12 +64,12 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
-		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
+	public void adjustRoomTemperatures(RoomTemperatureAdjustment adjustment) {
+		double targetTemperature = this.determineTargetTemperature(adjustment.getDate(), adjustment.getRoomHeatingMode(), adjustment.getDefaultTemperature());
 		for (Room room: rooms) {
-			room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
+			room.setHavc(isHavcOn(adjustment.getOutsideTemp(), targetTemperature, room));
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
+				double tempDelta = (room.getHavc() ? targetTemperature : adjustment.getOutsideTemp()) - room.getTemperature();
 				int multiplier = 0;
 				double increment = (room.getHavc() ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
 				if (tempDelta <= -increment) {

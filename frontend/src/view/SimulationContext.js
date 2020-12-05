@@ -146,7 +146,8 @@ export default class SimulationContext extends React.Component {
                     label: p.name
                 };
             }),
-            personName: ""
+            personName: "",
+            updateLocationKey: this.state.updateLocationKey + 1
         });
     }
 
@@ -163,7 +164,8 @@ export default class SimulationContext extends React.Component {
             user: {
                 ...this.state.user,
                 profile: evt.value
-            }
+            },
+            updateProfileKey: this.state.updateProfileKey + 1
         });
     }
 
@@ -328,7 +330,7 @@ export default class SimulationContext extends React.Component {
 
         await this.checkAwayModeHours();
 
-        await window.dispatchEvent(new Event("updateSelectedZone"));
+        await window.dispatchEvent(new CustomEvent("updateSelectedZone", { detail: true}));
     }
 
     async checkAwayModeHours() {
@@ -395,6 +397,7 @@ export default class SimulationContext extends React.Component {
                                         Profile
                                         <div className="SelectDiv">
                                             <Select
+                                                key={""}
                                                 styles={{
                                                     option: provided => ({...provided, width: "100%"}),
                                                     menu: provided => ({...provided, width: "100%"}),
@@ -459,6 +462,7 @@ export default class SimulationContext extends React.Component {
                                         <div className="SelectDiv">
                                             Locations
                                             <Select
+                                                key={this.state.updateLocationKey}
                                                 styles={{
                                                     option: provided => ({...provided, width: "100%"}),
                                                     menu: provided => ({...provided, width: "100%"}),
@@ -479,6 +483,7 @@ export default class SimulationContext extends React.Component {
                                                                         <div>
                                                                             Windows
                                                                             <Select
+                                                                                key={this.state.updateLocationKey}
                                                                                 styles={{
                                                                                     option: provided => ({...provided, width: "100%"}),
                                                                                     menu: provided => ({...provided, width: "100%"}),
@@ -511,7 +516,7 @@ export default class SimulationContext extends React.Component {
                                                                 <br/>
                                                                 Persons
                                                                 <Select
-                                                                    key={this.state.personUpdateKey}
+                                                                    key={`${this.state.personUpdateKey}${this.state.updateLocationKey}`}
                                                                     styles={{
                                                                         option: provided => ({...provided, width: "100%"}),
                                                                         menu: provided => ({...provided, width: "100%"}),

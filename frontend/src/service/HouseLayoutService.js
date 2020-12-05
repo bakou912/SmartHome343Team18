@@ -11,7 +11,7 @@ class HouseLayoutService {
     }
 
     async getAllRooms() {
-        return (await httpClient.get("layout/rooms")).map(r => ({
+        return (await httpClient.get("layout/rooms")).data.map(r => ({
             value: r,
             label: r.name
         }));

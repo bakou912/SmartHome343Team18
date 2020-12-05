@@ -5,6 +5,7 @@ import {Button, Col, Container, ListGroup, Row} from "react-bootstrap";
 import HouseLayoutService from "../../service/HouseLayoutService";
 import Select from "react-select";
 import {EditZoneRoom} from "../EditZoneRoom";
+import {AddRoomToZone} from "../AddRoomToZone";
 
 export default class SHHModule extends React.Component {
 
@@ -21,14 +22,15 @@ export default class SHHModule extends React.Component {
         this.defaultTempChange = this.defaultTempChange.bind(this);
         this.setAddingZone = this.setAddingZone.bind(this);
         this.addZone = this.addZone.bind(this);
+        this.removeZone = this.removeZone.bind(this);
         this.handleZoneNameChange = this.handleZoneNameChange.bind(this);
         this.updateSelectedZone = this.updateSelectedZone.bind(this);
         this.periodTempChange = this.periodTempChange.bind(this);
     }
 
     async componentDidMount() {
-        window.addEventListener("updateSelectedZone", async () => {
-            await this.updateSelectedZone();
+        window.addEventListener("updateSelectedZone", async e => {
+            await this.updateSelectedZone(e);
         });
 
         const defaultTemps = (await SmartHomeHeaterService.getDefaultTemperatures()).data;
@@ -41,14 +43,19 @@ export default class SHHModule extends React.Component {
         });
     }
 
-    async updateSelectedZone() {
+    async updateSelectedZone(event) {
         if (this.state.selectedZone === null) {
             return;
         }
+        const newState = {
+            selectedZone: await SmartHomeHeaterService.getZone(this.state.selectedZone.value.id),
+        };
 
-        await this.setState({
-            selectedZone: await SmartHomeHeaterService.getZone(this.state.selectedZone.value.id)
-        });
+        if (!event || !event.detail || event.detail !== true) {
+            newState.zoneUpdateKey = this.state.zoneUpdateKey + 1;
+        }
+
+        await this.setState(newState);
     }
 
     async onSelectedItem(item, evt) {
@@ -64,7 +71,7 @@ export default class SHHModule extends React.Component {
     async defaultTempChange(evt, name, limits) {
         let value = evt.target.value
 
-        value = this.adjustTempWithLimits(value, limits);
+        value = SHHModule.adjustTempWithLimits(value, limits);
 
         await this.setState({
             [`${name}DefaultTemp`]: value
@@ -80,14 +87,14 @@ export default class SHHModule extends React.Component {
     async periodTempChange(evt, period) {
         let value = evt.target.value
 
-        value = this.adjustTempWithLimits(value, { min: 15, max: 30 });
+        value = SHHModule.adjustTempWithLimits(value, { min: 15, max: 30 });
 
         await SmartHomeHeaterService.setPeriodTemp(this.state.selectedZone.value.id, period, value).then(async() => {
             await this.updateSelectedZone();
         });
     }
 
-    adjustTempWithLimits(temp, limits) {
+    static adjustTempWithLimits(temp, limits) {
         if (temp > limits.max) {
             temp = limits.max;
         } else if (temp < limits.min) {
@@ -114,6 +121,8 @@ export default class SHHModule extends React.Component {
             const updatedZones = this.state.zones;
             updatedZones.push(zone);
 
+            await this.updateSelectedZone();
+
             await this.setState({
                 zones: updatedZones,
                 zoneUpdateKey: this.state.zoneUpdateKey + 1,
@@ -125,6 +134,18 @@ export default class SHHModule extends React.Component {
                 alert("A zone with this name is already present.");
             }
         })
+    }
+
+    async removeZone() {
+        await SmartHomeHeaterService.removeZone(this.state.selectedZone.value.id).then(async () => {
+            const updatedZones = this.state.zones.filter(z => z.label !== this.state.selectedZone.label);
+
+            await this.setState({
+                zones: updatedZones,
+                selectedZone: null,
+                zoneUpdateKey: this.state.zoneUpdateKey + 1
+            });
+        });
     }
 
     async handleZoneNameChange(evt) {
@@ -190,6 +211,7 @@ export default class SHHModule extends React.Component {
                                     }}
                                     options={this.state.zones}
                                     onChange={(evt) => this.onSelectedItem("Zone", evt)}
+                                    defaultValue={this.state.selectedZone}
                                 />
                                 <Row>
                                     <Col>
@@ -212,7 +234,7 @@ export default class SHHModule extends React.Component {
                                                 <div>
                                                     <Button onClick={() => this.setAddingZone(true)} variant="secondary" size="sm">Add</Button>
                                                     {
-                                                        this.state.selectedZone !== null &&
+                                                        (this.state.selectedZone !== null && this.state.selectedZone.value.rooms.length === 0) &&
                                                         <Button onClick={this.removeZone} variant="secondary" size="sm">Remove</Button>
                                                     }
                                                 </div>
@@ -223,33 +245,46 @@ export default class SHHModule extends React.Component {
                             </Col>
                             <Col md={8}>
                                 {
-                                    (this.state.selectedZone !== null && this.state.selectedZone.value.rooms.length > 0) &&
-                                    <div>
-                                        Rooms
-                                        <ListGroup>
+                                    this.state.selectedZone !== null &&
+                                        <div>
+                                            Rooms&nbsp;
+                                            <div style={{float: "right", color: "orange", fontSize: "small"}}>
+                                                *Overridden
+                                            </div>
+                                            <AddRoomToZone key={this.state.zoneUpdateKey} zone={this.state.selectedZone.value}/>
                                             {
-                                                this.state.selectedZone.value.rooms.map((item) =>
-                                                    <ListGroup.Item
-                                                        key={this.state.selectedZone.value.rooms.indexOf(item)} className="ItemsTable"
-                                                        bsPrefix="list-group-item py-1" action
-                                                        variant="dark">
-                                                        <div>
-                                                            <div className="RoomLabelTemp">
-                                                                {`${item.label}: ${Math.round(item.value.temperature * 10) / 10}`}&deg;C
-                                                            </div>
-                                                            <div className="RoomZone">
-                                                                {this.state.selectedZone.label} &nbsp;
-                                                                <EditZoneRoom className="RoomLabelTemp" zone={this.state.selectedZone.label} room={item.value}/>
-                                                            </div>
-                                                        </div>
-                                                    </ListGroup.Item>
-                                                )
+                                                this.state.selectedZone.value.rooms.length > 0 &&
+                                                <div>
+                                                    <ListGroup key={this.state.zoneUpdateKey}>
+                                                        {
+                                                            this.state.selectedZone.value.rooms.map((item) =>
+                                                                <ListGroup.Item
+                                                                    key={`${item.label}${this.state.zoneUpdateKey}`} className="ItemsTable"
+                                                                    bsPrefix="list-group-item py-1" action
+                                                                    variant="dark">
+                                                                    <div>
+                                                                        <div className="RoomLabelTemp">
+                                                                            <span>{item.label}</span>:&nbsp;
+                                                                            <span style={{color: item.value.heatingMode === "OVERRIDDEN" ? "orange" : "black"}}>
+                                                                                {Math.round(item.value.temperature * 10) / 10}&deg;C
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="RoomZone">
+                                                                            {this.state.selectedZone.label} &nbsp;
+                                                                            <EditZoneRoom key={`${item.label}${this.state.zoneUpdateKey}`} className="RoomLabelTemp" zone={this.state.selectedZone} room={item.value}/>
+                                                                        </div>
+                                                                    </div>
+                                                                </ListGroup.Item>
+                                                            )
+                                                        }
+                                                    </ListGroup>
+                                                </div>
                                             }
-                                        </ListGroup>
-                                    </div>
+                                        </div>
                                 }
                             </Col>
                         </Row>
+                        <br/>
                         <Row>
                             {
                                 this.state.selectedZone !== null &&

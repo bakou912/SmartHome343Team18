@@ -37,7 +37,6 @@ public class Room extends Location {
 	private Double temperature = 0.0;
 	@Setter
 	@Builder.Default
-	@JsonIgnore
 	private RoomHeatingMode heatingMode = RoomHeatingMode.ZONE;
 	@Setter
 	@Builder.Default

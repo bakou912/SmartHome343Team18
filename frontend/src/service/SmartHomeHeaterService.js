@@ -27,9 +27,24 @@ class SmartHomeHeaterService {
         return httpClient.post(path, zone);
     }
 
+    async removeZone(zoneId) {
+        const path = `/heating/zones/${zoneId}`;
+        return httpClient.delete(path);
+    }
+
     async addRoomToZone(room, zoneId) {
         const path = `/heating/zones/${zoneId}/rooms`;
         return httpClient.post(path, room);
+    }
+
+    async overrideRoomTemp(rowId, roomId, temp) {
+        const path = `heating/rows/${rowId}/rooms/${roomId}/temperature`;
+        return httpClient.put(path, { temperature: temp });
+    }
+
+    async removeRoomOverride(rowId, roomId) {
+        const path = `heating/rows/${rowId}/rooms/${roomId}/heatingmode`;
+        return httpClient.put(path);
     }
 
     async getZones() {

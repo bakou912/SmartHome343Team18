@@ -44,6 +44,10 @@ public class HeatingModel extends AbstractBaseModel {
     @Setter
     @Builder.Default
     private Double outsideTemp = 0.0;
+    @Setter
+    @Getter
+    @Builder.Default
+    private Boolean on = false;
     
     private final IdUtil zoneId = new IdUtil();
     private final HouseLayoutModel houseLayoutModel;
@@ -187,7 +191,10 @@ public class HeatingModel extends AbstractBaseModel {
             case "timeIncrement":
                 for  (HeatingZone zone : zones) {
                     LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
-                    zone.adjustRoomTemperatures(currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime),outsideTemp);
+                    RoomTemperatureAdjustment adjustment = new RoomTemperatureAdjustment(
+                            currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime), outsideTemp, this.getOn()
+                    );
+                    zone.adjustRoomTemperatures(adjustment);
                 }
                 break;
             case "seasonDates":

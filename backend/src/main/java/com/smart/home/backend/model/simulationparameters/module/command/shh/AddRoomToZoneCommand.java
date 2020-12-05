@@ -15,16 +15,21 @@ import org.springframework.http.ResponseEntity;
 public class AddRoomToZoneCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneRoomInput, Room>{
 
     public AddRoomToZoneCommand() {
-        super("Adding room to zone", true);
+        super("Adding room to zone");
     }
     
     @Override
     public ResponseEntity<Room> execute(HeatingModel heatingModel, HeatingZoneRoomInput heatingZoneRoomInput) {
         HeatingZone zone = heatingModel.findZone(heatingZoneRoomInput.getZoneId());
-        Room foundRoom = heatingModel.addRoomToZone(heatingZoneRoomInput.getZoneId(), new LocationPosition(heatingZoneRoomInput.getRowId(), heatingZoneRoomInput.getRoomId()) );
+        Room foundRoom = heatingModel.getHouseLayoutModel().findRoom(new LocationPosition(heatingZoneRoomInput.getRowId(), heatingZoneRoomInput.getRoomId()));
         
         if (foundRoom != null){
-            this.logAction("Added " + foundRoom.getName() + " to zone " + zone.getName());
+            if (zone.getRooms().contains(foundRoom)) {
+                this.logAction(foundRoom.getName() + " is already in zone " + zone.getName());
+            } else {
+                zone.getRooms().add(foundRoom);
+                this.logAction("Added " + foundRoom.getName() + " to zone " + zone.getName());
+            }
         } else {
             this.logAction("Room not found and could not be added");
         }

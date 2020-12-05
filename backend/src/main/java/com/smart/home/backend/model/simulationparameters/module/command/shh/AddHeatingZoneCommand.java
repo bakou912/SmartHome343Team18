@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 public class AddHeatingZoneCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneInput, HeatingZone>{
 
     public AddHeatingZoneCommand() {
-        super("Adding heating zone", true);
+        super("Adding heating zone");
     }
 
     @Override

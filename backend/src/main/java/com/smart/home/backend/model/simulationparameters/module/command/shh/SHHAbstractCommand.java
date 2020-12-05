@@ -15,8 +15,8 @@ public class SHHAbstractCommand<X, Y, Z> extends AbstractCommand<X, Y, Z> {
      * @param locationDependent whether the command is dependent on location
      * 
      */
-    protected SHHAbstractCommand(String name, Boolean locationDependent) {
-        super(name, "SHH", locationDependent);
+    protected SHHAbstractCommand(String name) {
+        super(name, "SHH", false);
     }
     
 }

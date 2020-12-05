@@ -1,21 +1,15 @@
 package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.HeatingZonePeriod;
-import com.smart.home.backend.input.HeatingZoneTemperatureInput;
-import com.smart.home.backend.input.HeatingZoneInput;
-import com.smart.home.backend.input.HeatingZoneRoomInput;
-import com.smart.home.backend.input.HeatingZoneRoomTemperatureInput;
+import com.smart.home.backend.constant.RoomHeatingMode;
+import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.heating.DefaultTemperatures;
 import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.AddHeatingZoneCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.AddRoomToZoneCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.OverrideRoomTemperatureCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.RemoveRoomFromZoneCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.SetZoneTemperatureCommand;
-import com.smart.home.backend.model.simulationparameters.module.command.shh.RemoveHeatingZoneCommand;
+import com.smart.home.backend.model.simulationparameters.module.command.shh.*;
+import com.smart.home.backend.service.OutputConsole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +47,16 @@ public class HeatingController {
     @GetMapping("/heating")
     public ResponseEntity<HeatingModel> getModel() {
         return new ResponseEntity<>(this.getHeatingModel(), HttpStatus.OK);
+    }
+    
+    /**
+     * Set heating on or off.
+     * @param heatingOnInput input for setting heating on or off
+     * @return new heating status (true: on, false: off)
+     */
+    @PutMapping("heating/on")
+    public ResponseEntity<Boolean> setOn(@RequestBody HeatingOnInput heatingOnInput) {
+        return new SetHeatingOnCommand().execute(this.heatingModel, heatingOnInput);
     }
     
     /**
@@ -158,6 +162,26 @@ public class HeatingController {
     public ResponseEntity<Double> overrideRoomTemperature(LocationPosition locationPosition, @RequestBody HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature) {
         heatingZoneRoomTemperature.setLocationPosition(locationPosition);
         return new OverrideRoomTemperatureCommand().execute(this.heatingModel, heatingZoneRoomTemperature);
+    }
+    
+    /**
+     * Remove room's temperature override
+     * @param locationPosition room's location
+     * @return new room heating mode
+     */
+    @PutMapping("heating/rows/{rowId}/rooms/{roomId}/heatingmode")
+    public ResponseEntity<RoomHeatingMode> removeRoomOverride(LocationPosition locationPosition) {
+        Room foundRoom = this.getHeatingModel().getHouseLayoutModel().findRoom(locationPosition);
+        
+        if (foundRoom == null || !foundRoom.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        
+        OutputConsole.log("SHH | Removed override for " + foundRoom.getName() + "'s temperature");
+        
+        foundRoom.setHeatingMode(this.getHeatingModel().getHeatingMode());
+        
+        return new ResponseEntity<>(foundRoom.getHeatingMode(), HttpStatus.OK);
     }
     
     /**
