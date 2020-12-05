@@ -9,6 +9,7 @@ import com.smart.home.backend.model.heating.DefaultTemperatures;
 import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddHeatingZoneCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddRoomToZoneCommand;
@@ -189,6 +190,16 @@ public class HeatingController {
     public ResponseEntity<Double> setSummerTemperature(@RequestBody TemperatureInput temperatureInput) {
         this.getHeatingModel().getDefaultTemperatures().setSummerTemp(temperatureInput.getTemperature());
         return new ResponseEntity<>(temperatureInput.getTemperature(), HttpStatus.OK);
+    }
+
+    /**
+     * Initialize temperature of all rooms to be equal to the outside temperature
+     */
+    @PostMapping("heating/temperature/init")
+    public void initTemperature(){
+        this.getHeatingModel().getHouseLayoutModel().getAllRooms().forEach(
+                room -> room.setTemperature(this.getHeatingModel().getOutsideTemp())
+        );
     }
 
 }

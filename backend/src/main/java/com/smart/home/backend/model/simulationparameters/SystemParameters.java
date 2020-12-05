@@ -59,6 +59,7 @@ public class SystemParameters extends AbstractNotifier {
         }
     
         if (parametersInput.getOutsideTemp() != null) {
+            this.support.firePropertyChange("outsideTemp", this.getOutsideTemp(), parametersInput.getOutsideTemp());
             this.setOutsideTemp(parametersInput.getOutsideTemp());
         }
     
