@@ -91,9 +91,9 @@ public class HouseLayoutModel extends AbstractBaseModel {
 	@Nullable
 	public List<Room> getAllRooms(){
 		List<Room> rooms = new ArrayList<>();
-		for (int i = 0; i<rows.size(); i++){
-			for (int j = 0; j<rows.get(i).getRooms().size();j++){
-				rooms.add(rows.get(i).getRooms().get(j));
+		for (RoomRow row : rows) {
+			for (Room room : row.getRooms()) {
+				rooms.add(room);
 			}
 		}
 		return rooms;

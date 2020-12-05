@@ -34,7 +34,7 @@ class HeatingControllerTest {
         DateIncrementTask dateIncrementTask = new DateIncrementTask();
         HeatingModel heatingModel = new HeatingModel(new HouseLayoutModel());
         SystemParameters systemParameters = new SystemParameters(dateIncrementTask);
-        heatingController = new HeatingController(heatingModel,systemParameters);
+        heatingController = new HeatingController(heatingModel);
     }
 
     /**

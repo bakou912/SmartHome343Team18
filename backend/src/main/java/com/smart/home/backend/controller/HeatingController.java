@@ -44,9 +44,8 @@ public class HeatingController {
     private SystemParameters sysParams;
 
     @Autowired
-    public HeatingController(HeatingModel heatingModel, SystemParameters sysParams) {
+    public HeatingController(HeatingModel heatingModel) {
         this.heatingModel = heatingModel;
-        this.sysParams = sysParams;
     }
     
     /**

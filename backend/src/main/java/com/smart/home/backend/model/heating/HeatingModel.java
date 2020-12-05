@@ -185,15 +185,10 @@ public class HeatingModel extends AbstractBaseModel {
     public void propertyChange(PropertyChangeEvent evt) {
         switch(evt.getPropertyName()) {
             case "timeIncrement":
-                try {
-                    for  (HeatingZone zone : zones) {
-                        LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
-                        zone.adjustRoomTemperatures(currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime),outsideTemp);
-                    }
-                } catch(Exception e) {
-                    System.out.println(e.getMessage());
+                for  (HeatingZone zone : zones) {
+                    LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
+                    zone.adjustRoomTemperatures(currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime),outsideTemp);
                 }
-                
                 break;
             case "seasonDates":
                 this.setSeasonDates((SeasonDates) evt.getNewValue());
