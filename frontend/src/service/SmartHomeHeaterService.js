@@ -20,6 +20,10 @@ class SmartHomeHeaterService {
         const path = "/heating/awaymode/summer/temp";
         return httpClient.get(path);
     }
+	async initTemp(){
+		const path = "heating/temperature/init"
+		return httpClient.post(path);
+	}
 }
 
 export default new SmartHomeHeaterService();

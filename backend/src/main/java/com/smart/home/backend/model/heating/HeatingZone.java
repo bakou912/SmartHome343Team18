@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.HeatingZonePeriod;
 import com.smart.home.backend.constant.RoomHeatingMode;
+import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.model.houselayout.directional.Window;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,10 +66,18 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
+	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp, boolean isSummer) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		for (Room room: rooms) {
-			room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
+			if (!isSummerBreeze(outsideTemp, room, isSummer)){
+				room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
+			}
+			else{
+				room.setHavc(false);
+				for (Window window : room.getWindows()) {
+					window.setState(WindowState.OPEN);
+				}
+			}
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
 				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
@@ -77,7 +87,7 @@ public class HeatingZone extends ModelObject {
 				} else if (tempDelta >= increment) {
 					multiplier = 1;
 				}
-				
+
 				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
 		}
@@ -94,6 +104,18 @@ public class HeatingZone extends ModelObject {
 		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
 		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
 		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
+	}
+
+	private boolean isSummerBreeze(Double outsideTemp, Room room, boolean isSummer){
+		if (isSummer && (outsideTemp - room.getTemperature() < 0) && room.getHeatingMode() != RoomHeatingMode.AWAY){
+			for (Window window : room.getWindows()) {
+				if (window.getState() == WindowState.BLOCKED){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	/**
