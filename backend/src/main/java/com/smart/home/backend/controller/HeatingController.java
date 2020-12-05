@@ -9,7 +9,6 @@ import com.smart.home.backend.model.heating.DefaultTemperatures;
 import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.Room;
-import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddHeatingZoneCommand;
 import com.smart.home.backend.model.simulationparameters.module.command.shh.AddRoomToZoneCommand;
@@ -61,7 +60,7 @@ public class HeatingController {
      * @param heatingZoneInput input for a heating zone
      * @return heating zone name
      */
-    @PostMapping("/heating/zone")
+    @PostMapping("/heating/zones")
     public ResponseEntity<HeatingZone> addHeatingZone(@RequestBody HeatingZoneInput heatingZoneInput) {
         return new AddHeatingZoneCommand().execute(this.heatingModel, heatingZoneInput);
     }
@@ -70,7 +69,7 @@ public class HeatingController {
      * Retrieving all heating zones
      * @return found zone
      */
-    @GetMapping("/heating/zone")
+    @GetMapping("/heating/zones")
     public ResponseEntity<List<HeatingZone>> getHeatingZones() {
         return new ResponseEntity<>(this.getHeatingModel().getZones(), HttpStatus.OK);
     }
@@ -80,7 +79,7 @@ public class HeatingController {
      * @param zoneId id for a zone
      * @return found zone
      */
-    @GetMapping("/heating/zone/{zoneId}")
+    @GetMapping("/heating/zones/{zoneId}")
     public ResponseEntity<HeatingZone> getHeatingZone(@PathVariable Integer zoneId) {
         HeatingZone foundZone = this.getHeatingModel().findZone(zoneId);
         
@@ -96,7 +95,7 @@ public class HeatingController {
      * @param zoneId id for a zone
      * @return zone id
      */
-    @DeleteMapping("/heating/zone/{zoneId}")
+    @DeleteMapping("/heating/zones/{zoneId}")
     public ResponseEntity<Integer> removeHeatingZone(@PathVariable Integer zoneId) {
         return new RemoveHeatingZoneCommand().execute(this.heatingModel, zoneId);
     }
@@ -106,7 +105,7 @@ public class HeatingController {
      * @param heatingZoneRoomInput heating zone room input
      * @return room id
      */
-    @PostMapping("heating/zone/{zoneId}/room")
+    @PostMapping("heating/zones/{zoneId}/rooms")
     public ResponseEntity<Room> addRoomToZone(@PathVariable Integer zoneId, @RequestBody HeatingZoneRoomInput heatingZoneRoomInput) {
         heatingZoneRoomInput.setZoneId(zoneId);
         return new AddRoomToZoneCommand().execute(this.heatingModel, heatingZoneRoomInput);
@@ -117,7 +116,7 @@ public class HeatingController {
      * @param heatingZoneRoomInput heating zone room input
      * @return room id
      */
-    @DeleteMapping("heating/zone/room")
+    @DeleteMapping("heating/zones/rooms")
     public ResponseEntity<Integer> deleteRoomFromZone(@RequestBody HeatingZoneRoomInput heatingZoneRoomInput) {
         return new RemoveRoomFromZoneCommand().execute(this.heatingModel, heatingZoneRoomInput);
     }
@@ -127,7 +126,7 @@ public class HeatingController {
      * @param heatingZoneTemperatureInput heating zone temperature input
      * @return heating zone temperature
      */
-    @PutMapping("heating/zone/{zoneId}/{period}/temperature")
+    @PutMapping("heating/zones/{zoneId}/periods/{period}/temperature")
     public ResponseEntity<Double> setZoneTemperature(
             @PathVariable Integer zoneId,
             @PathVariable HeatingZonePeriod period,
@@ -143,7 +142,7 @@ public class HeatingController {
      * @param locationPosition room's position
      * @return temperature of room
      */
-    @GetMapping("heating/row/{rowId}/room/{roomId}/temperature")
+    @GetMapping("heating/rows/{rowId}/rooms/{roomId}/temperature")
     public ResponseEntity<Double> readRoomTemperature(LocationPosition locationPosition) {
         double roomTemperature = this.heatingModel.getRoomTemperature(locationPosition);
         return new ResponseEntity<>(roomTemperature, HttpStatus.OK);
@@ -155,7 +154,7 @@ public class HeatingController {
      * @param heatingZoneRoomTemperature heatingZoneRoomTemperature input
      * @return overridden temperature
      */
-    @PutMapping("heating/row/{rowId}/room/{roomId}/temperature")
+    @PutMapping("heating/rows/{rowId}/rooms/{roomId}/temperature")
     public ResponseEntity<Double> overrideRoomTemperature(LocationPosition locationPosition, @RequestBody HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature) {
         heatingZoneRoomTemperature.setLocationPosition(locationPosition);
         return new OverrideRoomTemperatureCommand().execute(this.heatingModel, heatingZoneRoomTemperature);

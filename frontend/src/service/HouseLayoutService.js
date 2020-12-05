@@ -11,10 +11,8 @@ class HouseLayoutService {
     }
 
     async getAllRooms() {
-        return (await httpClient.get("layout/room")).map(r => ({
-            value: {
-                ...r
-            },
+        return (await httpClient.get("layout/rooms")).map(r => ({
+            value: r,
             label: r.name
         }));
     }

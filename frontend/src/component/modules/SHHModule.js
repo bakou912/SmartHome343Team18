@@ -1,11 +1,13 @@
 import React from "react";
 import SmartHomeHeaterService from "../../service/SmartHomeHeaterService";
 import "../../style/Modules.css";
-import {Button, Col, Container, Row} from "react-bootstrap";
+import {Button, Col, Container, ListGroup, Row} from "react-bootstrap";
 import HouseLayoutService from "../../service/HouseLayoutService";
 import Select from "react-select";
+import {EditZoneRoom} from "../EditZoneRoom";
 
 export default class SHHModule extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -20,9 +22,15 @@ export default class SHHModule extends React.Component {
         this.setAddingZone = this.setAddingZone.bind(this);
         this.addZone = this.addZone.bind(this);
         this.handleZoneNameChange = this.handleZoneNameChange.bind(this);
+        this.updateSelectedZone = this.updateSelectedZone.bind(this);
+        this.periodTempChange = this.periodTempChange.bind(this);
     }
 
     async componentDidMount() {
+        window.addEventListener("updateSelectedZone", async () => {
+            await this.updateSelectedZone();
+        });
+
         const defaultTemps = (await SmartHomeHeaterService.getDefaultTemperatures()).data;
 
         await this.setState({
@@ -33,22 +41,30 @@ export default class SHHModule extends React.Component {
         });
     }
 
+    async updateSelectedZone() {
+        if (this.state.selectedZone === null) {
+            return;
+        }
+
+        await this.setState({
+            selectedZone: await SmartHomeHeaterService.getZone(this.state.selectedZone.value.id)
+        });
+    }
+
     async onSelectedItem(item, evt) {
         await this.setState({
             [`selected${item}`]: evt,
         });
 
-        console.log(this.state.selectedZone)
+        if (item === "Zone") {
+            await this.updateSelectedZone();
+        }
     }
 
     async defaultTempChange(evt, name, limits) {
         let value = evt.target.value
 
-        if (value > limits.max) {
-            value = limits.max;
-        } else if (value < limits.min) {
-            value = limits.min
-        }
+        value = this.adjustTempWithLimits(value, limits);
 
         await this.setState({
             [`${name}DefaultTemp`]: value
@@ -59,6 +75,25 @@ export default class SHHModule extends React.Component {
         } else {
             await SmartHomeHeaterService.setDefaultWinterTemp({ temperature: value });
         }
+    }
+
+    async periodTempChange(evt, period) {
+        let value = evt.target.value
+
+        value = this.adjustTempWithLimits(value, { min: 15, max: 30 });
+
+        await SmartHomeHeaterService.setPeriodTemp(this.state.selectedZone.value.id, period, value).then(async() => {
+            await this.updateSelectedZone();
+        });
+    }
+
+    adjustTempWithLimits(temp, limits) {
+        if (temp > limits.max) {
+            temp = limits.max;
+        } else if (temp < limits.min) {
+            temp = limits.min
+        }
+        return temp;
     }
 
     async setAddingZone(value) {
@@ -85,8 +120,6 @@ export default class SHHModule extends React.Component {
                 addingZone: false,
                 zoneName: ""
             });
-
-            //window.dispatchEvent(new Event("updateLayout"));
         }).catch(err => {
             if (err.response.status === 409) {
                 alert("A zone with this name is already present.");
@@ -145,7 +178,7 @@ export default class SHHModule extends React.Component {
                         </Row>
                         <br/>
                         <Row>
-                            <Col md={6}>
+                            <Col md={4}>
                                 Zones
                                 <Select
                                     key={this.state.zoneUpdateKey}
@@ -186,25 +219,90 @@ export default class SHHModule extends React.Component {
                                         }
                                     </Col>
                                 </Row>
+                                <br/>
                             </Col>
-                            <Col md={6}>
+                            <Col md={8}>
                                 {
-                                    this.state.selectedZone !== null &&
-                                        <div>
-                                            Rooms
-                                            <Select
-                                                styles={{
-                                                    option: provided => ({...provided, width: "100%"}),
-                                                    menu: provided => ({...provided, width: "100%"}),
-                                                    control: provided => ({...provided, width: "100%"}),
-                                                    singleValue: provided => provided
-                                                }}
-                                                options={this.state.zones}
-                                                onChange={(evt) => this.onSelectedItem("Person", evt)}
-                                            />
-                                        </div>
+                                    (this.state.selectedZone !== null && this.state.selectedZone.value.rooms.length > 0) &&
+                                    <div>
+                                        Rooms
+                                        <ListGroup>
+                                            {
+                                                this.state.selectedZone.value.rooms.map((item) =>
+                                                    <ListGroup.Item
+                                                        key={this.state.selectedZone.value.rooms.indexOf(item)} className="ItemsTable"
+                                                        bsPrefix="list-group-item py-1" action
+                                                        variant="dark">
+                                                        <div>
+                                                            <div className="RoomLabelTemp">
+                                                                {`${item.label}: ${Math.round(item.value.temperature * 10) / 10}`}&deg;C
+                                                            </div>
+                                                            <div className="RoomZone">
+                                                                {this.state.selectedZone.label} &nbsp;
+                                                                <EditZoneRoom className="RoomLabelTemp" zone={this.state.selectedZone.label} room={item.value}/>
+                                                            </div>
+                                                        </div>
+                                                    </ListGroup.Item>
+                                                )
+                                            }
+                                        </ListGroup>
+                                    </div>
                                 }
                             </Col>
+                        </Row>
+                        <Row>
+                            {
+                                this.state.selectedZone !== null &&
+                                <Container>
+                                    <Row>
+                                        <Col md={4}>
+                                            Morning Target (&deg;C):
+                                        </Col>
+                                        <Col md={1}>
+                                            <input
+                                                style={{ width: "50px" }}
+                                                name="MorningTargetTemp"
+                                                type="number"
+                                                value={this.state.selectedZone.value.periods.MORNING}
+                                                onChange={async evt => await this.periodTempChange(evt, "MORNING")}
+                                                min={0} max={50}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <br/>
+                                    <Row>
+                                        <Col md={4}>
+                                            Afternoon Target (&deg;C):
+                                        </Col>
+                                        <Col md={1}>
+                                            <input
+                                                style={{ width: "50px" }}
+                                                name="AfternoonTargetTemp"
+                                                type="number"
+                                                value={this.state.selectedZone.value.periods.AFTERNOON}
+                                                onChange={async evt => await this.periodTempChange(evt, "AFTERNOON")}
+                                                min={15} max={30}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <br/>
+                                    <Row>
+                                        <Col md={4}>
+                                            Night Target (&deg;C):
+                                        </Col>
+                                        <Col md={1}>
+                                            <input
+                                                style={{ width: "50px" }}
+                                                name="NightTargetTemp"
+                                                type="number"
+                                                value={this.state.selectedZone.value.periods.NIGHT}
+                                                onChange={async evt => await this.periodTempChange(evt, "NIGHT")}
+                                                min={15} max={30}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </Container>
+                            }
                         </Row>
                     </Container>
                 </div>

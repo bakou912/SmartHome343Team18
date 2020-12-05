@@ -42,6 +42,9 @@ public class Room extends Location {
 	@Setter
 	@Builder.Default
 	private Boolean havc = true;
+	@Setter
+	@Nullable
+	private Integer rowId;
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
