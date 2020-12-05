@@ -15,6 +15,8 @@ import com.smart.home.backend.model.heating.HeatingModel;
 import com.smart.home.backend.model.heating.HeatingZone;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.RoomRow;
+import com.smart.home.backend.model.simulationparameters.DateIncrementTask;
+import com.smart.home.backend.model.simulationparameters.SystemParameters;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.service.mapper.RoomsMapper;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,6 @@ class HeatingControllerTest {
     @BeforeEach
     public void beforeEach(){
         HeatingModel heatingModel = new HeatingModel(new HouseLayoutModel());
-
         heatingController = new HeatingController(heatingModel);
     }
 

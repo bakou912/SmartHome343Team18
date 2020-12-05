@@ -25,7 +25,8 @@ import java.util.Map;
 @SuperBuilder
 public class HeatingZone extends ModelObject {
 	
-	private static final Double INCREMENT_VALUE = 0.1;
+	private static final Double INCREMENT_VALUE_HAVC = 0.1;
+	private static final Double INCREMENT_VALUE = 0.05;
 	
 	@Builder.Default
 	private String name = "";
@@ -63,23 +64,36 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature) {
+	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
-		
 		for (Room room: rooms) {
+			room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = targetTemperature - room.getTemperature();
+				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
-				
-				if (tempDelta <= -INCREMENT_VALUE) {
+				double increment = (room.getHavc() ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
+				if (tempDelta <= -increment) {
 					multiplier = -1;
-				} else if (tempDelta >= INCREMENT_VALUE) {
+				} else if (tempDelta >= increment) {
 					multiplier = 1;
 				}
 				
-				room.setTemperature(room.getTemperature() + multiplier * INCREMENT_VALUE);
+				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
 		}
+	}
+	
+	/**
+	 * Method to determine if the HAVC should be on or off
+	 * @param outsideTemp
+	 * @param targetTemperature
+	 * @param room
+	 * @return true if HAVC should on and false if it should be off
+	 */
+	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
+		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
+		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
+		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
 	}
 	
 	/**

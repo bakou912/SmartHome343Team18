@@ -39,6 +39,9 @@ public class Room extends Location {
 	@Builder.Default
 	@JsonIgnore
 	private RoomHeatingMode heatingMode = RoomHeatingMode.ZONE;
+	@Setter
+	@Builder.Default
+	private Boolean havc = true;
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
