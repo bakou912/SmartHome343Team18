@@ -5,6 +5,7 @@ import HouseLayout from "./HouseLayout";
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import HouseLayoutService from "../service/HouseLayoutService";
 import Select from 'react-select'
+import SmartHomeHeaterService from "../service/SmartHomeHeaterService";
 
 export default class SimulationParameters extends React.Component {
 
@@ -134,6 +135,7 @@ export default class SimulationParameters extends React.Component {
             .catch(() => {
                 alert("One or more system parameters were inappropriate");
             })
+		await SmartHomeHeaterService.initTemp();
     }
 
     redirectToDashboard() {

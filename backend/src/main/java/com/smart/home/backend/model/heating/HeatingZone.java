@@ -5,8 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.HeatingZonePeriod;
 import com.smart.home.backend.constant.RoomHeatingMode;
+import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.model.houselayout.directional.Window;
+import com.smart.home.backend.service.OutputConsole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -64,10 +67,10 @@ public class HeatingZone extends ModelObject {
 	/**
 	 * Adjusts rooms' temperatures according to the target temperature.
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp) {
+	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp, boolean isSummer) {
 		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
 		for (Room room: rooms) {
-			room.setHavc(isHavcOn(outsideTemp, targetTemperature, room));
+			room.adjustRoomSummerBreeze(outsideTemp, isSummer, targetTemperature);
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
 				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
 				int multiplier = 0;
@@ -77,25 +80,23 @@ public class HeatingZone extends ModelObject {
 				} else if (tempDelta >= increment) {
 					multiplier = 1;
 				}
-				
+
 				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
+			pipeBurstWarning(room);
 		}
 	}
-	
+
 	/**
-	 * Method to determine if the HAVC should be on or off
-	 * @param outsideTemp
-	 * @param targetTemperature
-	 * @param room
-	 * @return true if HAVC should on and false if it should be off
+	 * Writes to the console a message if the is a risk of pipe burst
+	 * @param room room to check for risk of pipe burst
 	 */
-	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
-		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
-		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
-		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
+	private void pipeBurstWarning(Room room) {
+		if (room.getTemperature() <= 0){
+			OutputConsole.log("SHH | WARNING !!! Freezing temperatures in the " + room.getName() + " pipes might burst");
+		}
 	}
-	
+
 	/**
 	 * Determine which temperature to use.
 	 * @param date current date
