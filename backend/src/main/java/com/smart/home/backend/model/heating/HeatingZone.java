@@ -9,6 +9,7 @@ import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
 import com.smart.home.backend.model.houselayout.directional.Window;
+import com.smart.home.backend.service.OutputConsole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,9 +83,20 @@ public class HeatingZone extends ModelObject {
 
 				room.setTemperature(room.getTemperature() + multiplier * increment);
 			}
+			pipeBurstWarning(room);
 		}
 	}
-	
+
+	/**
+	 * Writes to the console a message if the is a risk of pipe burst
+	 * @param room room to check for risk of pipe burst
+	 */
+	private void pipeBurstWarning(Room room) {
+		if (room.getTemperature() <= 0){
+			OutputConsole.log("WARNING !!! Freezing temperatures in the " + room.getName() + " pipes might burst");
+		}
+	}
+
 	/**
 	 * Determine which temperature to use.
 	 * @param date current date
