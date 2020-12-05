@@ -93,7 +93,7 @@ public class HeatingZone extends ModelObject {
 	 */
 	private void pipeBurstWarning(Room room) {
 		if (room.getTemperature() <= 0){
-			OutputConsole.log("WARNING !!! Freezing temperatures in the " + room.getName() + " pipes might burst");
+			OutputConsole.log("SHH | WARNING !!! Freezing temperatures in the " + room.getName() + " pipes might burst");
 		}
 	}
 
