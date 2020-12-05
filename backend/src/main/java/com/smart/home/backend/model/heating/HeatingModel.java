@@ -43,7 +43,7 @@ public class HeatingModel extends AbstractBaseModel {
     private SeasonDates seasonDates = new SeasonDates();
     @Setter
     @Builder.Default
-    private Double outsideTemp;
+    private Double outsideTemp = 0.0;
     
     private final IdUtil zoneId = new IdUtil();
     private final HouseLayoutModel houseLayoutModel;

@@ -88,13 +88,11 @@ public class HouseLayoutModel extends AbstractBaseModel {
 	 * gets all the rooms in the house layout
 	 * @return list of all rooms
 	 */
-	@Nullable
+	@NonNull
 	public List<Room> getAllRooms(){
 		List<Room> rooms = new ArrayList<>();
 		for (RoomRow row : rows) {
-			for (Room room : row.getRooms()) {
-				rooms.add(room);
-			}
+			rooms.addAll(row.getRooms());
 		}
 		return rooms;
 	}

@@ -41,7 +41,6 @@ import java.util.List;
 public class HeatingController {
     
     private HeatingModel heatingModel;
-    private SystemParameters sysParams;
 
     @Autowired
     public HeatingController(HeatingModel heatingModel) {
@@ -195,12 +194,12 @@ public class HeatingController {
 
     /**
      * Initialize temperature of all rooms to be equal to the outside temperature
-     * @return
      */
     @PostMapping("heating/temperature/init")
     public void initTemperature(){
-        heatingModel.getHouseLayoutModel().getAllRooms().stream()
-                .forEach(room -> room.setTemperature(sysParams.getOutsideTemp()));
+        this.getHeatingModel().getHouseLayoutModel().getAllRooms().forEach(
+                room -> room.setTemperature(this.getHeatingModel().getOutsideTemp())
+        );
     }
 
 }

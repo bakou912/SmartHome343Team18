@@ -21,7 +21,6 @@ import com.smart.home.backend.model.simulationparameters.location.LocationPositi
 import com.smart.home.backend.service.mapper.RoomsMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import com.smart.home.backend.constant.Direction;
 
@@ -31,9 +30,7 @@ class HeatingControllerTest {
     
     @BeforeEach
     public void beforeEach(){
-        DateIncrementTask dateIncrementTask = new DateIncrementTask();
         HeatingModel heatingModel = new HeatingModel(new HouseLayoutModel());
-        SystemParameters systemParameters = new SystemParameters(dateIncrementTask);
         heatingController = new HeatingController(heatingModel);
     }
 
