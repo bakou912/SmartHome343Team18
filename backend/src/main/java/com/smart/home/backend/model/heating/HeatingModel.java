@@ -189,7 +189,7 @@ public class HeatingModel extends AbstractBaseModel {
                 this.setOutsideTemp((Double) evt.getNewValue());
                 break;
             case "rooms":
-                this.findZone(0).getRooms().addAll((List<Room>) evt.getNewValue());
+                this.findZone(0).setRooms((List<Room>) evt.getNewValue());
                 break;
             default:
                 break;

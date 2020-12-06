@@ -235,8 +235,8 @@ export default class SimulationContext extends React.Component {
             timeSpeed: this.state.timeSpeed,
             outsideTemp: this.state.outsideTemp,
 			seasonDates: {
-				summerStart: this.state.summerStart + "T" + "00:00:00",
-				winterStart: this.state.winterStart + "T" + "00:00:00"
+				summerStart: this.state.summerStart + "T00:00:00",
+				winterStart: this.state.winterStart + "T00:00:00"
 			}
         });
         await window.location.reload();

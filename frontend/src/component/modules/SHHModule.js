@@ -183,7 +183,7 @@ export default class SHHModule extends React.Component {
                             <Col md={5}>
                                 Away Default Summer (&deg;C):
                             </Col>
-                            <Col md={1}>
+                            <Col md={2}>
                                 <input
                                     style={{ width: "50px" }}
                                     name="SummerTemp"
@@ -211,7 +211,7 @@ export default class SHHModule extends React.Component {
                             <Col md={5}>
                                 Away Default Winter (&deg;C):
                             </Col>
-                            <Col md={1}>
+                            <Col md={2}>
                                 <input
                                     style={{ width: "50px" }}
                                     name="WinterTemp"

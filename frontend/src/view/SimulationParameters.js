@@ -167,7 +167,7 @@ export default class SimulationParameters extends React.Component {
 				...this.state.parametersInput,
 				seasonDates:{
 					winterStart: this.state.parametersInput.seasonDates.winterStart,
-					summerStart: evt.target.value + "T" + "00:00:00"
+					summerStart: evt.target.value + "T00:00:00"
 				}
 			}
         });
@@ -178,7 +178,7 @@ export default class SimulationParameters extends React.Component {
 			parametersInput: {
 				...this.state.parametersInput,
 				seasonDates:{
-					winterStart: evt.target.value + "T" + "00:00:00",
+					winterStart: evt.target.value + "T00:00:00",
 					summerStart: this.state.parametersInput.seasonDates.summerStart,
 				}
 			}
