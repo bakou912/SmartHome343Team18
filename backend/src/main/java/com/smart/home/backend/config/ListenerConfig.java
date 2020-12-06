@@ -48,6 +48,7 @@ public class ListenerConfig {
 	@PostConstruct
 	public void addListeners() {
 		this.houseLayoutModel.addListener(securityModel);
+		this.houseLayoutModel.addListener(heatingModel);
 		
 		this.systemParameters.addListener(securityModel);
 		this.systemParameters.addListener(heatingModel);

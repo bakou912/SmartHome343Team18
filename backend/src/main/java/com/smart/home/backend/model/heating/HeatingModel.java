@@ -62,6 +62,7 @@ public class HeatingModel extends AbstractBaseModel {
     @Autowired
     public HeatingModel(HouseLayoutModel houseLayoutModel) {
         this.houseLayoutModel = houseLayoutModel;
+        this.getZones().add(HeatingZone.builder().id(this.getZoneId().newId()).name("Default").build());
     }
     
     /**
@@ -208,6 +209,9 @@ public class HeatingModel extends AbstractBaseModel {
                 break;
             case "outsideTemp":
                 this.setOutsideTemp((Double) evt.getNewValue());
+                break;
+            case "rooms":
+                this.findZone(0).getRooms().addAll((List<Room>) evt.getNewValue());
                 break;
             default:
                 break;
