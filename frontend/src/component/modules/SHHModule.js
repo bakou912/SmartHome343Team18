@@ -180,8 +180,8 @@ export default class SHHModule extends React.Component {
                     <Container>
                         <br/>
                         <Row>
-                            <Col md={6}>
-                                Default Summer Temperature (&deg;C):
+                            <Col md={5}>
+                                Away Default Summer (&deg;C):
                             </Col>
                             <Col md={1}>
                                 <input
@@ -208,8 +208,8 @@ export default class SHHModule extends React.Component {
                         </Row>
                         <br/>
                         <Row>
-                            <Col md={6}>
-                                Default Winter Temperature (&deg;C):
+                            <Col md={5}>
+                                Away Default Winter (&deg;C):
                             </Col>
                             <Col md={1}>
                                 <input
