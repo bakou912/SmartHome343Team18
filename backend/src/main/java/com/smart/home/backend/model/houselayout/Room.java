@@ -122,7 +122,7 @@ public class Room extends Location {
 		
 		for (Window window : this.getWindows()) {
 			WindowState newState = summerBreeze ? WindowState.OPEN : WindowState.CLOSED;
-			if (!newState.equals(window.getState())) {
+			if (!newState.equals(window.getState()) && !window.getState().equals(WindowState.BLOCKED) ) {
 				window.setState(newState);
 				OutputConsole.log("SHH | Changed window state to " + window.getState());
 			}
