@@ -108,10 +108,10 @@ public class HeatingZone extends ModelObject {
 		
 		if (globalHeatingMode.equals(RoomHeatingMode.ZONE)) {
 			HeatingZonePeriod period;
-			if (hour >= 5 && hour <= 11) {
+			if (hour >= 5 && hour < 11) {
 				period = HeatingZonePeriod.MORNING;
-			} else if (hour > 11 && hour <= 21) {
-				period = HeatingZonePeriod.AFTERNOON;
+			} else if (hour >= 11 && hour < 21) {
+				period = HeatingZonePeriod.AFTERNO
 			} else {
 				period = HeatingZonePeriod.NIGHT;
 			}
