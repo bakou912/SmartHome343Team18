@@ -77,6 +77,14 @@
             {
                 "name": "Door management",
                 "locationRestriction": "NONE"
+            },
+            {
+                "name": "Setting default season temperatures",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Setting period temperatures",
+                "locationRestriction": "NONE"
             }
         ]
     },

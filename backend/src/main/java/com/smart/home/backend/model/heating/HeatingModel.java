@@ -103,6 +103,25 @@ public class HeatingModel extends AbstractBaseModel {
     }
     
     /**
+     * Adds a room to the zone.
+     * @param zone target zone
+     * @param room room to add
+     * @return found room
+     */
+    public Room addRoomToZone(HeatingZone zone, Room room) throws RoomAlreadyInZoneException {
+        if (zone.getRooms().contains(room)) {
+            throw new RoomAlreadyInZoneException(room, zone);
+        } else {
+            this.getZones().forEach(
+                    z -> z.getRooms().remove(room)
+            );
+            zone.getRooms().add(room);
+        }
+        
+        return room;
+    }
+    
+    /**
      * Modifies some period's target temperature for a specific zone.
      * @param zoneId zone's id
      * @param zonePeriod zone period

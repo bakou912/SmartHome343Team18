@@ -179,49 +179,51 @@ export default class SHHModule extends React.Component {
                 <div className="Module">
                     <Container>
                         <br/>
-                        <Row>
-                            <Col md={5}>
-                                Away Default Summer (&deg;C):
-                            </Col>
-                            <Col md={2}>
-                                <input
-                                    style={{ width: "50px" }}
-                                    name="SummerTemp"
-                                    type="number"
-                                    value={this.state.summerDefaultTemp}
-                                    onChange={async evt => await this.defaultTempChange(evt, "summer", { min: 0, max: 50})}
-                                    min={0} max={50}
-                                />
-                            </Col>
-                            <Col md={5}>
-                                <div style={{float: "right"}}>
-                                    <Command  name="Setting HAVC status">
-                                        <span>HAVC</span>
-                                        &nbsp;
-                                        <Switch
-                                            onChange={this.onSystemStatusChange}
-                                            checked={this.state.systemOn}
-                                        />
-                                    </Command>
-                                </div>
-                            </Col>
-                        </Row>
-                        <br/>
-                        <Row>
-                            <Col md={5}>
-                                Away Default Winter (&deg;C):
-                            </Col>
-                            <Col md={2}>
-                                <input
-                                    style={{ width: "50px" }}
-                                    name="WinterTemp"
-                                    type="number"
-                                    value={this.state.winterDefaultTemp}
-                                    onChange={async evt => await this.defaultTempChange(evt, "winter", { min: -40, max: 20})}
-                                    min={-40} max={20}
-                                />
-                            </Col>
-                        </Row>
+                        <Command name="Setting default season temperatures">
+                            <Row>
+                                <Col md={5}>
+                                    Away Default Summer (&deg;C):
+                                </Col>
+                                <Col md={2}>
+                                    <input
+                                        style={{ width: "50px" }}
+                                        name="SummerTemp"
+                                        type="number"
+                                        value={this.state.summerDefaultTemp}
+                                        onChange={async evt => await this.defaultTempChange(evt, "summer", { min: 0, max: 50})}
+                                        min={0} max={50}
+                                    />
+                                </Col>
+                                <Col md={5}>
+                                    <div style={{float: "right"}}>
+                                        <Command  name="Setting HAVC status">
+                                            <span>HAVC</span>
+                                            &nbsp;
+                                            <Switch
+                                                onChange={this.onSystemStatusChange}
+                                                checked={this.state.systemOn}
+                                            />
+                                        </Command>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <br/>
+                            <Row>
+                                <Col md={5}>
+                                    Away Default Winter (&deg;C):
+                                </Col>
+                                <Col md={2}>
+                                    <input
+                                        style={{ width: "50px" }}
+                                        name="WinterTemp"
+                                        type="number"
+                                        value={this.state.winterDefaultTemp}
+                                        onChange={async evt => await this.defaultTempChange(evt, "winter", { min: -40, max: 20})}
+                                        min={-40} max={20}
+                                    />
+                                </Col>
+                            </Row>
+                        </Command>
                         <br/>
                         <Row>
                             <Col md={4}>
@@ -302,7 +304,7 @@ export default class SHHModule extends React.Component {
                                                                         </div>
                                                                         <div className="RoomZone">
                                                                             {this.state.selectedZone.label} &nbsp;
-                                                                            <EditZoneRoom key={`${item.label}${this.state.zoneUpdateKey}`} className="RoomLabelTemp" zone={this.state.selectedZone} room={item.value}/>
+                                                                            <EditZoneRoom key={`${item.label}${this.state.zoneUpdateKey}`} className="RoomLabelTemp" zone={this.state.selectedZone.label} room={item.value}/>
                                                                         </div>
                                                                     </div>
                                                                 </ListGroup.Item>
@@ -320,53 +322,55 @@ export default class SHHModule extends React.Component {
                             {
                                 this.state.selectedZone !== null &&
                                 <Container>
-                                    <Row>
-                                        <Col md={7}>
-                                            [6AM-12PM] Morning Target (&deg;C):
-                                        </Col>
-                                        <Col md={1}>
-                                            <input
-                                                style={{ width: "50px" }}
-                                                name="MorningTargetTemp"
-                                                type="number"
-                                                value={this.state.selectedZone.value.periods.MORNING}
-                                                onChange={async evt => await this.periodTempChange(evt, "MORNING")}
-                                                min={0} max={50}
-                                            />
-                                        </Col>
-                                    </Row>
-                                    <br/>
-                                    <Row>
-                                        <Col md={7}>
-                                            [12PM-10PM] Afternoon Target (&deg;C):
-                                        </Col>
-                                        <Col md={1}>
-                                            <input
-                                                style={{ width: "50px" }}
-                                                name="AfternoonTargetTemp"
-                                                type="number"
-                                                value={this.state.selectedZone.value.periods.AFTERNOON}
-                                                onChange={async evt => await this.periodTempChange(evt, "AFTERNOON")}
-                                                min={15} max={30}
-                                            />
-                                        </Col>
-                                    </Row>
-                                    <br/>
-                                    <Row>
-                                        <Col md={7}>
-                                            [10PM-6AM] Night Target (&deg;C):
-                                        </Col>
-                                        <Col md={1}>
-                                            <input
-                                                style={{ width: "50px" }}
-                                                name="NightTargetTemp"
-                                                type="number"
-                                                value={this.state.selectedZone.value.periods.NIGHT}
-                                                onChange={async evt => await this.periodTempChange(evt, "NIGHT")}
-                                                min={15} max={30}
-                                            />
-                                        </Col>
-                                    </Row>
+                                    <Command name="Setting period temperatures">
+                                        <Row>
+                                            <Col md={7}>
+                                                [6AM-12PM] Morning Target (&deg;C):
+                                            </Col>
+                                            <Col md={1}>
+                                                <input
+                                                    style={{ width: "50px" }}
+                                                    name="MorningTargetTemp"
+                                                    type="number"
+                                                    value={this.state.selectedZone.value.periods.MORNING}
+                                                    onChange={async evt => await this.periodTempChange(evt, "MORNING")}
+                                                    min={0} max={50}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <br/>
+                                        <Row>
+                                            <Col md={7}>
+                                                [12PM-10PM] Afternoon Target (&deg;C):
+                                            </Col>
+                                            <Col md={1}>
+                                                <input
+                                                    style={{ width: "50px" }}
+                                                    name="AfternoonTargetTemp"
+                                                    type="number"
+                                                    value={this.state.selectedZone.value.periods.AFTERNOON}
+                                                    onChange={async evt => await this.periodTempChange(evt, "AFTERNOON")}
+                                                    min={15} max={30}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <br/>
+                                        <Row>
+                                            <Col md={7}>
+                                                [10PM-6AM] Night Target (&deg;C):
+                                            </Col>
+                                            <Col md={1}>
+                                                <input
+                                                    style={{ width: "50px" }}
+                                                    name="NightTargetTemp"
+                                                    type="number"
+                                                    value={this.state.selectedZone.value.periods.NIGHT}
+                                                    onChange={async evt => await this.periodTempChange(evt, "NIGHT")}
+                                                    min={15} max={30}
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </Command>
                                 </Container>
                             }
                         </Row>

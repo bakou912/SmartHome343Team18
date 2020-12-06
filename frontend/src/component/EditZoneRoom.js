@@ -49,7 +49,12 @@ export class EditZoneRoom extends React.Component {
     }
 
     async overrideTempChange(evt, limits) {
+        if (!evt.target.value || isNaN(evt.target.value)) {
+            return;
+        }
+
         const limitedTemp = SHHModule.adjustTempWithLimits(evt.target.value, limits);
+
         await SmartHomeHeaterService.overrideRoomTemp(this.state.room.rowId, this.state.room.id, limitedTemp).then(async() => {
             await this.setState({
                 room: {
@@ -96,6 +101,7 @@ export class EditZoneRoom extends React.Component {
                                                 bsPrefix="list-group-item py-1" action
                                                 variant="dark"
                                                 active={item.label === this.state.currentZoneLabel}
+                                                disabled={item.label === this.state.currentZoneLabel}
                                                 onClick={async () => this.handleClick(item)}
                                             >
                                                 <div>
