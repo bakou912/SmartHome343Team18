@@ -24,6 +24,10 @@ public class AddRoomToZoneCommand extends SHHAbstractCommand<HeatingModel, Heati
         Room foundRoom = heatingModel.getHouseLayoutModel().findRoom(new LocationPosition(heatingZoneRoomInput.getRowId(), heatingZoneRoomInput.getRoomId()));
         
         if (foundRoom != null){
+            heatingModel.getZones().forEach(
+                    z -> z.getRooms().remove(foundRoom)
+            );
+            
             if (zone.getRooms().contains(foundRoom)) {
                 this.logAction(foundRoom.getName() + " is already in zone " + zone.getName());
             } else {

@@ -1,7 +1,84 @@
 [
     {
         "name": "Parent",
-        "commandPermissions": []
+        "commandPermissions": [
+            {
+                "name": "Person management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Remove permission",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Modify permission restriction",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Person management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Add permission",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Light away mode management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Away mode management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Away mode light hours management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Authorities alert time management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Setting zone temperature",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Setting HAVC status",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Removing room from zone",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Removing heating zone",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Overriding room's temperature",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Adding room to zone",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Adding heating zone",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Window management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Light management",
+                "locationRestriction": "NONE"
+            },
+            {
+                "name": "Door management",
+                "locationRestriction": "NONE"
+            }
+        ]
     },
     {
         "name": "Child",

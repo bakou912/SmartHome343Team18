@@ -103,28 +103,6 @@ public class HeatingModel extends AbstractBaseModel {
     }
     
     /**
-     * Adds a room to a heating zone.
-     * @param zoneId zone's id
-     * @param roomLocation room's location
-     * @return found room
-     */
-    public Room addRoomToZone(Integer zoneId, LocationPosition roomLocation) {
-        HeatingZone heatingZone = this.findZone(zoneId);
-        Room foundRoom = this.getHouseLayoutModel().findRoom(roomLocation);
-        
-        if (heatingZone == null || foundRoom == null) {
-            return null;
-        }
-    
-        this.getZones().forEach(
-                zone -> zone.getRooms().remove(foundRoom)
-        );
-        
-        heatingZone.addRoom(foundRoom);
-        return foundRoom;
-    }
-    
-    /**
      * Modifies some period's target temperature for a specific zone.
      * @param zoneId zone's id
      * @param zonePeriod zone period

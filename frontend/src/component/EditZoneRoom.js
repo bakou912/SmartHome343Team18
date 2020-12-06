@@ -114,8 +114,8 @@ export class EditZoneRoom extends React.Component {
                                         name="SummerTemp"
                                         type="number"
                                         value={this.state.room.temperature}
-                                        onChange={async evt => await this.overrideTempChange(evt, { min: 15, max: 30})}
-                                        min={15} max={30}
+                                        onChange={async evt => await this.overrideTempChange(evt, { min: -50, max: 50})}
+                                        min={-50} max={50}
                                     />
                                     &nbsp;
                                     {
