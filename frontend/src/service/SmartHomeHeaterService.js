@@ -2,6 +2,17 @@ import httpClient from "./HttpClient";
 
 class SmartHomeHeaterService {
 
+    async setSystemOn(on) {
+        const path = "/heating/on";
+        return httpClient.put(path, { on: on });
+    }
+
+    async getSystemOn() {
+        const path = "/heating/on";
+        return httpClient.get(path);
+    }
+
+
     async setDefaultSummerTemp(temp) {
         const path = "/heating/awaymode/summer/temperature";
         return httpClient.put(path, temp);
@@ -69,6 +80,11 @@ class SmartHomeHeaterService {
             label: z.name
         }
     }
+
+	async initTemp(){
+		const path = "heating/temperature/init"
+		return httpClient.post(path);
+	}
 
 }
 

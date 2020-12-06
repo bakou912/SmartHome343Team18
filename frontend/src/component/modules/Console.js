@@ -30,6 +30,9 @@ export default class Console extends React.Component {
         const componentLines = [];
 
         for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes("window", "door", "light")) {
+                window.dispatchEvent(new Event("updateLayout"));
+            }
             componentLines.push(<p key={i}>{lines[i]}</p>);
         }
 

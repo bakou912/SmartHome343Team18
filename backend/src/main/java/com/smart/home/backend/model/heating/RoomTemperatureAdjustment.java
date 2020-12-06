@@ -11,9 +11,10 @@ import java.time.LocalDateTime;
 public class RoomTemperatureAdjustment {
 	
 	private final LocalDateTime date;
-	private final RoomHeatingMode roomHeatingMode;
+	private final RoomHeatingMode globalHeatingMode;
 	private final double defaultTemperature;
 	private final double outsideTemp;
 	private final boolean systemOn;
+	private final boolean summer;
 	
 }

@@ -6,6 +6,8 @@ import HouseLayoutService from "../../service/HouseLayoutService";
 import Select from "react-select";
 import {EditZoneRoom} from "../EditZoneRoom";
 import {AddRoomToZone} from "../AddRoomToZone";
+import Switch from "react-switch";
+import Command from "./Command";
 
 export default class SHHModule extends React.Component {
 
@@ -17,7 +19,8 @@ export default class SHHModule extends React.Component {
             selectedZone: null,
             addingZone: false,
             zoneUpdateKey: 0,
-            zoneName: ""
+            zoneName: "",
+            systemOn: false
         };
         this.defaultTempChange = this.defaultTempChange.bind(this);
         this.setAddingZone = this.setAddingZone.bind(this);
@@ -26,6 +29,7 @@ export default class SHHModule extends React.Component {
         this.handleZoneNameChange = this.handleZoneNameChange.bind(this);
         this.updateSelectedZone = this.updateSelectedZone.bind(this);
         this.periodTempChange = this.periodTempChange.bind(this);
+        this.onSystemStatusChange = this.onSystemStatusChange.bind(this);
     }
 
     async componentDidMount() {
@@ -39,7 +43,8 @@ export default class SHHModule extends React.Component {
             summerDefaultTemp: defaultTemps.summerTemp,
             winterDefaultTemp: defaultTemps.winterTemp,
             rooms: await HouseLayoutService.getAllRooms().catch(() => []),
-            zones: await SmartHomeHeaterService.getZones().catch(() => [])
+            zones: await SmartHomeHeaterService.getZones().catch(() => []),
+            systemOn: (await SmartHomeHeaterService.getSystemOn()).data
         });
     }
 
@@ -160,6 +165,14 @@ export default class SHHModule extends React.Component {
         });
     }
 
+    async onSystemStatusChange(checked) {
+        await SmartHomeHeaterService.setSystemOn(checked).then(async () => {
+            await this.setState({
+                systemOn: checked
+            });
+        });
+    }
+
     render() {
         return (
             <Container>
@@ -179,6 +192,18 @@ export default class SHHModule extends React.Component {
                                     onChange={async evt => await this.defaultTempChange(evt, "summer", { min: 0, max: 50})}
                                     min={0} max={50}
                                 />
+                            </Col>
+                            <Col md={5}>
+                                <div style={{float: "right"}}>
+                                    <Command  name="Setting HAVC status">
+                                        <span>HAVC</span>
+                                        &nbsp;
+                                        <Switch
+                                            onChange={this.onSystemStatusChange}
+                                            checked={this.state.systemOn}
+                                        />
+                                    </Command>
+                                </div>
                             </Col>
                         </Row>
                         <br/>
@@ -232,10 +257,14 @@ export default class SHHModule extends React.Component {
                                                 </div>
                                                 :
                                                 <div>
-                                                    <Button onClick={() => this.setAddingZone(true)} variant="secondary" size="sm">Add</Button>
+                                                    <Command name="Adding heating zone">
+                                                        <Button onClick={() => this.setAddingZone(true)} variant="secondary" size="sm">Add</Button>
+                                                    </Command>
                                                     {
                                                         (this.state.selectedZone !== null && this.state.selectedZone.value.rooms.length === 0) &&
-                                                        <Button onClick={this.removeZone} variant="secondary" size="sm">Remove</Button>
+                                                        <Command name="Removing heating zone">
+                                                            <Button onClick={this.removeZone} variant="secondary" size="sm">Remove</Button>
+                                                        </Command>
                                                     }
                                                 </div>
                                         }
@@ -251,7 +280,9 @@ export default class SHHModule extends React.Component {
                                             <div style={{float: "right", color: "orange", fontSize: "small"}}>
                                                 *Overridden
                                             </div>
-                                            <AddRoomToZone key={this.state.zoneUpdateKey} zone={this.state.selectedZone.value}/>
+                                            <Command name="Adding room to zone">
+                                                <AddRoomToZone key={this.state.zoneUpdateKey} zone={this.state.selectedZone.value}/>
+                                            </Command>
                                             {
                                                 this.state.selectedZone.value.rooms.length > 0 &&
                                                 <div>
@@ -290,8 +321,8 @@ export default class SHHModule extends React.Component {
                                 this.state.selectedZone !== null &&
                                 <Container>
                                     <Row>
-                                        <Col md={4}>
-                                            Morning Target (&deg;C):
+                                        <Col md={7}>
+                                            [6AM-12PM] Morning Target (&deg;C):
                                         </Col>
                                         <Col md={1}>
                                             <input
@@ -306,8 +337,8 @@ export default class SHHModule extends React.Component {
                                     </Row>
                                     <br/>
                                     <Row>
-                                        <Col md={4}>
-                                            Afternoon Target (&deg;C):
+                                        <Col md={7}>
+                                            [12PM-10PM] Afternoon Target (&deg;C):
                                         </Col>
                                         <Col md={1}>
                                             <input
@@ -322,8 +353,8 @@ export default class SHHModule extends React.Component {
                                     </Row>
                                     <br/>
                                     <Row>
-                                        <Col md={4}>
-                                            Night Target (&deg;C):
+                                        <Col md={7}>
+                                            [10PM-6AM] Night Target (&deg;C):
                                         </Col>
                                         <Col md={1}>
                                             <input

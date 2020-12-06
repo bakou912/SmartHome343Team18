@@ -331,6 +331,7 @@ export default class SimulationContext extends React.Component {
         await this.checkAwayModeHours();
 
         await window.dispatchEvent(new CustomEvent("updateSelectedZone", { detail: true}));
+        await window.dispatchEvent(new Event("updateConsole"));
     }
 
     async checkAwayModeHours() {

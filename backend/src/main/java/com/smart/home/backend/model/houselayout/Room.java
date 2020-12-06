@@ -1,12 +1,13 @@
 package com.smart.home.backend.model.houselayout;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smart.home.backend.constant.RoomHeatingMode;
+import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.DoorInput;
 import com.smart.home.backend.input.WindowInput;
 import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 
+import com.smart.home.backend.service.OutputConsole;
 import com.smart.home.backend.service.util.IdUtil;
 import lombok.Builder;
 import lombok.Getter;
@@ -102,6 +103,64 @@ public class Room extends Location {
 						.id(this.getWindowId().newId())
 						.build()
 		);
+	}
+	
+	/**
+	 * Adjusts the room temperature during summer time
+	 * @param outsideTemp outside temperature
+	 * @param isSummer true if its summer time false if its not summer time
+	 * @param targetTemperature target temperature
+	 */
+	public void adjustRoomSummerBreeze(Double outsideTemp, boolean isSummer, double targetTemperature) {
+		boolean summerBreeze = isSummerBreeze(outsideTemp, targetTemperature, isSummer);
+		
+		if (summerBreeze) {
+			this.setHavc(false);
+		} else {
+			this.setHavc(isHavcOn(targetTemperature));
+		}
+		
+		for (Window window : this.getWindows()) {
+			WindowState newState = summerBreeze ? WindowState.OPEN : WindowState.CLOSED;
+			if (!newState.equals(window.getState())) {
+				window.setState(newState);
+				OutputConsole.log("SHH | Changed window state to " + window.getState());
+			}
+			
+		}
+	}
+	
+	/**
+	 * Decides whether the windows should be open or not during summer.
+	 * Handles issues with windows
+	 * @param outsideTemp outside temperature
+	 * @param targetTemperature target temperature
+	 * @param isSummer true if its summer time false if its not summer time
+	 * @return whether to open windows or not
+	 */
+	private boolean isSummerBreeze(Double outsideTemp, Double targetTemperature, boolean isSummer){
+		if (isSummer && (targetTemperature < this.getTemperature()) && (outsideTemp < this.getTemperature()) && this.getHeatingMode() != RoomHeatingMode.AWAY) {
+			for (Window window : this.getWindows()) {
+				if (window.getState() == WindowState.BLOCKED) {
+					OutputConsole.log("SHH | Window " + window.getDirection() + " in " + this.getName() + " is blocked. Cancelled window opening command.");
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Method to determine if the HAVC should be on or off
+	 * @param targetTemperature target temperature
+\	 * @return true if HAVC should on and false if it should be off
+	 */
+	private boolean isHavcOn(double targetTemperature) {
+		boolean targetReached = Math.abs(this.getTemperature() - targetTemperature) <= 0.1;
+		boolean targetReacquired = Math.abs(this.getTemperature() - targetTemperature) >= 0.25;
+		return (this.getHavc() && !targetReached) || (!this.getHavc() && targetReacquired);
 	}
 	
 }

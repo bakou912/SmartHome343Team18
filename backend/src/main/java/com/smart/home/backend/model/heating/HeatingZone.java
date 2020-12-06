@@ -7,6 +7,7 @@ import com.smart.home.backend.constant.HeatingZonePeriod;
 import com.smart.home.backend.constant.RoomHeatingMode;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
+import com.smart.home.backend.service.OutputConsole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,40 +63,51 @@ public class HeatingZone extends ModelObject {
 	}
 	
 	/**
-	 * Adjusts rooms' temperatures according to the target temperature.
+	 * Adjusts rooms' temperatures according to the target temperature and different parameters.
+	 * @param adjustment adjustment parameters
 	 */
 	public void adjustRoomTemperatures(RoomTemperatureAdjustment adjustment) {
-		double targetTemperature = this.determineTargetTemperature(adjustment.getDate(), adjustment.getRoomHeatingMode(), adjustment.getDefaultTemperature());
+		double targetTemperature = this.determineTargetTemperature(adjustment.getDate(), adjustment.getGlobalHeatingMode(), adjustment.getDefaultTemperature());
 		for (Room room: rooms) {
-			room.setHavc(isHavcOn(adjustment.getOutsideTemp(), targetTemperature, room));
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = (room.getHavc() ? targetTemperature : adjustment.getOutsideTemp()) - room.getTemperature();
-				int multiplier = 0;
-				double increment = (room.getHavc() ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
-				if (tempDelta <= -increment) {
-					multiplier = -1;
-				} else if (tempDelta >= increment) {
-					multiplier = 1;
-				}
-				
-				room.setTemperature(room.getTemperature() + multiplier * increment);
+				adjustTemperature(adjustment, targetTemperature, room);
 			}
+			this.pipeBurstWarning(room);
 		}
 	}
 	
 	/**
-	 * Method to determine if the HAVC should be on or off
-	 * @param outsideTemp
-	 * @param targetTemperature
-	 * @param room
-	 * @return true if HAVC should on and false if it should be off
+	 * The temperature adjustment for a single room.
+	 * @param adjustment adjustment parameters
+	 * @param targetTemperature target temperature
+	 * @param room room to adjust
 	 */
-	private boolean isHavcOn(Double outsideTemp, double targetTemperature, Room room) {
-		boolean targetReached = Math.abs(room.getTemperature() - targetTemperature) <= 0.1;
-		boolean outsideReached = Math.abs(room.getTemperature() - outsideTemp) <= 0.25;
-		return (room.getHavc() && !targetReached) || (!room.getHavc() && outsideReached);
+	private void adjustTemperature(RoomTemperatureAdjustment adjustment, double targetTemperature, Room room) {
+		if (adjustment.isSystemOn()) {
+			room.adjustRoomSummerBreeze(adjustment.getOutsideTemp(), adjustment.isSummer(), targetTemperature);
+		}
+		double tempDelta = ((room.getHavc() && adjustment.isSystemOn()) ? targetTemperature : adjustment.getOutsideTemp()) - room.getTemperature();
+		int multiplier = 0;
+		double increment = ((room.getHavc() && adjustment.isSystemOn()) ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
+		if (tempDelta <= -increment) {
+			multiplier = -1;
+		} else if (tempDelta >= increment) {
+			multiplier = 1;
+		}
+		
+		room.setTemperature(room.getTemperature() + multiplier * increment);
 	}
 	
+	/**
+	 * Writes to the console a message if the is a risk of pipe burst
+	 * @param room room to check for risk of pipe burst
+	 */
+	private void pipeBurstWarning(Room room) {
+		if (room.getTemperature() <= 0){
+			OutputConsole.log("SHH | WARNING !!! Freezing temperatures in the " + room.getName() + " pipes might burst");
+		}
+	}
+
 	/**
 	 * Determine which temperature to use.
 	 * @param date current date

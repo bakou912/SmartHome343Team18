@@ -2,6 +2,7 @@ import React from "react";
 import {Button, Col, Image, ListGroup, Modal, Row} from "react-bootstrap";
 import SmartHomeHeaterService from "../service/SmartHomeHeaterService";
 import SHHModule from "./modules/SHHModule";
+import Command from "./modules/Command";
 
 export class EditZoneRoom extends React.Component {
     constructor(props) {
@@ -106,22 +107,24 @@ export class EditZoneRoom extends React.Component {
                                 </ListGroup>
                             </Col>
                             <Col md={8}>
-                                Override Temperature (&deg;C):&nbsp;
-                                <input
-                                    style={{ width: "50px" }}
-                                    name="SummerTemp"
-                                    type="number"
-                                    value={this.state.room.temperature}
-                                    onChange={async evt => await this.overrideTempChange(evt, { min: 15, max: 30})}
-                                    min={15} max={30}
-                                />
-                                &nbsp;
-                                {
-                                    this.state.room.heatingMode === "OVERRIDDEN" &&
-                                    <Button onClick={this.removeOverride} variant="dark" size="sm">
-                                        X
-                                    </Button>
-                                }
+                                <Command name="Overriding room's temperature">
+                                    Override Temperature (&deg;C):&nbsp;
+                                    <input
+                                        style={{ width: "50px" }}
+                                        name="SummerTemp"
+                                        type="number"
+                                        value={this.state.room.temperature}
+                                        onChange={async evt => await this.overrideTempChange(evt, { min: 15, max: 30})}
+                                        min={15} max={30}
+                                    />
+                                    &nbsp;
+                                    {
+                                        this.state.room.heatingMode === "OVERRIDDEN" &&
+                                        <Button onClick={this.removeOverride} variant="dark" size="sm">
+                                            X
+                                        </Button>
+                                    }
+                                </Command>
                             </Col>
                         </Row>
                     </Modal.Body>

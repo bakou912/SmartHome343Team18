@@ -64,14 +64,14 @@ export default class Command extends React.Component {
 
     render() {
         return this.state.loaded === true ?
-            <div>
+            <span>
                 {
                     this.state.commandAuthorized ?
                         this.props.children
                         :
                         null
                 }
-            </div>
+            </span>
             : null;
     }
 

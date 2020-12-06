@@ -50,12 +50,21 @@ public class HeatingController {
     }
     
     /**
+     * Retrieving heating system status.
+     * @return current heating system status
+     */
+    @GetMapping("heating/on")
+    public ResponseEntity<Boolean> getSystemOn() {
+        return new ResponseEntity<>(this.getHeatingModel().getOn(), HttpStatus.OK);
+    }
+    
+    /**
      * Set heating on or off.
      * @param heatingOnInput input for setting heating on or off
      * @return new heating status (true: on, false: off)
      */
     @PutMapping("heating/on")
-    public ResponseEntity<Boolean> setOn(@RequestBody HeatingOnInput heatingOnInput) {
+    public ResponseEntity<Boolean> setSystemOn(@RequestBody HeatingOnInput heatingOnInput) {
         return new SetHeatingOnCommand().execute(this.heatingModel, heatingOnInput);
     }
     

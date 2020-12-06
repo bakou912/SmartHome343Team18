@@ -48,6 +48,9 @@ public class HeatingModel extends AbstractBaseModel {
     @Getter
     @Builder.Default
     private Boolean on = false;
+    @Setter
+    @Builder.Default
+    private Boolean summer = false;
     
     private final IdUtil zoneId = new IdUtil();
     private final HouseLayoutModel houseLayoutModel;
@@ -192,7 +195,7 @@ public class HeatingModel extends AbstractBaseModel {
                 for  (HeatingZone zone : zones) {
                     LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
                     RoomTemperatureAdjustment adjustment = new RoomTemperatureAdjustment(
-                            currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime), outsideTemp, this.getOn()
+                            currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime), outsideTemp, this.getOn(), this.getSummer()
                     );
                     zone.adjustRoomTemperatures(adjustment);
                 }
@@ -223,7 +226,11 @@ public class HeatingModel extends AbstractBaseModel {
         double temp = this.getDefaultTemperatures().getWinterTemp();
         if (day >= summerStart.getDayOfYear() && day < winterStart.getDayOfYear()) {
             temp = this.getDefaultTemperatures().getSummerTemp();
+            this.setSummer(true);
+        } else {
+            this.setSummer(false);
         }
+        
         return temp;
     }
     
