@@ -56,6 +56,8 @@ export default class SimulationContext extends React.Component {
         this.setAwayModeTimes = this.setAwayModeTimes.bind(this);
         this.simulatorTime = this.simulatorTime.bind(this);
         this.checkAwayModeHours = this.checkAwayModeHours.bind(this);
+		this.onSummerStartSelected = this.onSummerStartSelected.bind(this);
+		this.onWinterStartSelected = this.onWinterStartSelected.bind(this);
     }
 
     async componentDidMount() {
@@ -69,6 +71,8 @@ export default class SimulationContext extends React.Component {
         this.profiles = await ParametersService.getProfiles(this.contextModel.parameters.userProfiles.profiles);
 
         const date = new Date(this.contextModel.parameters.sysParams.date);
+		const summerStart = new Date(this.contextModel.parameters.sysParams.seasonDates.summerStart);
+		const winterStart = new Date(this.contextModel.parameters.sysParams.seasonDates.winterStart);
         this.dateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
 
         await this.setState({
@@ -77,6 +81,8 @@ export default class SimulationContext extends React.Component {
             timeSpeed: this.contextModel.parameters.sysParams.timeSpeed,
             simulationState: this.contextModel.state,
             date: this.dateTime.toISOString().substring(0, 10),
+            summerStart: summerStart.toISOString().substring(0, 10),
+            winterStart: winterStart.toISOString().substring(0, 10),
             time: this.dateTime.toISOString().substring(11, 19),
             rooms: await HouseLayoutService.getAllLocations(this.contextModel.layout)
         });
@@ -188,6 +194,18 @@ export default class SimulationContext extends React.Component {
         });
     }
 
+	async onSummerStartSelected(evt) {
+        await this.setState({
+            summerStart: evt.target.value
+        });
+    }
+
+	async onWinterStartSelected(evt) {
+        await this.setState({
+            winterStart: evt.target.value
+        });
+    }
+
     async onTimeSelected(evt) {
         await this.setState({
             time: evt.target.value
@@ -213,7 +231,11 @@ export default class SimulationContext extends React.Component {
         await SimulationContextService.modifySysParams({
             dateTime: this.state.date + "T" + this.state.time + (this.state.time.length === 5 ? ":00" : ""),
             timeSpeed: this.state.timeSpeed,
-            outsideTemp: this.state.outsideTemp
+            outsideTemp: this.state.outsideTemp,
+			seasonDates: {
+				summerStart: this.state.summerStart + "T" + "00:00:00",
+				winterStart: this.state.winterStart + "T" + "00:00:00"
+			}
         });
         await window.location.reload();
     }
@@ -314,7 +336,7 @@ export default class SimulationContext extends React.Component {
     async setAwayModeTimes() {
         this.awayModeHours = (await SmartHomeSecurityService.getAwayModeHours()).data;
     }
-    
+
     async simulatorTime() {
         if (this.state.simulationState === "OFF" || this.state.editingParameters === true) {
             return;
@@ -442,6 +464,20 @@ export default class SimulationContext extends React.Component {
                                                 <input type="number" name="timeSpeed" min={1} max={500} value={this.state.timeSpeed} onChange={this.onTimeSpeedSelected}/>
                                             </Col>
                                         </Row>
+										<Row>
+											<Col>
+												<br/>
+												<label>Summer Start Date</label>
+												<br/>
+												<input type="date" name="date" value={this.state.summerStart} onChange={this.onSummerStartSelected}/>
+											</Col>
+											<Col>
+												<br/>
+												<label>Winter Start Date</label>
+												<br/>
+												<input type="date" name="date" value={this.state.winterStart} onChange={this.onWinterStartSelected}/>
+											</Col>
+										</Row>
                                     </div>
                                 </Modal.Body>
                                 <Modal.Footer>

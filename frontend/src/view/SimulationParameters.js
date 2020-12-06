@@ -21,7 +21,11 @@ export default class SimulationParameters extends React.Component {
             parametersInput: {
                 insideTemp: null,
                 outsideTemp: null,
-                dateTime: null
+                dateTime: null,
+				seasonDates:{
+					winterStart: null,
+					summerStart: null
+				}
             },
             userInput: {
                 profile: "",
@@ -43,6 +47,8 @@ export default class SimulationParameters extends React.Component {
         this.fileChangedHandler = this.fileChangedHandler.bind(this);
         this.fileUploadHandler = this.fileUploadHandler.bind(this);
         this.getHouseLayout = this.getHouseLayout.bind(this);
+		this.onSummerStartSelected = this.onSummerStartSelected.bind(this);
+		this.onWinterStartSelected = this.onWinterStartSelected.bind(this);
     }
 
     async componentDidMount() {
@@ -155,7 +161,29 @@ export default class SimulationParameters extends React.Component {
             file: event.target.files[0]
         });
     }
+	async onSummerStartSelected(evt) {
+        await this.setState({
+			parametersInput: {
+				...this.state.parametersInput,
+				seasonDates:{
+					winterStart: this.state.parametersInput.seasonDates.winterStart,
+					summerStart: evt.target.value + "T" + "00:00:00"
+				}
+			}
+        });
+    }
 
+	async onWinterStartSelected(evt) {
+		await this.setState({
+			parametersInput: {
+				...this.state.parametersInput,
+				seasonDates:{
+					winterStart: evt.target.value + "T" + "00:00:00",
+					summerStart: this.state.parametersInput.seasonDates.summerStart,
+				}
+			}
+        });
+    }
     async fileUploadHandler() {
         await HouseLayoutService.createLayout(this.state.file)
             .then(async () => {
@@ -265,6 +293,20 @@ export default class SimulationParameters extends React.Component {
                                                             <input type="time" name="time" onChange={this.onTimeSelected}/>
                                                         </Col>
                                                     </Row>
+													<Row>
+														<Col>
+															<br/>
+															<label>Summer Start Date</label>
+															<br/>
+															<input type="date" name="date" value={this.state.summerStart} onChange={this.onSummerStartSelected}/>
+														</Col>
+														<Col>
+															<br/>
+															<label>Winter Start Date</label>
+															<br/>
+															<input type="date" name="date" value={this.state.winterStart} onChange={this.onWinterStartSelected}/>
+														</Col>
+													</Row>
                                                 </Container>
                                             </Col>
                                         </Row>
