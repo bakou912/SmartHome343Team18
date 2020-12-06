@@ -1,8 +1,7 @@
-package com.smart.home.backend.controllers;
+package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.LocationRestriction;
 import com.smart.home.backend.constant.Profile;
-import com.smart.home.backend.controller.SimulationParametersController;
 import com.smart.home.backend.input.CommandPermissionInput;
 import com.smart.home.backend.input.EditParametersInput;
 import com.smart.home.backend.input.ParametersInput;
