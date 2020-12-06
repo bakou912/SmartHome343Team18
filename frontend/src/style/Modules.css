@@ -1,7 +1,8 @@
 .Modules {
   background-color: white;
   min-width: 600px;
-  height: 500px;
+  min-height: 500px;
+  max-height: 600px;
 }
 
 .Module {
@@ -50,4 +51,12 @@
 
 .Console {
   background-color: white;
+}
+
+.RoomZone {
+  float: right;
+}
+
+.RoomLabelTemp {
+  float: left;
 }

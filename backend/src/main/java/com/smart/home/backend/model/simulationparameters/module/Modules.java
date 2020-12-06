@@ -16,6 +16,7 @@ public class Modules {
 		this.modules = new ArrayList<>();
 		this.modules.add(new SHCModule());
 		this.modules.add(new SHPModule());
+		this.modules.add(new SHHModule());
 	}
 	
 	/**

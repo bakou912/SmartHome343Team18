@@ -17,7 +17,10 @@ export class EditUserProfiles extends React.Component {
             modules: [],
             selectedProfile: null,
             selectedModule: null,
-            selectedCommand: null
+            selectedCommand: null,
+            selectedProfileUpdateKey: 0,
+            selectedModuleUpdateKey: 0,
+            selectedCommandUpdateKey: 0
         };
 
         this.hideReset = this.hideReset.bind(this);
@@ -50,9 +53,17 @@ export class EditUserProfiles extends React.Component {
 
     async onSelected(component, evt) {
         this.foundPermission = false;
-        await this.setState({
-            [component]: evt.value
-        });
+
+        let newState = {
+            [component]: evt.value,
+            [`${component}UpdateKey`]: this.state[`${component}UpdateKey`] + 1
+        };
+
+        if (component !== "selectedCommand") {
+            newState.selectedCommand = null;
+        }
+
+        await this.setState(newState);
     }
 
     permissionDefaultValue(restriction) {
@@ -153,6 +164,7 @@ export class EditUserProfiles extends React.Component {
                         <div style={{display: "flex", justifyContent: "center"}}>
                             <div className="SelectDivLarger">
                                 <Select
+                                    key={`${this.state.selectedCommandUpdateKey}${this.state.selectedModuleUpdateKey}${this.state.selectedProfileUpdateKey}`}
                                     styles={{
                                         option: provided => ({...provided, width: "100%"}),
                                         menu: provided => ({...provided, width: "100%"}),
@@ -166,7 +178,7 @@ export class EditUserProfiles extends React.Component {
                         </div>
                         <div key={this.state.selectedProfile?.name + this.state.selectedModule?.name}>
                             {
-                                this.state.selectedProfile && this.state.selectedModule && this.state.selectedCommand ?
+                                this.state.selectedProfile && this.state.selectedModule && this.state.selectedCommand &&
                                     <div key={this.state.selectedCommand.name} onChange={this.onChangePermission}>
                                         <input type="radio" value="NONE" name="permission" defaultChecked={this.permissionDefaultValue("NONE")}/> Authorized
                                         <br/>
@@ -182,7 +194,6 @@ export class EditUserProfiles extends React.Component {
                                         }
                                         <input type="radio" value="REMOVE" name="permission" defaultChecked={this.permissionDefaultValue("REMOVE") || this.foundPermission === false}/> Unauthorized
                                     </div>
-                                    : null
                             }
                         </div>
                     </Modal.Body>

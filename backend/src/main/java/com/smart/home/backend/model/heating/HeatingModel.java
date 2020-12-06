@@ -45,6 +45,10 @@ public class HeatingModel extends AbstractBaseModel {
     @Builder.Default
     private Double outsideTemp = 0.0;
     @Setter
+    @Getter
+    @Builder.Default
+    private Boolean on = false;
+    @Setter
     @Builder.Default
     private Boolean summer = false;
     
@@ -58,6 +62,7 @@ public class HeatingModel extends AbstractBaseModel {
     @Autowired
     public HeatingModel(HouseLayoutModel houseLayoutModel) {
         this.houseLayoutModel = houseLayoutModel;
+        this.getZones().add(HeatingZone.builder().id(this.getZoneId().newId()).name("Default").build());
     }
     
     /**
@@ -95,28 +100,6 @@ public class HeatingModel extends AbstractBaseModel {
         HeatingZone foundZone = this.getZones().stream().filter(zone -> zone.getId().equals(zoneId)).findFirst().orElse(null);
         this.getZones().remove(foundZone);
         return foundZone;
-    }
-    
-    /**
-     * Adds a room to a heating zone.
-     * @param zoneId zone's id
-     * @param roomLocation room's location
-     * @return found room
-     */
-    public Room addRoomToZone(Integer zoneId, LocationPosition roomLocation) {
-        HeatingZone heatingZone = this.findZone(zoneId);
-        Room foundRoom = this.getHouseLayoutModel().findRoom(roomLocation);
-        
-        if (heatingZone == null || foundRoom == null) {
-            return null;
-        }
-    
-        this.getZones().forEach(
-                zone -> zone.getRooms().remove(foundRoom)
-        );
-        
-        heatingZone.addRoom(foundRoom);
-        return foundRoom;
     }
     
     /**
@@ -190,7 +173,10 @@ public class HeatingModel extends AbstractBaseModel {
             case "timeIncrement":
                 for  (HeatingZone zone : zones) {
                     LocalDateTime currentTime = (LocalDateTime) evt.getNewValue();
-                    zone.adjustRoomTemperatures(currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime), outsideTemp, summer);
+                    RoomTemperatureAdjustment adjustment = new RoomTemperatureAdjustment(
+                            currentTime, this.getHeatingMode(), this.chooseDefaultSeasonTemperature(currentTime), outsideTemp, this.getOn(), this.getSummer()
+                    );
+                    zone.adjustRoomTemperatures(adjustment);
                 }
                 break;
             case "seasonDates":
@@ -201,6 +187,9 @@ public class HeatingModel extends AbstractBaseModel {
                 break;
             case "outsideTemp":
                 this.setOutsideTemp((Double) evt.getNewValue());
+                break;
+            case "rooms":
+                this.findZone(0).getRooms().addAll((List<Room>) evt.getNewValue());
                 break;
             default:
                 break;
@@ -219,9 +208,9 @@ public class HeatingModel extends AbstractBaseModel {
         double temp = this.getDefaultTemperatures().getWinterTemp();
         if (day >= summerStart.getDayOfYear() && day < winterStart.getDayOfYear()) {
             temp = this.getDefaultTemperatures().getSummerTemp();
-            this.summer = true;
+            this.setSummer(true);
         } else {
-            summer = false;
+            this.setSummer(false);
         }
         
         return temp;

@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 public class RemoveRoomFromZoneCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneRoomInput, Integer> {
 
     public RemoveRoomFromZoneCommand() {
-        super("Removing room from zone", true);
+        super("Removing room from zone");
     }
 
     @Override

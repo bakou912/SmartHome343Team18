@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.houselayout;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smart.home.backend.constant.RoomHeatingMode;
 import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.input.DoorInput;
@@ -39,11 +38,13 @@ public class Room extends Location {
 	private Double temperature = 0.0;
 	@Setter
 	@Builder.Default
-	@JsonIgnore
 	private RoomHeatingMode heatingMode = RoomHeatingMode.ZONE;
 	@Setter
 	@Builder.Default
 	private Boolean havc = true;
+	@Setter
+	@Nullable
+	private Integer rowId;
 	
 	private final IdUtil doorId = new IdUtil();
 	private final IdUtil windowId = new IdUtil();
@@ -113,15 +114,19 @@ public class Room extends Location {
 	public void adjustRoomSummerBreeze(Double outsideTemp, boolean isSummer, double targetTemperature) {
 		boolean summerBreeze = isSummerBreeze(outsideTemp, targetTemperature, isSummer);
 		
-		if(summerBreeze) {
+		if (summerBreeze) {
 			this.setHavc(false);
 		} else {
 			this.setHavc(isHavcOn(targetTemperature));
 		}
 		
 		for (Window window : this.getWindows()) {
-			window.setState( summerBreeze ? WindowState.OPEN : WindowState.CLOSED);
-			OutputConsole.log("SHH | Changed window state to " + window.getState());
+			WindowState newState = summerBreeze ? WindowState.OPEN : WindowState.CLOSED;
+			if (!newState.equals(window.getState()) && !window.getState().equals(WindowState.BLOCKED) ) {
+				window.setState(newState);
+				OutputConsole.log("SHH | Changed window state to " + window.getState());
+			}
+			
 		}
 	}
 	

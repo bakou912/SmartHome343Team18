@@ -1,6 +1,5 @@
 package com.smart.home.backend.model.heating;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.smart.home.backend.constant.HeatingZonePeriod;
 import lombok.Getter;
 
@@ -12,14 +11,16 @@ import java.util.Map;
  */
 public class HeatingZonePeriods {
 	
+	private final Double DEFAULT_TEMP = 22.0;
+	
 	@Getter
 	private final Map<HeatingZonePeriod, Double> periodMap;
 	
 	public HeatingZonePeriods() {
 		this.periodMap = new EnumMap<>(HeatingZonePeriod.class);
-		this.periodMap.put(HeatingZonePeriod.MORNING, 0.0);
-		this.periodMap.put(HeatingZonePeriod.AFTERNOON, 0.0);
-		this.periodMap.put(HeatingZonePeriod.NIGHT, 0.0);
+		this.periodMap.put(HeatingZonePeriod.MORNING, DEFAULT_TEMP);
+		this.periodMap.put(HeatingZonePeriod.AFTERNOON, DEFAULT_TEMP);
+		this.periodMap.put(HeatingZonePeriod.NIGHT, DEFAULT_TEMP);
 	}
 	
 	/**

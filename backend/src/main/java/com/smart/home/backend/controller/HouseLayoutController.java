@@ -81,6 +81,15 @@ public class HouseLayoutController {
 		this.getHouseLayoutModel().reset();
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	/**
+	 * Retrieving all rooms.
+	 * @return List of all rooms
+	 */
+	@GetMapping("layout/rooms")
+	public ResponseEntity<List<Room>> getAllRooms() {
+		return new ResponseEntity<>(this.getHouseLayoutModel().getAllRooms(), HttpStatus.OK);
+	}
 
 	/**
 	 * Adding a room to a row.

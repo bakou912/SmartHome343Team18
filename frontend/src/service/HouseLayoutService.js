@@ -10,6 +10,13 @@ class HouseLayoutService {
         return httpClient.get("layout");
     }
 
+    async getAllRooms() {
+        return (await httpClient.get("layout/rooms")).data.map(r => ({
+            value: r,
+            label: r.name
+        }));
+    }
+
     async getAllLocations(existingLayout) {
         const layout = existingLayout || (await this.getLayout()).data;
         let locations = [];

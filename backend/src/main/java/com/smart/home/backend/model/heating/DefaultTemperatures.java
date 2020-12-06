@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class DefaultTemperatures {
 	
-	Double summerTemp = 0.0;
-	Double winterTemp = 0.0;
+	Double summerTemp = 12.0;
+	Double winterTemp = 12.0;
 	
 }

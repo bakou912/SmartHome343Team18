@@ -13,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 public class OverrideRoomTemperatureCommand extends SHHAbstractCommand<HeatingModel, HeatingZoneRoomTemperatureInput, Double>{
 
     public OverrideRoomTemperatureCommand() {
-        super("Overriding room's temperature", true);
+        super("Overriding room's temperature");
     }
     
     @Override
     public ResponseEntity<Double> execute(HeatingModel heatingModel, HeatingZoneRoomTemperatureInput heatingZoneRoomTemperature ) {
         Room foundRoom = heatingModel.overrideRoomTemperature(heatingZoneRoomTemperature.getLocationPosition(), heatingZoneRoomTemperature.getOverrideTemperature());
-        this.logAction("Overriding " + foundRoom.getName() + "'s temperature to " + heatingZoneRoomTemperature.getOverrideTemperature());
+        this.logAction("Overrode " + foundRoom.getName() + "'s temperature to " + heatingZoneRoomTemperature.getOverrideTemperature());
         return new ResponseEntity<>(heatingZoneRoomTemperature.getOverrideTemperature(), HttpStatus.OK);
     }
     

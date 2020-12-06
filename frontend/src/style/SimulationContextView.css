@@ -41,6 +41,27 @@
   cursor: pointer;
 }
 
+.AddRoomToZoneButton {
+  border-radius: 0;
+  background-color: #343a40;
+  color: white;
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  justify-content: center;
+  align-items: center;
+}
+
+.AddRoomToZoneButtonInside {
+  text-align: center;
+  margin-top: -3px;
+}
+
+.AddRoomToZoneButton:hover {
+  background-color: #23272b;
+  cursor: pointer;
+}
+
 .DarkButton:hover {
   box-shadow: 0 2px 4px 0 black, 0 2px 4px 0 black;
 }

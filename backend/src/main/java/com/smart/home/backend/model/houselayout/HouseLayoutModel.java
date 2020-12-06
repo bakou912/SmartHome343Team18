@@ -48,6 +48,15 @@ public class HouseLayoutModel extends AbstractBaseModel {
 	}
 	
 	/**
+	 * Mutator for rows.
+	 * @param rows input rows
+	 */
+	public void setRows(List<RoomRow> rows) {
+		this.rows = rows;
+		this.support.firePropertyChange("rooms", null, this.getAllRooms());
+	}
+	
+	/**
 	 * Finds a row with the corresponding id.
 	 * @param id Searched row's id
 	 * @return Found row
@@ -92,7 +101,10 @@ public class HouseLayoutModel extends AbstractBaseModel {
 	public List<Room> getAllRooms(){
 		List<Room> rooms = new ArrayList<>();
 		for (RoomRow row : rows) {
-			rooms.addAll(row.getRooms());
+			for (Room room: row.getRooms()) {
+				room.setRowId(row.getId());
+				rooms.add(room);
+			}
 		}
 		return rooms;
 	}

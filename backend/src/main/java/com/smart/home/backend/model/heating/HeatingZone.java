@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smart.home.backend.constant.HeatingZonePeriod;
 import com.smart.home.backend.constant.RoomHeatingMode;
-import com.smart.home.backend.constant.WindowState;
 import com.smart.home.backend.model.ModelObject;
 import com.smart.home.backend.model.houselayout.Room;
-import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.service.OutputConsole;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,28 +63,41 @@ public class HeatingZone extends ModelObject {
 	}
 	
 	/**
-	 * Adjusts rooms' temperatures according to the target temperature.
+	 * Adjusts rooms' temperatures according to the target temperature and different parameters.
+	 * @param adjustment adjustment parameters
 	 */
-	public void adjustRoomTemperatures(LocalDateTime date, RoomHeatingMode globalHeatingMode, double defaultTemperature, Double outsideTemp, boolean isSummer) {
-		double targetTemperature = this.determineTargetTemperature(date, globalHeatingMode, defaultTemperature);
+	public void adjustRoomTemperatures(RoomTemperatureAdjustment adjustment) {
+		double targetTemperature = this.determineTargetTemperature(adjustment.getDate(), adjustment.getGlobalHeatingMode(), adjustment.getDefaultTemperature());
 		for (Room room: rooms) {
-			room.adjustRoomSummerBreeze(outsideTemp, isSummer, targetTemperature);
 			if (!room.getHeatingMode().equals(RoomHeatingMode.OVERRIDDEN)) {
-				double tempDelta = (room.getHavc() ? targetTemperature : outsideTemp) - room.getTemperature();
-				int multiplier = 0;
-				double increment = (room.getHavc() ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
-				if (tempDelta <= -increment) {
-					multiplier = -1;
-				} else if (tempDelta >= increment) {
-					multiplier = 1;
-				}
-
-				room.setTemperature(room.getTemperature() + multiplier * increment);
+				adjustTemperature(adjustment, targetTemperature, room);
 			}
-			pipeBurstWarning(room);
+			this.pipeBurstWarning(room);
 		}
 	}
-
+	
+	/**
+	 * The temperature adjustment for a single room.
+	 * @param adjustment adjustment parameters
+	 * @param targetTemperature target temperature
+	 * @param room room to adjust
+	 */
+	private void adjustTemperature(RoomTemperatureAdjustment adjustment, double targetTemperature, Room room) {
+		if (adjustment.isSystemOn()) {
+			room.adjustRoomSummerBreeze(adjustment.getOutsideTemp(), adjustment.isSummer(), targetTemperature);
+		}
+		double tempDelta = ((room.getHavc() && adjustment.isSystemOn()) ? targetTemperature : adjustment.getOutsideTemp()) - room.getTemperature();
+		int multiplier = 0;
+		double increment = ((room.getHavc() && adjustment.isSystemOn()) ? INCREMENT_VALUE_HAVC : INCREMENT_VALUE);
+		if (tempDelta <= -increment) {
+			multiplier = -1;
+		} else if (tempDelta >= increment) {
+			multiplier = 1;
+		}
+		
+		room.setTemperature(room.getTemperature() + multiplier * increment);
+	}
+	
 	/**
 	 * Writes to the console a message if the is a risk of pipe burst
 	 * @param room room to check for risk of pipe burst
