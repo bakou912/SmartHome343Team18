@@ -1,9 +1,8 @@
-package com.smart.home.backend.controllers;
+package com.smart.home.backend.controller;
 
 import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.SimulationState;
 import com.smart.home.backend.constant.WindowState;
-import com.smart.home.backend.controller.SimulationContextController;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.OutsideLocation;

@@ -1,6 +1,5 @@
-package com.smart.home.backend.controllers;
+package com.smart.home.backend.controller;
 
-import com.smart.home.backend.controller.SmartHomeSecurityController;
 import com.smart.home.backend.input.AuthoritiesTimerInput;
 import com.smart.home.backend.input.AwayModeInput;
 import com.smart.home.backend.model.security.AwayModeHours;
@@ -9,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.ResponseEntity;
 

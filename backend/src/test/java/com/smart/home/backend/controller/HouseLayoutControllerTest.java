@@ -1,4 +1,4 @@
-package com.smart.home.backend.controllers;
+package com.smart.home.backend.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,7 +9,6 @@ import com.smart.home.backend.constant.Direction;
 import com.smart.home.backend.constant.DoorState;
 import com.smart.home.backend.constant.LightState;
 import com.smart.home.backend.constant.WindowState;
-import com.smart.home.backend.controller.HouseLayoutController;
 import com.smart.home.backend.input.*;
 import com.smart.home.backend.model.houselayout.HouseLayoutModel;
 import com.smart.home.backend.model.houselayout.Light;
@@ -17,7 +16,6 @@ import com.smart.home.backend.model.houselayout.directional.Door;
 import com.smart.home.backend.model.houselayout.directional.Window;
 import com.smart.home.backend.model.simulationparameters.location.LocationPosition;
 import com.smart.home.backend.model.simulationparameters.location.RoomItemLocationPosition;
-import com.smart.home.backend.model.security.SecurityModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
