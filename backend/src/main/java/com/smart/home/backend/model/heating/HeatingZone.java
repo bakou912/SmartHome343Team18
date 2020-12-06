@@ -40,19 +40,6 @@ public class HeatingZone extends ModelObject {
 	private HeatingZonePeriods periods = new HeatingZonePeriods();
 	
 	/**
-	 * Adds a room to the rooms list.
-	 * @param room room to add
-	 * @return Whether the room was added
-	 */
-	public boolean addRoom(Room room) {
-		if (this.getRooms().contains(room)) {
-			return false;
-		}
-		
-		return this.getRooms().add(room);
-	}
-	
-	/**
 	 * Removes a room from the rooms list.
 	 * @param room room to remove
 	 * @return Removed room

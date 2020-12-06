@@ -22,6 +22,7 @@ public class SHHModule extends Module {
         this.getCommands().add(new RemoveRoomFromZoneCommand());
         this.getCommands().add(new SetHeatingOnCommand());
         this.getCommands().add(new SetZoneTemperatureCommand());
+        this.getCommands().add(new SetDefaultSeasonTempsCommand());
     }
     
 }
