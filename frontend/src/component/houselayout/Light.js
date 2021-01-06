@@ -1,39 +1,24 @@
 import React from "react";
 
-export default class Light extends React.Component {
+export default function Light(props) {
 
-    static dimension = 15;
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            x: props.x,
-            y: props.y,
-            state: props.state
-        };
-    }
-
-    getImagePath() {
+    const getImagePath = () => {
         let path = "/light";
 
-        if (this.state.state === "ON") {
+        if (props.state === "ON") {
             path += "-on"
         }
 
         return path + ".png";
     }
 
-    render() {
-        return (
-            <image
-                x={this.state.x}
-                y={this.state.y}
-                width={Light.dimension}
-                height={Light.dimension}
-                href={this.getImagePath()}
-            />
-        );
-    }
-
+    return (
+        <image
+            x={props.x}
+            y={props.y}
+            width={props.dimension}
+            height={props.dimension}
+            href={getImagePath()}
+        />
+    );
 }

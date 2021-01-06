@@ -1,7 +1,21 @@
 import React from "react";
-import Door from "../../component/houselayout/Door";
+import RoomItem from "../../component/houselayout/RoomItem";
 
 export default class DoorsFactory {
+
+    static dimension = 15;
+
+    static getImagePath(state) {
+        let path = "/door";
+
+        if (state === "LOCKED") {
+            path += "-locked";
+        } else if (state === "OPEN") {
+            path += "-open";
+        }
+
+        return path + ".png";
+    }
 
     static create(room, startPosition, roomDimensions, rowIndex) {
         const doorModels = room.doors;
@@ -10,12 +24,13 @@ export default class DoorsFactory {
         for(let i = 0; i < doorModels.length; i++) {
 
             doorComponents.push(
-                <Door
+                <RoomItem
                     key={`${i}`}
                     roomWidth={roomDimensions.width}
                     roomHeight={roomDimensions.height}
                     direction={doorModels[i].direction}
-                    state={doorModels[i].state}
+                    dimension={DoorsFactory.dimension}
+                    imagePath={this.getImagePath(doorModels[i].state)}
                 />
             );
         }
@@ -23,10 +38,10 @@ export default class DoorsFactory {
         return (
             <svg
                 key={`${rowIndex}${room.id}`}
-                x={startPosition.x - Door.dimension / 2}
-                y={startPosition.y - Door.dimension / 2}
-                width={roomDimensions.width + Door.dimension}
-                height={roomDimensions.height + Door.dimension}
+                x={startPosition.x - DoorsFactory.dimension / 2}
+                y={startPosition.y - DoorsFactory.dimension / 2}
+                width={roomDimensions.width + DoorsFactory.dimension}
+                height={roomDimensions.height + DoorsFactory.dimension}
             >
                 {doorComponents}
             </svg>

@@ -1,28 +1,13 @@
 import React from "react";
 
-export default class Person extends React.Component {
-
-    static dimension = 10;
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            x: props.x,
-            y: props.y,
-        };
-    }
-
-    render() {
-        return (
-            <image
-                x={this.state.x}
-                y={this.state.y}
-                width={Person.dimension}
-                height={Person.dimension}
-                href="/person.png"
-            />
-        );
-    }
-
+export default function Person (props) {
+    return (
+        <image
+            x={props.x}
+            y={props.y}
+            width={props.dimension}
+            height={props.dimension}
+            href="/person.png"
+        />
+    );
 }

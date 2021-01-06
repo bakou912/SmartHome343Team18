@@ -1,36 +1,21 @@
-import React from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import "../../style/Modules.css";
 import ParametersService from "../../service/ParametersService";
 import OutputConsoleService from "../../service/OutputConsoleService";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
-export default class Command extends React.Component {
+export default function Command(props) {
 
-    constructor(props) {
-        super(props);
+    const [commandAuthorized, setCommandAuthorized] = useState();
 
-        this.state = {
-            loaded: false
-        }
-
-        this.isCommandAuthorized = this.isCommandAuthorized.bind(this);
-    }
-
-    async componentDidMount() {
-        await this.setState({
-            commandAuthorized: await this.isCommandAuthorized(),
-            loaded: true
-        });
-    }
-
-    async isCommandAuthorized() {
+    const isCommandAuthorized = useCallback(async () => {
         let authorized = false;
         let logString = "";
 
         const user = await ParametersService.getUser();
 
-        const commandPermission = user.profile.commandPermissions.find(cp => cp.name === this.props.name);
+        const commandPermission = user.profile.commandPermissions.find(cp => cp.name === props.name);
 
         if (commandPermission) {
             switch(commandPermission.locationRestriction) {
@@ -46,7 +31,7 @@ export default class Command extends React.Component {
                     logString = " when inside";
                     break;
                 case "ROOM":
-                    authorized = this.props.location.rowId === user.location.rowId && this.props.location.roomId === user.location.roomId;
+                    authorized = props.location.rowId === user.location.rowId && props.location.roomId === user.location.roomId;
                     logString = " if not in the same room";
                     break;
                 default:
@@ -55,24 +40,25 @@ export default class Command extends React.Component {
 
         if (!authorized) {
             await OutputConsoleService.logLine(
-                `Profile ${user.profile.name} does not have permission to use the ${this.props.name.toLowerCase()} command${logString}`
+                `Profile ${user.profile.name} does not have permission to use the ${props.name.toLowerCase()} command${logString}`
             );
         }
 
         return authorized;
-    }
+    }, [props]);
 
-    render() {
-        return this.state.loaded === true ?
-            <span>
-                {
-                    this.state.commandAuthorized ?
-                        this.props.children
-                        :
-                        null
-                }
-            </span>
-            : null;
-    }
+    useEffect( () => {
+        (async () => setCommandAuthorized(await isCommandAuthorized()))();
+    },[isCommandAuthorized]);
 
+    return (
+        <span>
+            {
+                commandAuthorized ?
+                    props.children
+                    :
+                    null
+            }
+        </span>
+    );
 }

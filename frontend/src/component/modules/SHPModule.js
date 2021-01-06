@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import SmartHomeSecurityService from "../../service/SmartHomeSecurityService";
 import "../../style/Modules.css";
 import Switch from "react-switch";
@@ -11,84 +11,65 @@ import SimulationContextService from "../../service/SimulationContextService";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
-export default class SHPModule extends React.Component {
+export default function SHPModule () {
 
-    interval = null
+    const interval = useRef(null);
+    const [awayMode, setAwayMode] = useState(false);
+    const [awayModeHours, setAwayModeHours] = useState(null);
+    const [authoritiesTimer, setAuthoritiesTimer] = useState(0);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [locations, setLocations] = useState([]);
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            awayMode: false,
-            authoritiesTimer: 0,
-            awayModeHours: null,
-            selectedLocation: null,
-        };
-        this.onAwayModeChange = this.onAwayModeChange.bind(this);
-        this.onAuthoritiesTimerChange = this.onAuthoritiesTimerChange.bind(this);
-        this.saveAuthoritiesTimer = this.saveAuthoritiesTimer.bind(this);
-        this.setLightAwayMode = this.setLightAwayMode.bind(this);
-        this.onSelectedLocation = this.onSelectedLocation.bind(this);
-        this.intervalHandler = this.intervalHandler.bind(this);
-    }
+    const intervalHandler = useCallback (async () => {
+        if ((await SimulationContextService.getContext()).data.state === "ON" && awayMode === true) {
+            window.dispatchEvent(new Event("updateConsole"))
+        }
+    }, [awayMode]);
 
-    async componentDidMount() {
-        let authoritiesTimer = (await SmartHomeSecurityService.getAuthoritiesTimer()).data;
-        authoritiesTimer = authoritiesTimer.substr(2);
-        authoritiesTimer = authoritiesTimer.substr(0, authoritiesTimer.length - 1);
+    const init = useCallback(async () => {
+        let initAuthoritiesTimer = (await SmartHomeSecurityService.getAuthoritiesTimer()).data;
+        initAuthoritiesTimer = initAuthoritiesTimer.substr(2);
+        initAuthoritiesTimer = initAuthoritiesTimer.substr(0, initAuthoritiesTimer.length - 1);
         const timeSpeed = (await ParametersService.getParams()).data.sysParams.timeSpeed;
-        this.interval = setInterval(async () => await this.intervalHandler(), authoritiesTimer * 1000 / timeSpeed);
-        await this.setState({
-            locations: await HouseLayoutService.getAllLocations(),
-            awayMode: (await SmartHomeSecurityService.getAwayModeState()).data,
-            authoritiesTimer: authoritiesTimer,
-            awayModeHours: (await SmartHomeSecurityService.getAwayModeHours()).data
-        });
-    }
+        interval.current = setInterval(async () => await intervalHandler(), initAuthoritiesTimer * 1000 / timeSpeed);
+        setLocations(await HouseLayoutService.getAllLocations());
+        setAwayMode((await SmartHomeSecurityService.getAwayModeState()).data);
+        setAwayModeHours((await SmartHomeSecurityService.getAwayModeHours()).data);
+        setAuthoritiesTimer(initAuthoritiesTimer);
+    }, [intervalHandler]);
 
-    async onAwayModeChange(checked) {
+    const onAwayModeChange = async (checked) => {
         await SmartHomeSecurityService.toggleAwayMode(checked).then(async () => {
-            await this.setState({
-                awayMode: checked
-            });
+            setAwayMode(checked);
         });
 
         window.dispatchEvent(new Event("updateLayout"));
 
         const timeSpeed = (await ParametersService.getParams()).data.sysParams.timeSpeed;
-        clearInterval(this.interval);
-        this.interval = setInterval(async () => await this.intervalHandler(), this.state.authoritiesTimer * 1000 / timeSpeed);
-    }
+        clearInterval(interval.current);
+        interval.current = setInterval(async () => await intervalHandler(), authoritiesTimer * 1000 / timeSpeed);
+    };
 
-    async intervalHandler() {
-        if ((await SimulationContextService.getContext()).data.state === "ON" && this.state.awayMode === true) {
-            window.dispatchEvent(new Event("updateConsole"))
-        }
-    }
+    const onAuthoritiesTimerChange = async (evt) => {
+        setAuthoritiesTimer(evt.target.value);
+    };
 
-    async onAuthoritiesTimerChange(evt) {
-        await this.setState({
-            authoritiesTimer: evt.target.value
-        });
-    }
+    const saveAuthoritiesTimer = async () => {
+        await SmartHomeSecurityService.modifyAuthoritiesTimer(authoritiesTimer);
+    };
 
-    async saveAuthoritiesTimer() {
-        await SmartHomeSecurityService.modifyAuthoritiesTimer(this.state.authoritiesTimer);
-    }
-
-    async setLightAwayMode(setOn) {
-        const action = OUTSIDE.includes(this.state.selectedLocation.name) ?
-            async () => HouseLayoutService.modifyOutsideLightState({ location: this.state.selectedLocation.name, awayMode: setOn })
+    const setLightAwayMode = async (setOn) => {
+        const action = OUTSIDE.includes(selectedLocation.name) ?
+            async () => HouseLayoutService.modifyOutsideLightState({ location: selectedLocation.name, awayMode: setOn })
             :
-            async () => HouseLayoutService.modifyRoomLightState(this.state.selectedLocation.rowId, this.state.selectedLocation.roomId, { awayMode: setOn })
+            async () => HouseLayoutService.modifyRoomLightState(selectedLocation.rowId, selectedLocation.roomId, { awayMode: setOn })
 
         await action().then(async () => {
-            await this.setState({
-                selectedLocation: {
-                    ...this.state.selectedLocation,
-                    light: {
-                        ...this.state.selectedLocation.light,
-                        awayMode: setOn
-                    }
+            setSelectedLocation({
+                ...selectedLocation,
+                light: {
+                    ...selectedLocation.light,
+                    awayMode: setOn
                 }
             });
         });
@@ -97,125 +78,118 @@ export default class SHPModule extends React.Component {
         if (setOn === true) {
             window.dispatchEvent(new Event("awayModeOn"));
         }
-    }
+    };
 
-    async onSelectedLocation(evt) {
-        await this.setState({
-            locations: await HouseLayoutService.getAllLocations(),
-            selectedLocation: null,
-        });
+    const onSelectedLocation = async (evt) => {
+        setLocations(await HouseLayoutService.getAllLocations());
+        setSelectedLocation({...evt.value});
+    };
 
-        await this.setState({
-            selectedLocation: evt.value
-        });
-    }
-
-    async onTimeSelected(evt, type) {
+    const onTimeSelected = async (evt, type) => {
         await SmartHomeSecurityService.modifyAwayModeHours({ [type]: evt.target.value.toString() }).then(async response => {
-            await this.setState({
-                awayModeHours: response.data
-            });
+            setAwayModeHours(response.data);
         });
-    }
+    };
 
-    render() {
-        return (
-            <Container className="Module">
-                <Row>
-                    <Col>
-                        <Command name="Away mode management">
-                            <span>Away Mode</span>
-                            <Switch
-                                onChange={this.onAwayModeChange}
-                                checked={this.state.awayMode}
+    useEffect( () => {
+        init();
+    }, [init]);
+
+    return (
+        <Container className="Module">
+            <Row>
+                <Col>
+                    <Command name="Away mode management">
+                        <span>Away Mode</span>
+                        <Switch
+                            onChange={onAwayModeChange}
+                            checked={awayMode}
+                        />
+                    </Command>
+                    <br/>
+                    <Command name="Authorities alert time management">
+                        <label>
+                            Authorities alert delay (seconds):&nbsp;
+                            <input
+                                style={{width: "50px"}}
+                                min={0}
+                                disabled={awayMode}
+                                name="authoritiesTimer"
+                                type="number"
+                                value={authoritiesTimer}
+                                onChange={onAuthoritiesTimerChange}
                             />
-                        </Command>
-                        <br/>
-                        <Command name="Authorities alert time management">
-                            <label>
-                                Authorities alert delay (seconds):&nbsp;
-                                <input
-                                    key={this.state.loaded}
-                                    style={{width: "50px"}}
-                                    min={0}
-                                    disabled={this.state.awayMode}
-                                    name="authoritiesTimer"
-                                    type="number"
-                                    value={this.state.authoritiesTimer}
-                                    onChange={this.onAuthoritiesTimerChange}
-                                />
-                                &nbsp;
-                                <Button disabled={this.state.awayMode} onClick={this.saveAuthoritiesTimer} variant="secondary" size="sm">
-                                    Save
-                                </Button>
-                            </label>
-                        </Command>
-                    </Col>
-                </Row>
-                <Row disabled={this.state.awayMode}>
-                    <div className="Module">
-                        <br/>
-                        <Row>
-                            {
-                                this.state.awayModeHours &&
-                                <Command name="Away mode light hours management">
-                                    <Col>
-                                        <label>
-                                            Lights on start time&nbsp;
-                                            <input disabled={this.state.awayMode} type="time" name="fromTime" defaultValue={this.state.awayModeHours.from} onChange={async evt => this.onTimeSelected(evt, "from")}/>
-                                        </label>
-                                        <br/>
-                                        <label>
-                                            Lights on stop time&nbsp;
-                                            <input disabled={this.state.awayMode} type="time" name="toTime" defaultValue={this.state.awayModeHours.to} onChange={async evt => this.onTimeSelected(evt, "to")}/>
-                                        </label>
-                                    </Col>
-                                </Command>
-                            }
-                        </Row>
-                        <br/>
-                        <Row>
-                            <Col>
-                                Locations
-                                <Select
-                                    styles={{
-                                        option: provided => ({...provided, width: "200px"}),
-                                        menu: provided => ({...provided, width: "200px"}),
-                                        control: provided => ({...provided, width: "200px"}),
-                                        singleValue: provided => provided
-                                    }}
-                                    options={this.state.locations}
-                                    onChange={this.onSelectedLocation}
-                                />
-                                <br/>
-                            </Col>
-                        </Row>
+                            &nbsp;
+                            <Button disabled={awayMode} onClick={saveAuthoritiesTimer} variant="secondary" size="sm">
+                                Save
+                            </Button>
+                        </label>
+                    </Command>
+                </Col>
+            </Row>
+            <Row disabled={awayMode}>
+                <div className="Module">
+                    <br/>
+                    <Row>
                         {
-                            this.state.selectedLocation !== null ?
-                                <Container>
-                                        <Command name="Light away mode management" location={this.state.selectedLocation}>
-                                            <Row>
-                                                <Col>
-                                                    <div style={{margin: "25px"}}>
-                                                        <label>Enable Light Away Mode</label>
-                                                        &nbsp;
-                                                        <Switch
-                                                            disabled={this.state.awayMode}
-                                                            height={20}
-                                                            width={48}
-                                                            onChange={this.setLightAwayMode}
-                                                            checked={this.state.selectedLocation.light.awayMode}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Command>
-                                </Container>
-                                : null
+                            awayModeHours &&
+                            <Command name="Away mode light hours management">
+                                <Col>
+                                    <label>
+                                        Lights on start time&nbsp;
+                                        <input disabled={awayMode} type="time" name="fromTime" defaultValue={awayModeHours.from} onChange={async evt => onTimeSelected(evt, "from")}/>
+                                    </label>
+                                    <br/>
+                                    <label>
+                                        Lights on stop time&nbsp;
+                                        <input disabled={awayMode} type="time" name="toTime" defaultValue={awayModeHours.to} onChange={async evt => onTimeSelected(evt, "to")}/>
+                                    </label>
+                                </Col>
+                            </Command>
                         }
-                    </div>
-                </Row>
-            </Container>
-        );
-    }
+                    </Row>
+                    <br/>
+                    <Row>
+                        <Col>
+                            Locations
+                            <Select
+                                styles={{
+                                    option: provided => ({...provided, width: "200px"}),
+                                    menu: provided => ({...provided, width: "200px"}),
+                                    control: provided => ({...provided, width: "200px"}),
+                                    singleValue: provided => provided
+                                }}
+                                options={locations}
+                                onChange={onSelectedLocation}
+                            />
+                            <br/>
+                        </Col>
+                    </Row>
+                    {
+                        selectedLocation !== null ?
+                            <Container>
+                                    <Command name="Light away mode management" location={selectedLocation}>
+                                        <Row>
+                                            <Col>
+                                                <div style={{margin: "25px"}}>
+                                                    <label>Enable Light Away Mode</label>
+                                                    &nbsp;
+                                                    <Switch
+                                                        disabled={awayMode}
+                                                        height={20}
+                                                        width={48}
+                                                        onChange={setLightAwayMode}
+                                                        checked={selectedLocation.light.awayMode}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </Command>
+                            </Container>
+                            : null
+                    }
+                </div>
+            </Row>
+        </Container>
+    );
 }

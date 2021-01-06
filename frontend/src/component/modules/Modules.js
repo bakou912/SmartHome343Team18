@@ -1,51 +1,36 @@
-import React from "react";
+import React, {useState} from "react";
 import "../../style/Modules.css";
 import SHCModule from "./SHCModule";
 import SHPModule from "./SHPModule";
 import SHHModule from "./SHHModule";
 
-export default class Modules extends React.Component {
+export default function Modules() {
 
-    modules = new Map();
+    const modules = new Map();
+    modules.set("SHC", <SHCModule/>);
+    modules.set("SHP", <SHPModule/>);
+    modules.set("SHH", <SHHModule/>);
+    const [selectedTab, setSelectedTab] = useState(Array.from(modules.keys())[0]);
 
-    constructor(props) {
-        super(props);
-
-        this.modules.set("SHC", <SHCModule/>);
-        this.modules.set("SHP", <SHPModule/>);
-        this.modules.set("SHH", <SHHModule/>);
-
-        this.state = {
-            selectedTab: Array.from(this.modules.keys())[0]
-        };
-
-        this.createTabs = this.createTabs.bind(this);
-        this.changeSelectedTab = this.changeSelectedTab.bind(this);
-    }
-
-    createTabs() {
-        return Array.from(this.modules.keys()).map(tab => {
-            return <div key={tab} className={`Tab ${this.state.selectedTab === tab ? "ActiveTab" : ""}`} onClick={() => this.changeSelectedTab(tab)}>
+    const createTabs = () => {
+        return Array.from(modules.keys()).map(tab => {
+            return <div key={tab} className={`Tab ${selectedTab === tab ? "ActiveTab" : ""}`} onClick={() => changeSelectedTab(tab)}>
                 {tab}
             </div>;
         })
-    }
+    };
 
-    changeSelectedTab(tab) {
-        this.setState({
-            selectedTab: tab
-        });
-    }
+    const changeSelectedTab = (tab) => {
+        setSelectedTab(tab);
+    };
 
-    render() {
-        return (
-            <div className="Modules">
-                <div className="Tabs">
-                    {this.createTabs()}
-                </div>
-                {this.modules.get(this.state.selectedTab)}
+    return (
+        <div className="Modules">
+            <div className="Tabs">
+                {createTabs()}
             </div>
-        );
-    }
+            {modules.get(selectedTab)}
+        </div>
+    );
 
 }
