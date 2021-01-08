@@ -64,9 +64,9 @@ export default function SHHModule() {
 
         value = TempLimitsUtil.adjustTempWithLimits(value, { min: 15, max: 30 });
 
-        await SmartHomeHeaterService.setPeriodTemp(selectedZone.current.value.id, period, value).then(async() => {
-            await updateSelectedZone();
-        });
+        await SmartHomeHeaterService.setPeriodTemp(selectedZone.current.value.id, period, value);
+        selectedZone.current.value.periods[period] = value
+        setSelectedZoneUpdate({...selectedZone.current});
     };
 
     const addZone = async () => {
@@ -114,18 +114,22 @@ export default function SHHModule() {
     };
 
     const onSystemStatusChange = async (checked) => {
-        console.log(checked)
         await SmartHomeHeaterService.setSystemOn(checked).then(async () => {
             setSystemOn(checked);
         });
     };
 
+    // Adding event subscription on mount
     useEffect( () => {
-        window.addEventListener("updateSelectedZone", async e => {
-            await updateSelectedZone(e);
-        });
-
+        window.addEventListener("updateSelectedZone", updateSelectedZone);
         init();
+    }, []);
+
+    // Removing event subscription on unmount
+    useEffect(() => {
+        return () => {
+            window.removeEventListener("updateZoneRooms", updateSelectedZone);
+        }
     }, []);
 
     return (
@@ -263,7 +267,7 @@ export default function SHHModule() {
                                                 name="MorningTargetTemp"
                                                 type="number"
                                                 value={selectedZone.current.value.periods.MORNING}
-                                                onChange={async evt => await periodTempChange(evt, "MORNING")}
+                                                onChange={evt => periodTempChange(evt, "MORNING")}
                                                 min={0} max={50}
                                             />
                                         </Col>
@@ -279,7 +283,7 @@ export default function SHHModule() {
                                                 name="AfternoonTargetTemp"
                                                 type="number"
                                                 value={selectedZone.current.value.periods.AFTERNOON}
-                                                onChange={async evt => await periodTempChange(evt, "AFTERNOON")}
+                                                onChange={evt => periodTempChange(evt, "AFTERNOON")}
                                                 min={15} max={30}
                                             />
                                         </Col>
@@ -295,7 +299,7 @@ export default function SHHModule() {
                                                 name="NightTargetTemp"
                                                 type="number"
                                                 value={selectedZone.current.value.periods.NIGHT}
-                                                onChange={async evt => await periodTempChange(evt, "NIGHT")}
+                                                onChange={ evt => periodTempChange(evt, "NIGHT")}
                                                 min={15} max={30}
                                             />
                                         </Col>

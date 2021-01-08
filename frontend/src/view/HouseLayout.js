@@ -1,5 +1,5 @@
 import "../style/HouseLayoutView.css";
-import React from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import Room from "../component/houselayout/Room";
 import DoorsFactory from "../service/factory/DoorsFactory";
 import HouseLayoutService from "../service/HouseLayoutService";
@@ -9,51 +9,27 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Container } from "react-bootstrap";
 import PersonsFactory from "../service/factory/PersonsFactory";
 
-export default class HouseLayout extends React.Component {
+export default function HouseLayout() {
 
-    layoutContainerDimensions = { width: 150, height: 75 }
-    roomDimensions = { width: 150, height: 75 }
+    const roomDimensions = useRef({ width: 150, height: 75 });
+    const layoutModel = useRef(null);
+    const [rooms, setRooms] = useState([]);
+    const [doors, setDoors] = useState([]);
+    const [lights, setLights] = useState([]);
+    const [windows, setWindows] = useState([]);
+    const [persons, setPersons] = useState([]);
+    const [layoutWidth, setLayoutWidth] = useState(1);
+    const [layoutHeight, setLayoutHeight] = useState(150);
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            rooms: [],
-            doors: [],
-            lights: [],
-            windows: [],
-            layoutWidth: 1,
-            layoutHeight: 1,
-            key: 0
-        };
-
-        this.layoutInit = this.layoutInit.bind(this);
-    }
-
-    async componentDidMount() {
-        window.addEventListener("updateLayout", async () => {
-            await this.layoutInit();
-        });
-
-        await this.layoutInit();
-    }
-
-    async layoutInit() {
-        this.layoutModel = (await HouseLayoutService.getLayout()).data;
-
-        if (this.layoutModel && Array.isArray(this.layoutModel.rows)) {
-            this.setState(this.createLocations());
-        }
-    }
-
-    createLocations() {
-        const rows = this.layoutModel.rows;
-        const rooms = [];
-        let doors = [];
-        let lights = [];
-        let windows = [];
-        let persons = [];
-        let layoutHeight = this.layoutModel.rows.length * this.roomDimensions.height;
+    const createLocations = useCallback(() => {
+        console.log("creating layout")
+        const rows = layoutModel.current.rows;
+        const newRooms = [];
+        let newDoors = [];
+        let newLights = [];
+        let newWindows = [];
+        let newPersons = [];
+        let newLayoutHeight = layoutModel.current.rows.length * roomDimensions.current.height;
         let nbRoomsMax = 0;
 
         for(let i = 0; i < rows.length; i++) {
@@ -61,23 +37,23 @@ export default class HouseLayout extends React.Component {
 
             for(let j = 0; j < rowRooms.length; j++) {
                 const room = rowRooms[j];
-                const startPosition = { x: j * this.roomDimensions.width, y: i * this.roomDimensions.height};
+                const startPosition = { x: j * roomDimensions.current.width, y: i * roomDimensions.current.height};
 
-                rooms.push(
+                newRooms.push(
                     <Room
                         key={`${i}${j}`}
                         x={startPosition.x}
                         y={startPosition.y}
                         room={room}
-                        width={this.roomDimensions.width}
-                        height={this.roomDimensions.height}
+                        width={roomDimensions.current.width}
+                        height={roomDimensions.current.height}
                     />
                 );
 
-                doors = doors.concat(DoorsFactory.create(room, startPosition, this.roomDimensions, i));
-                windows = windows.concat(WindowsFactory.create(room, startPosition, this.roomDimensions, i));
-                lights = lights.concat(LightsFactory.create(room, startPosition, this.roomDimensions, i));
-                persons = persons.concat(PersonsFactory.create(room, startPosition, this.roomDimensions, i));
+                newDoors = newDoors.concat(DoorsFactory.create(room, startPosition, roomDimensions.current, i));
+                newWindows = newWindows.concat(WindowsFactory.create(room, startPosition, roomDimensions.current, i));
+                newLights = newLights.concat(LightsFactory.create(room, startPosition, roomDimensions.current, i));
+                newPersons = newPersons.concat(PersonsFactory.create(room, startPosition, roomDimensions.current, i));
 
                 if (j >= nbRoomsMax) {
                     nbRoomsMax++;
@@ -87,44 +63,56 @@ export default class HouseLayout extends React.Component {
 
         const backyardPosition = { x: 0, y: -layoutHeight / 2 };
         const entrancePosition = { x: 0, y: layoutHeight};
-        const outsideDimensions = { width: nbRoomsMax * this.roomDimensions.width, height: layoutHeight / 2};
+        const outsideDimensions = { width: nbRoomsMax * roomDimensions.current.width, height: layoutHeight / 2};
 
-        lights = lights.concat(LightsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
-        persons = persons.concat(PersonsFactory.create(this.layoutModel.backyard, backyardPosition, outsideDimensions, "-1"));
+        newLights = newLights.concat(LightsFactory.create(layoutModel.current.backyard, backyardPosition, outsideDimensions, "-1"));
+        newPersons = newPersons.concat(PersonsFactory.create(layoutModel.current.backyard, backyardPosition, outsideDimensions, "-1"));
 
-        lights = lights.concat(LightsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
-        persons = persons.concat(PersonsFactory.create(this.layoutModel.entrance, entrancePosition, outsideDimensions, "-2"));
+        newLights = newLights.concat(LightsFactory.create(layoutModel.current.entrance, entrancePosition, outsideDimensions, "-2"));
+        newPersons = newPersons.concat(PersonsFactory.create(layoutModel.current.entrance, entrancePosition, outsideDimensions, "-2"));
 
-        return {
-            rooms: rooms,
-            doors: doors,
-            lights: lights,
-            windows: windows,
-            persons: persons,
-            layoutWidth: nbRoomsMax * this.roomDimensions.width,
-            layoutHeight: layoutHeight,
-            key: this.state.key + 1
-        };
-    }
+        setRooms(newRooms);
+        setDoors(newDoors);
+        setWindows(newWindows);
+        setLights(newLights);
+        setPersons(newPersons);
+        setLayoutWidth(nbRoomsMax * roomDimensions.current.width);
+        setLayoutHeight(newLayoutHeight);
+    }, [layoutHeight]);
 
-    render() {
-        return (
-            <Container className="HouseLayoutRepresentation">
-                <TransformWrapper>
-                    <TransformComponent>
-                        <svg key={this.state.key} width="600px" height="400px">
-                            <g transform={`translate(${300 - this.state.layoutWidth / 2}, ${200 - this.state.layoutHeight / 2})`}>
-                                {this.state.rooms}
-                                {this.state.doors}
-                                {this.state.windows}
-                                {this.state.lights}
-                                {this.state.persons}
-                            </g>
-                        </svg>
-                    </TransformComponent>
-                </TransformWrapper>
-            </Container>
-        );
-    }
+    const layoutInit = useCallback(async () => {
+        layoutModel.current = (await HouseLayoutService.getLayout()).data;
 
+        if (layoutModel.current && Array.isArray(layoutModel.current.rows)) {
+            createLocations();
+        }
+    }, [createLocations]);
+
+    useEffect(
+        () => {
+            window.addEventListener("updateLayout", async () => {
+                await layoutInit();
+            });
+
+            layoutInit();
+        }, [layoutInit]
+    );
+
+    return (
+        <Container className="HouseLayoutRepresentation">
+            <TransformWrapper>
+                <TransformComponent>
+                    <svg width="600px" height="400px">
+                        <g transform={`translate(${300 - layoutWidth / 2}, ${200 - layoutHeight / 2})`}>
+                            {rooms}
+                            {doors}
+                            {windows}
+                            {lights}
+                            {persons}
+                        </g>
+                    </svg>
+                </TransformComponent>
+            </TransformWrapper>
+        </Container>
+    );
 }

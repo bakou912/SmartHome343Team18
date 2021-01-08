@@ -10,13 +10,11 @@ export default function Console() {
     const [lines, setLines] = useState([]);
 
     const getLines = async () => {
+        console.log("get lines")
         const rawLines = (await OutputConsoleService.getLines()).data;
         const componentLines = [];
 
         for (let i = 0; i < rawLines.length; i++) {
-            if (rawLines[i].includes("window", "door", "light")) {
-                window.dispatchEvent(new Event("updateLayout"));
-            }
             componentLines.push(<p key={i}>{rawLines[i]}</p>);
         }
 

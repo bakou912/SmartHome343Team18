@@ -145,11 +145,17 @@ export default function SHCModule() {
         setSelectedDoorItem(item === "Door");
     };
 
+    // Adding event subscription on mount
     useEffect( () => {
-        window.addEventListener("updatePermissions", async () => {
-            setup()
-        });
+        window.addEventListener("updatePermissions", setup);
         setup();
+    }, []);
+
+    // Removing event subscription on unmount
+    useEffect(() => {
+        return () => {
+            window.removeEventListener("updateZoneRooms", setup);
+        }
     }, []);
 
     useEffect( () => {
