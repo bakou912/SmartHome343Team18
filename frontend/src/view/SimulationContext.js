@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../style/SimulationContextView.css";
 import {Container, Modal, Button, Col, Row} from "react-bootstrap";
 import SimulationContextService from "../service/SimulationContextService";
@@ -10,299 +10,188 @@ import SmartHomeSecurityService from "../service/SmartHomeSecurityService";
 
 const OUTSIDE = ["Backyard", "Entrance"];
 
-export default class SimulationContext extends React.Component {
+export default function SimulationContext() {
 
-    contextModel = {};
-    dateTime = new Date();
-    profiles = {}
-    awayModeHours = null;
-    hoursUpdate = {
+    const contextModel = useRef({});
+    const dateTime = useRef(new Date());
+    const profiles = useRef({});
+    const awayModeHours = useRef(null);
+    const hoursUpdate = useRef({
         from: false,
         to: false
+    });
+    const simulatorTimeHandler = useRef(null);
+    const [loaded, setLoaded] = useState(false);
+    const [editingParameters, setEditingParameters] = useState(false);
+    const [editingContext, setEditingContext] = useState(false);
+    const [addingPerson, setAddingPerson] = useState(false);
+    const [selectedContextLocation, setSelectedContextLocation] = useState(null);
+    const [selectedWindow, setSelectedWindow] = useState(null);
+    const [selectedPerson, setSelectedPerson] = useState(null);
+    const [timeSpeed, setTimeSpeed] = useState(1);
+    const [rooms, setRooms] = useState([]);
+    const [windows, setWindows] = useState([]);
+    const [persons, setPersons] = useState([]);
+    const [user, setUser] = useState(null);
+    const [personName, setPersonName] = useState(null);
+    const [outsideTemp, setOutsideTemp] = useState(null);
+    const [date, setDate] = useState(null);
+    const [time, setTime] = useState(null);
+    const [summerStart, setSummerStart] = useState(null);
+    const [winterStart, setWinterStart] = useState(null);
+    const [simulationState, setSimulationState] = useState(null);
+    const [presentationInfo, setPresentationInfo] = useState(null);
+
+    const handleNameChange = (evt) => {
+        const targetValue = evt.target.value;
+
+        if (targetValue.length > 20) {
+            return;
+        }
+
+       setUser({
+           ...user,
+           name: evt.target.value
+       });
     };
-    simulatorTimeHandler = null;
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            loaded: false,
-            editingParameters: false,
-            editingContext: false,
-            selectedContextLocation: null,
-            selectedWindow: null,
-            selectedPerson: null,
-            addingPerson: false,
-            personUpdateKey: 0,
-            timeSpeed: 1
-        };
-
-        this.handleNameChange = this.handleNameChange.bind(this);
-        this.addPerson = this.addPerson.bind(this);
-        this.removePerson = this.removePerson.bind(this);
-        this.setEditing = this.setEditing.bind(this);
-        this.handlePersonNameChange = this.handlePersonNameChange.bind(this);
-        this.onSelectedLocation = this.onSelectedLocation.bind(this);
-        this.onSelectedContextLocation = this.onSelectedContextLocation.bind(this);
-        this.onSelectedProfile = this.onSelectedProfile.bind(this);
-        this.tempChangeHandler = this.tempChangeHandler.bind(this);
-        this.onDateSelected = this.onDateSelected.bind(this);
-        this.onTimeSelected = this.onTimeSelected.bind(this);
-        this.onTimeSpeedSelected = this.onTimeSpeedSelected.bind(this);
-        this.onSelectedItem = this.onSelectedItem.bind(this);
-        this.blockWindow = this.blockWindow.bind(this);
-        this.saveEdit = this.saveEdit.bind(this);
-        this.toggleSimulationState = this.toggleSimulationState.bind(this);
-        this.setAwayModeTimes = this.setAwayModeTimes.bind(this);
-        this.simulatorTime = this.simulatorTime.bind(this);
-        this.checkAwayModeHours = this.checkAwayModeHours.bind(this);
-		this.onSummerStartSelected = this.onSummerStartSelected.bind(this);
-		this.onWinterStartSelected = this.onWinterStartSelected.bind(this);
-    }
-
-    async componentDidMount() {
-        window.addEventListener("awayModeOn", async () => {
-            await this.setAwayModeTimes();
-        });
-
-        await this.setAwayModeTimes();
-
-        this.contextModel = (await SimulationContextService.getContext()).data;
-        this.profiles = await ParametersService.getProfiles(this.contextModel.parameters.userProfiles.profiles);
-
-        const date = new Date(this.contextModel.parameters.sysParams.date);
-		const summerStart = new Date(this.contextModel.parameters.sysParams.seasonDates.summerStart);
-		const winterStart = new Date(this.contextModel.parameters.sysParams.seasonDates.winterStart);
-        this.dateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-
-        await this.setState({
-            user: this.contextModel.parameters.user,
-            outsideTemp: this.contextModel.parameters.sysParams.outsideTemp,
-            timeSpeed: this.contextModel.parameters.sysParams.timeSpeed,
-            simulationState: this.contextModel.state,
-            date: this.dateTime.toISOString().substring(0, 10),
-            summerStart: summerStart.toISOString().substring(0, 10),
-            winterStart: winterStart.toISOString().substring(0, 10),
-            time: this.dateTime.toISOString().substring(11, 19),
-            rooms: await HouseLayoutService.getAllLocations(this.contextModel.layout)
-        });
-
-        await this.setState({
-            firstState: this.state,
-            loaded: true
-        });
-
-        this.simulatorTimeHandler = setInterval(async () => await this.simulatorTime(),1000 / this.state.timeSpeed);
-    }
-
-    async handleNameChange(evt) {
+    const handlePersonNameChange = (evt) => {
         const targetValue = evt.target.value;
 
         if (targetValue.length > 20) {
             return;
         }
 
-        await this.setState( {
-            user: {
-                ...this.state.user,
-                name: evt.target.value
-            }
+        setPersonName(evt.target.value);
+    };
+
+    const onSelectedLocation = (evt) => {
+        setUser({
+            ...user,
+            location: evt.value
         });
-    }
+    };
 
-    async handlePersonNameChange(evt) {
-        const targetValue = evt.target.value;
+    const onSelectedContextLocation = async (evt) => {
+        setRooms(await HouseLayoutService.getAllLocations());
+        setSelectedWindow(null);
+        setSelectedPerson(null);
+        setSelectedContextLocation({
+            value: evt.value,
+            label: evt.label
+        });
+        setWindows(OUTSIDE.includes(evt.label) ? [] : evt.value.windows.map(w => {
+            return {
+                value: w,
+                label: w.direction
+            };
+        }));
+        setPersons(evt.value.persons.map(p => {
+            return {
+                value: p,
+                label: p.name
+            };
+        }));
+        setPersonName("")
+    };
 
-        if (targetValue.length > 20) {
-            return;
+    const onSelectedProfile = (evt) => {
+        setUser({
+            ...user,
+            profile: evt.value
+        });
+    };
+
+    const setModal = (modalName, value) => {
+        if (modalName === "Parameters") {
+            setEditingParameters(value);
+        } else {
+            setEditingContext(value);
         }
 
-        await this.setState({
-            personName: evt.target.value
-        });
-    }
+        setSelectedWindow(null);
+        setSelectedPerson(null);
+        setSelectedContextLocation(null);
+    };
 
-    async onSelectedLocation(evt) {
-        await this.setState({
-            user: {
-                ...this.state.user,
-                location: evt.value
-            }
-        });
-    }
+    const onTimeSpeedSelected = async (evt) => {
+        setTimeSpeed(evt.target.value);
+        await clearInterval(simulatorTimeHandler.current);
+        simulatorTimeHandler.current = setInterval(async () => await simulatorTime(), 1000 / timeSpeed);
+    };
 
-    async onSelectedContextLocation(evt) {
-        await this.setState({
-            rooms: await HouseLayoutService.getAllLocations(),
-            selectedWindow: null,
-            selectedPerson: null,
-            selectedContextLocation: {
-                value: evt.value,
-                label: evt.label
-            },
-            windows: OUTSIDE.includes(evt.label) ? [] : evt.value.windows.map(w => {
-                return {
-                    value: w,
-                    label: w.direction
-                };
-            }),
-            persons: evt.value.persons.map(p => {
-                return {
-                    value: p,
-                    label: p.name
-                };
-            }),
-            personName: "",
-            updateLocationKey: this.state.updateLocationKey + 1
-        });
-    }
-
-    async onSelectedItem(item, evt) {
-        await this.setState({
-            [`selected${item}`]: {
-                ...evt
-            }
-        });
-    }
-
-    async onSelectedProfile(evt) {
-        await this.setState({
-            user: {
-                ...this.state.user,
-                profile: evt.value
-            },
-            updateProfileKey: this.state.updateProfileKey + 1
-        });
-    }
-
-    async setModal(modalName, value) {
-        await this.setState({
-            [`editing${modalName}`]: value,
-            selectedWindow: null,
-            selectedPerson: null,
-            selectedContextLocation: null
-        });
-    }
-
-    async tempChangeHandler(evt) {
-        await this.setState({
-            outsideTemp: evt.target.value
-        });
-    }
-
-    async onDateSelected(evt) {
-        await this.setState({
-            date: evt.target.value
-        });
-    }
-
-	async onSummerStartSelected(evt) {
-        await this.setState({
-            summerStart: evt.target.value
-        });
-    }
-
-	async onWinterStartSelected(evt) {
-        await this.setState({
-            winterStart: evt.target.value
-        });
-    }
-
-    async onTimeSelected(evt) {
-        await this.setState({
-            time: evt.target.value
-        });
-    }
-
-    async onTimeSpeedSelected(evt) {
-        await this.setState({
-            timeSpeed: evt.target.value
-        });
-
-        await clearInterval(this.simulatorTimeHandler);
-        this.simulatorTimeHandler = setInterval(async () => await this.simulatorTime(),1000 / this.state.timeSpeed);
-    }
-
-    async saveEdit() {
+    const saveEdit = async () => {
         const userInput = {
-            ...this.state.user,
-            profile: this.state.user.profile.name
+            ...user,
+            profile: user.profile.name
         }
 
         await SimulationContextService.modifyUser(userInput);
         await SimulationContextService.modifySysParams({
-            dateTime: this.state.date + "T" + this.state.time + (this.state.time.length === 5 ? ":00" : ""),
-            timeSpeed: this.state.timeSpeed,
-            outsideTemp: this.state.outsideTemp,
+            dateTime: date + "T" + time + (time.length === 5 ? ":00" : ""),
+            timeSpeed: timeSpeed,
+            outsideTemp: outsideTemp,
 			seasonDates: {
-				summerStart: this.state.summerStart + "T00:00:00",
-				winterStart: this.state.winterStart + "T00:00:00"
+				summerStart: summerStart + "T00:00:00",
+				winterStart: winterStart + "T00:00:00"
 			}
         });
         await window.location.reload();
-    }
+    };
 
-    async toggleSimulationState() {
+    const toggleSimulationState = async () => {
         await SimulationContextService.toggleState()
             .then(async response => {
-                await this.setState({
-                    simulationState: response.data
-                })
+                setSimulationState(response.data);
             })
             .catch(() => {
                 alert("Simulation state could not be changed");
             });
-    }
+    };
 
-
-    async blockWindow(block) {
+    const blockWindow = async (block) => {
         let windowState;
         if (block === true) {
             windowState = "BLOCKED";
-            await SimulationContextService.blockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.blockWindow(selectedContextLocation.value.rowId, selectedContextLocation.value.roomId, selectedWindow.value.id)
         } else {
             windowState = "CLOSED";
-            await SimulationContextService.unblockWindow(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedWindow.value.id)
+            await SimulationContextService.unblockWindow(selectedContextLocation.value.rowId, selectedContextLocation.value.roomId, selectedWindow.value.id)
         }
 
-        this.setState({
-            selectedWindow: {
-                ...this.state.selectedWindow,
-                value: {
-                    ...this.state.selectedWindow.value,
-                    state: windowState
-                }
+        setSelectedWindow({
+            ...selectedWindow,
+            value: {
+                ...selectedWindow.value,
+                state: windowState
             }
         });
 
         await window.dispatchEvent(new Event("updateLayout"));
         await window.dispatchEvent(new Event("updatePermissions"));
-    }
+    };
 
-    async addPerson() {
-        const action = OUTSIDE.includes(this.state.selectedContextLocation.label) ?
-            async () => SimulationContextService.addPersonOutside({ location: this.state.selectedContextLocation.label, name: this.state.personName})
+    const addPerson = async () => {
+        const action = OUTSIDE.includes(selectedContextLocation.label) ?
+            async () => SimulationContextService.addPersonOutside({ location: selectedContextLocation.label, name: personName})
             :
-            async () => SimulationContextService.addPersonToRoom(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId,  {name: this.state.personName});
+            async () => SimulationContextService.addPersonToRoom(selectedContextLocation.value.rowId, selectedContextLocation.value.roomId,  {name: personName});
 
         await action().then(async response => {
             const person = {
                 value: {
                     id: response.data,
-                    name: this.state.personName
+                    name: personName
                 },
-                label: this.state.personName
+                label: personName
             };
 
-            const updatedPersons = this.state.persons;
+            const updatedPersons = persons;
             updatedPersons.push(person);
 
-            await this.setState({
-                persons: updatedPersons,
-                personUpdateKey: this.state.personUpdateKey + 1,
-                addingPerson: false,
-                personName: ""
-            });
+            setPersons([...updatedPersons]);
+            setAddingPerson(false);
+            setPersonName("");
 
             window.dispatchEvent(new Event("updateLayout"));
         }).catch(err => {
@@ -310,304 +199,323 @@ export default class SimulationContext extends React.Component {
                 alert("A person with this name is already present.");
             }
         })
+    };
 
-    }
-
-    async removePerson() {
-        const action = OUTSIDE.includes(this.state.selectedContextLocation.label) ?
-            async () => SimulationContextService.removePersonFromOutside(this.state.selectedContextLocation.label, this.state.selectedPerson.value.id)
+    const removePerson = async () => {
+        const action = OUTSIDE.includes(selectedContextLocation.label) ?
+            async () => SimulationContextService.removePersonFromOutside(selectedContextLocation.label, selectedPerson.value.id)
             :
-            async () => SimulationContextService.removePersonFromRoom(this.state.selectedContextLocation.value.rowId, this.state.selectedContextLocation.value.roomId, this.state.selectedPerson.value.id);
+            async () => SimulationContextService.removePersonFromRoom(selectedContextLocation.value.rowId, selectedContextLocation.value.roomId, selectedPerson.value.id);
 
         await action().then(async () =>{
-            await this.setState({
-                persons: this.state.persons.filter(person => person.value.name !== this.state.selectedPerson.value.name),
-                personUpdateKey: this.state.personUpdateKey + 1,
-                selectedPerson: null
-            });
+            setPersons([...persons.filter(person => person.value.name !== selectedPerson.value.name)]);
+            setSelectedPerson(null)
         });
         window.dispatchEvent(new Event("updateLayout"));
-    }
+    };
 
-    async setEditing(value) {
-        await this.setState({
-            addingPerson: value
-        });
-    }
+    const setAwayModeTimes = async () => {
+        awayModeHours.current = (await SmartHomeSecurityService.getAwayModeHours()).data;
+    };
 
-    async setAwayModeTimes() {
-        this.awayModeHours = (await SmartHomeSecurityService.getAwayModeHours()).data;
-    }
-
-    async simulatorTime() {
-        if (this.state.simulationState === "OFF" || this.state.editingParameters === true) {
+    const simulatorTime = async () => {
+        if (simulationState === "OFF" || editingParameters === true) {
             return;
         }
-        this.dateTime.setSeconds(this.dateTime.getSeconds() + 1);
+        dateTime.current.setSeconds(dateTime.current.getSeconds() + 1);
 
-        await this.setState({
-            date: this.dateTime.toISOString().substring(0, 10),
-            time: this.dateTime.toISOString().substring(11, 19)
-        });
+        setDate(dateTime.current.toISOString().substring(0, 10));
+        setTime(dateTime.current.toISOString().substring(11, 19));
 
-        await this.checkAwayModeHours();
+        await checkAwayModeHours();
 
         await window.dispatchEvent(new CustomEvent("updateSelectedZone", { detail: true}));
         await window.dispatchEvent(new Event("updateConsole"));
-    }
+    };
 
-    async checkAwayModeHours() {
-        const time = this.dateTime.toISOString().substring(11, 19);
+    const checkAwayModeHours = async () => {
+        const newTime = dateTime.current.toISOString().substring(11, 19);
 
-        if (time >= this.awayModeHours.from) {
-            if (time <= this.awayModeHours.to && this.hoursUpdate.from === false && this.hoursUpdate.to === false) {
-                this.hoursUpdate.to = true;
+        if (newTime >= awayModeHours.current.from) {
+            if (newTime <= awayModeHours.current.to && hoursUpdate.current.from === false && hoursUpdate.current.to === false) {
+                hoursUpdate.current.to = true;
                 await window.dispatchEvent(new Event("updateLayout"));
             } else {
-                this.hoursUpdate.to = false;
+                hoursUpdate.current.to = false;
             }
-            this.hoursUpdate.from = true;
+            hoursUpdate.current.from = true;
         } else {
-            this.hoursUpdate.from = false;
+            hoursUpdate.current.from = false;
         }
-    }
+    };
 
-    render() {
-        return (
-            <Container>
-                {
-                    this.state.loaded ?
-                        <div className="SimulationContext">
-                            <Button className="StartButton" size="sm" variant={this.state.simulationState === "ON" ? "danger" : "primary"} onClick={this.toggleSimulationState}>
-                                {this.state.simulationState === "ON" ? "Stop" : "Start"}
-                            </Button>
-                            <Button className="EditButton" size="sm" variant="secondary" onClick={() => this.setModal("Parameters", true)}>Parameters</Button>
-                            <br/>
-                            <br/>
-                            <Button className="EditButton" size="sm" variant="secondary" onClick={() => this.setModal("Context", true)}>Context</Button>
-                            <br/>
-                            <br/>
-                            <img src="/user.png" alt="profile pic" width="100px"/>
-                            <br/>
-                            {this.state.firstState.user.name}
-                            <br/>
-                            Profile: {`${this.state.firstState.user.profile.name} `}
-                            <EditUserProfiles profiles={this.profiles}/>
-                            <br/>
-                            <br/>
-                            Location: {this.state.firstState.user.location.name}
-                            <br/>
-                            <br/>
-                            Outside temperature: {this.state.firstState.outsideTemp}&deg;C
-                            <br/>
-                            <br/>
-                            {this.dateTime.toDateString()}
-                            <br/>
-                            {`${this.state.time} (x${this.state.firstState.timeSpeed})`}
-                            <br/>
-                            <br/>
-                            <Modal show={this.state.editingParameters} onHide={() => this.setModal("Parameters", false)}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Parameters Editing</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body style={{display: "flex", justifyContent: "center"}}>
-                                    <div>
-                                        Name
-                                        <br/>
-                                        <input type="text" placeholder="User" maxLength="20" value={this.state.user.name} onChange={this.handleNameChange}/>
-                                        <br/>
-                                        <br/>
-                                        Profile
-                                        <div className="SelectDiv">
-                                            <Select
-                                                key={""}
-                                                styles={{
-                                                    option: provided => ({...provided, width: "100%"}),
-                                                    menu: provided => ({...provided, width: "100%"}),
-                                                    control: provided => ({...provided, width: "100%"}),
-                                                    singleValue: provided => provided
-                                                }}
-                                                options={this.profiles}
-                                                onChange={this.onSelectedProfile}
-                                                defaultValue={this.profiles.filter(profile => profile.value.name === this.state.user.profile.name)}
-                                            />
-                                        </div>
-                                        <br/>
-                                        Location
-                                        <div className="SelectDiv">
-                                            <Select
-                                                styles={{
-                                                    option: provided => ({...provided, width: "100%"}),
-                                                    menu: provided => ({...provided, width: "100%"}),
-                                                    control: provided => ({...provided, width: "100%"}),
-                                                    singleValue: provided => provided
-                                                }}
-                                                options={this.state.rooms}
-                                                onChange={this.onSelectedLocation}
-                                                defaultValue={this.state.rooms.filter(room => room.label === this.state.user.location.name)}
-                                            />
-                                        </div>
-                                        <br/>
-                                        <label>Outside Temperature</label>
-                                        <br/>
-                                        <input name="outsideTemp" type="number" value={this.state.outsideTemp} onChange={this.tempChangeHandler} style={{width: "120px"}}/>
-                                        <br/>
-                                        <br/>
-                                        <Row>
-                                            <Col>
-                                                <label>Date</label>
-                                                <br/>
-                                                <input type="date" name="date" value={this.state.date} onChange={this.onDateSelected}/>
-                                            </Col>
-                                            <Col>
-                                                <label>Time</label>
-                                                <br/>
-                                                <input type="time" name="time" value={this.state.time} onChange={this.onTimeSelected}/>
-                                            </Col>
-                                            <Col>
-                                                <label>Time Speed</label>
-                                                <br/>
-                                                <input type="number" name="timeSpeed" min={1} max={500} value={this.state.timeSpeed} onChange={this.onTimeSpeedSelected}/>
-                                            </Col>
-                                        </Row>
-										<Row>
-											<Col>
-												<br/>
-												<label>Summer Start Date</label>
-												<br/>
-												<input type="date" name="date" value={this.state.summerStart} onChange={this.onSummerStartSelected}/>
-											</Col>
-											<Col>
-												<br/>
-												<label>Winter Start Date</label>
-												<br/>
-												<input type="date" name="date" value={this.state.winterStart} onChange={this.onWinterStartSelected}/>
-											</Col>
-										</Row>
+    useEffect( () => {
+        (async () => {
+            window.addEventListener("awayModeOn", async () => {
+                await setAwayModeTimes();
+            });
+
+            await setAwayModeTimes();
+
+            contextModel.current = (await SimulationContextService.getContext()).data;
+            profiles.current = await ParametersService.getProfiles(contextModel.current.parameters.userProfiles.profiles);
+
+            const newDate = new Date(contextModel.current.parameters.sysParams.date);
+            const newSummerStart = new Date(contextModel.current.parameters.sysParams.seasonDates.summerStart);
+            const newWinterStart = new Date(contextModel.current.parameters.sysParams.seasonDates.winterStart);
+            dateTime.current.current = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000);
+
+            setUser(contextModel.current.parameters.user);
+            setOutsideTemp(contextModel.current.parameters.sysParams.outsideTemp);
+            setTimeSpeed(contextModel.current.parameters.sysParams.timeSpeed);
+            setSimulationState(contextModel.current.state);
+            setDate(dateTime.current.toISOString().substring(0, 10));
+            setTime(dateTime.current.toISOString().substring(11, 19));
+            setSummerStart(newSummerStart.toISOString().substring(0, 10));
+            setWinterStart(newWinterStart.toISOString().substring(0, 10));
+            setRooms([...await HouseLayoutService.getAllLocations(contextModel.current.layout)]);
+            setPresentationInfo({
+                userName: contextModel.current.parameters.user.name,
+                profileName: contextModel.current.parameters.user.profile.name,
+                location: contextModel.current.parameters.user.location.name,
+                outsideTemp: contextModel.current.parameters.sysParams.outsideTemp,
+                timeSpeed: contextModel.current.parameters.sysParams.timeSpeed
+            });
+            setLoaded(true);
+
+            simulatorTimeHandler.current = setInterval(async () => await simulatorTime(),1000 / timeSpeed);
+        })();
+    }, []);
+
+    return (
+        <Container>
+            {
+                loaded &&
+                    <div className="SimulationContext">
+                        <Button className="StartButton" size="sm" variant={simulationState === "ON" ? "danger" : "primary"} onClick={toggleSimulationState}>
+                            {simulationState === "ON" ? "Stop" : "Start"}
+                        </Button>
+                        <Button className="EditButton" size="sm" variant="secondary" onClick={() => setModal("Parameters", true)}>Parameters</Button>
+                        <br/>
+                        <br/>
+                        <Button className="EditButton" size="sm" variant="secondary" onClick={() => setModal("Context", true)}>Context</Button>
+                        <br/>
+                        <br/>
+                        <img src="/user.png" alt="profile pic" width="100px"/>
+                        <br/>
+                        {presentationInfo.userName}
+                        <br/>
+                        Profile: {`${presentationInfo.profileName} `}
+                        <EditUserProfiles profiles={profiles.current}/>
+                        <br/>
+                        <br/>
+                        Location: {presentationInfo.location}
+                        <br/>
+                        <br/>
+                        Outside temperature: {presentationInfo.outsideTemp}&deg;C
+                        <br/>
+                        <br/>
+                        {dateTime.current.toDateString()}
+                        <br/>
+                        {`${time} (x${presentationInfo.timeSpeed})`}
+                        <br/>
+                        <br/>
+                        <Modal show={editingParameters} onHide={() => setModal("Parameters", false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Parameters Editing</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body style={{display: "flex", justifyContent: "center"}}>
+                                <div>
+                                    Name
+                                    <br/>
+                                    <input type="text" placeholder="User" maxLength="20" value={user.name} onChange={handleNameChange}/>
+                                    <br/>
+                                    <br/>
+                                    Profile
+                                    <div className="SelectDiv">
+                                        <Select
+                                            key={""}
+                                            styles={{
+                                                option: provided => ({...provided, width: "100%"}),
+                                                menu: provided => ({...provided, width: "100%"}),
+                                                control: provided => ({...provided, width: "100%"}),
+                                                singleValue: provided => provided
+                                            }}
+                                            options={profiles.current}
+                                            onChange={onSelectedProfile}
+                                            defaultValue={profiles.current.filter(profile => profile.value.name === user.profile.name)}
+                                        />
                                     </div>
-                                </Modal.Body>
-                                <Modal.Footer>
-                                    <Button onClick={this.saveEdit}>Save</Button>
-                                </Modal.Footer>
-                            </Modal>
-                            <Modal show={this.state.editingContext} onHide={() => this.setModal("Context", false)}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Context Editing</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <Container style={{display: "flex", justifyContent: "center"}}>
-                                        <div className="SelectDiv">
-                                            Locations
-                                            <Select
-                                                key={this.state.updateLocationKey}
-                                                styles={{
-                                                    option: provided => ({...provided, width: "100%"}),
-                                                    menu: provided => ({...provided, width: "100%"}),
-                                                    control: provided => ({...provided, width: "100%"}),
-                                                    singleValue: provided => provided
-                                                }}
-                                                options={this.state.rooms}
-                                                onChange={this.onSelectedContextLocation}
-                                            />
-                                            {
-                                                this.state.selectedContextLocation !== null ?
-                                                    <Container>
-                                                        <Row>
-                                                            <Col>
-                                                                <br/>
-                                                                {
-                                                                    !OUTSIDE.includes(this.state.selectedContextLocation.label) ?
-                                                                        <div>
-                                                                            Windows
-                                                                            <Select
-                                                                                key={this.state.updateLocationKey}
-                                                                                styles={{
-                                                                                    option: provided => ({...provided, width: "100%"}),
-                                                                                    menu: provided => ({...provided, width: "100%"}),
-                                                                                    control: provided => ({...provided, width: "100%"}),
-                                                                                    singleValue: provided => provided
-                                                                                }}
-                                                                                options={this.state.windows}
-                                                                                value={this.state.selectedWindow}
-                                                                                onChange={(evt) => this.onSelectedItem("Window", evt)}
-                                                                            />
-                                                                            {
-                                                                                this.state.selectedWindow !== null ?
-                                                                                    <div>
-                                                                                        {
-                                                                                            this.state.selectedWindow.value.state === "BLOCKED" ?
-                                                                                                <Button onClick={() => this.blockWindow(false)}
-                                                                                                        variant="secondary"
-                                                                                                        size="sm">Unobstruct</Button>
-                                                                                                :
-                                                                                                <Button onClick={() => this.blockWindow(true)}
-                                                                                                        variant="secondary"
-                                                                                                        size="sm">Obstruct</Button>
-                                                                                        }
-                                                                                    </div>
-                                                                                    : null
-                                                                            }
-                                                                        </div>
-                                                                        : null
-                                                                }
-                                                                <br/>
-                                                                Persons
-                                                                <Select
-                                                                    key={`${this.state.personUpdateKey}${this.state.updateLocationKey}`}
-                                                                    styles={{
-                                                                        option: provided => ({...provided, width: "100%"}),
-                                                                        menu: provided => ({...provided, width: "100%"}),
-                                                                        control: provided => ({...provided, width: "100%"}),
-                                                                        singleValue: provided => provided
-                                                                    }}
-                                                                    options={this.state.persons}
-                                                                    onChange={(evt) => this.onSelectedItem("Person", evt)}
-                                                                />
-                                                                <Row>
-                                                                    <Col>
+                                    <br/>
+                                    Location
+                                    <div className="SelectDiv">
+                                        <Select
+                                            styles={{
+                                                option: provided => ({...provided, width: "100%"}),
+                                                menu: provided => ({...provided, width: "100%"}),
+                                                control: provided => ({...provided, width: "100%"}),
+                                                singleValue: provided => provided
+                                            }}
+                                            options={rooms}
+                                            onChange={onSelectedLocation}
+                                            defaultValue={rooms.filter(room => room.label === user.location.name)}
+                                        />
+                                    </div>
+                                    <br/>
+                                    <label>Outside Temperature</label>
+                                    <br/>
+                                    <input name="outsideTemp" type="number" value={outsideTemp} onChange={(evt) => setOutsideTemp(evt.target.value)} style={{width: "120px"}}/>
+                                    <br/>
+                                    <br/>
+                                    <Row>
+                                        <Col>
+                                            <label>Date</label>
+                                            <br/>
+                                            <input type="date" name="date" value={date} onChange={(evt) => setDate(evt.target.value)}/>
+                                        </Col>
+                                        <Col>
+                                            <label>Time</label>
+                                            <br/>
+                                            <input type="time" name="time" value={time} onChange={(evt) => setTime(evt.target.value)}/>
+                                        </Col>
+                                        <Col>
+                                            <label>Time Speed</label>
+                                            <br/>
+                                            <input type="number" name="timeSpeed" min={1} max={500} value={timeSpeed} onChange={onTimeSpeedSelected}/>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <br/>
+                                            <label>Summer Start Date</label>
+                                            <br/>
+                                            <input type="date" name="date" value={summerStart} onChange={(evt) => setSummerStart(evt.target.value)}/>
+                                        </Col>
+                                        <Col>
+                                            <br/>
+                                            <label>Winter Start Date</label>
+                                            <br/>
+                                            <input type="date" name="date" value={winterStart} onChange={(evt) => setWinterStart(evt.target.value)}/>
+                                        </Col>
+                                    </Row>
+                                </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={saveEdit}>Save</Button>
+                            </Modal.Footer>
+                        </Modal>
+                        <Modal show={editingContext} onHide={() => setModal("Context", false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Context Editing</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <Container style={{display: "flex", justifyContent: "center"}}>
+                                    <div className="SelectDiv">
+                                        Locations
+                                        <Select
+                                            styles={{
+                                                option: provided => ({...provided, width: "100%"}),
+                                                menu: provided => ({...provided, width: "100%"}),
+                                                control: provided => ({...provided, width: "100%"}),
+                                                singleValue: provided => provided
+                                            }}
+                                            options={rooms}
+                                            onChange={onSelectedContextLocation}
+                                        />
+                                        {
+                                            selectedContextLocation &&
+                                                <Container>
+                                                    <Row>
+                                                        <Col>
+                                                            <br/>
+                                                            {
+                                                                !OUTSIDE.includes(selectedContextLocation.label) &&
+                                                                    <div>
+                                                                        Windows
+                                                                        <Select
+                                                                            styles={{
+                                                                                option: provided => ({...provided, width: "100%"}),
+                                                                                menu: provided => ({...provided, width: "100%"}),
+                                                                                control: provided => ({...provided, width: "100%"}),
+                                                                                singleValue: provided => provided
+                                                                            }}
+                                                                            options={windows}
+                                                                            value={selectedWindow}
+                                                                            onChange={(evt) => setSelectedWindow(evt)}
+                                                                        />
                                                                         {
-                                                                            this.state.addingPerson ?
+                                                                            selectedWindow !== null &&
                                                                                 <div>
-                                                                                    <input
-                                                                                        type="text" placeholder="Name" maxLength="20"
-                                                                                        value={this.state.personName}
-                                                                                        onChange={this.handlePersonNameChange}
-                                                                                    />
-                                                                                    <Button onClick={async () => await this.setState({ addingPerson: false })} variant="dark" size="sm">
-                                                                                        X
-                                                                                    </Button>
-                                                                                    <Button onClick={this.addPerson} variant="secondary" size="sm">
-                                                                                        Save
-                                                                                    </Button>
-                                                                                </div>
-                                                                                :
-                                                                                <div>
-                                                                                    <Button onClick={() => this.setEditing(true)} variant="secondary"
-                                                                                            size="sm">Add</Button>
                                                                                     {
-                                                                                        this.state.selectedPerson !== null?
-                                                                                            <Button onClick={this.removePerson} variant="secondary"
-                                                                                                    size="sm">Remove</Button>
-                                                                                            : null
+                                                                                        selectedWindow.value.state === "BLOCKED" ?
+                                                                                            <Button onClick={() => blockWindow(false)}
+                                                                                                    variant="secondary"
+                                                                                                    size="sm">Unobstruct</Button>
+                                                                                            :
+                                                                                            <Button onClick={() => blockWindow(true)}
+                                                                                                    variant="secondary"
+                                                                                                    size="sm">Obstruct</Button>
                                                                                     }
                                                                                 </div>
                                                                         }
-                                                                    </Col>
-                                                                </Row>
-                                                            </Col>
-                                                        </Row>
-                                                    </Container>
-                                                    : null
-                                            }
-                                        </div>
-                                    </Container>
-                                </Modal.Body>
-                            </Modal>
-                        </div>
-                        : null
-                }
-            </Container>
-        )
-    }
-
+                                                                    </div>
+                                                            }
+                                                            <br/>
+                                                            Persons
+                                                            <Select
+                                                                styles={{
+                                                                    option: provided => ({...provided, width: "100%"}),
+                                                                    menu: provided => ({...provided, width: "100%"}),
+                                                                    control: provided => ({...provided, width: "100%"}),
+                                                                    singleValue: provided => provided
+                                                                }}
+                                                                options={persons}
+                                                                onChange={(evt) => setSelectedPerson(evt)}
+                                                            />
+                                                            <Row>
+                                                                <Col>
+                                                                    {
+                                                                        addingPerson ?
+                                                                            <div>
+                                                                                <input
+                                                                                    type="text" placeholder="Name" maxLength="20"
+                                                                                    value={personName}
+                                                                                    onChange={handlePersonNameChange}
+                                                                                />
+                                                                                <Button onClick={() => setAddingPerson(false)} variant="dark" size="sm">
+                                                                                    X
+                                                                                </Button>
+                                                                                <Button onClick={addPerson} variant="secondary" size="sm">
+                                                                                    Save
+                                                                                </Button>
+                                                                            </div>
+                                                                            :
+                                                                            <div>
+                                                                                <Button onClick={() => setAddingPerson(true)} variant="secondary"
+                                                                                        size="sm">
+                                                                                    Add
+                                                                                </Button>
+                                                                                {
+                                                                                    selectedPerson !== null &&
+                                                                                        <Button onClick={removePerson} variant="secondary"
+                                                                                                size="sm">
+                                                                                            Remove
+                                                                                        </Button>
+                                                                                }
+                                                                            </div>
+                                                                    }
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
+                                                    </Row>
+                                                </Container>
+                                        }
+                                    </div>
+                                </Container>
+                            </Modal.Body>
+                        </Modal>
+                    </div>
+            }
+        </Container>
+    );
 }

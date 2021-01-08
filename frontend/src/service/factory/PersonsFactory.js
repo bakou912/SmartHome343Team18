@@ -3,6 +3,8 @@ import Person from "../../component/houselayout/Person";
 
 export default class PersonsFactory {
 
+    static dimension = 10;
+
     static create(room, startPosition, roomDimensions, rowIndex) {
         const personModels = room.persons;
         const personComponents = [];
@@ -18,7 +20,7 @@ export default class PersonsFactory {
             );
         }
 
-        const svgWidth = personComponents.length * Person.dimension;
+        const svgWidth = personComponents.length * PersonsFactory.dimension;
 
         return (
             <svg

@@ -1,34 +1,19 @@
-import React from "react";
+import React, {useRef} from "react";
 
-export default class Room extends React.Component {
+export default function Room(props) {
 
-    roomWidth = undefined;
-    roomHeight = undefined;
+    const roomModel = useRef(props.room);
+    const roomWidth = useRef(props.width);
+    const roomHeight = useRef(props.height);
+    const x = useRef(props.x);
+    const y = useRef(props.y);
 
-    roomModel = undefined;
-
-    constructor(props) {
-        super(props);
-
-        this.roomModel = props.room;
-        this.roomWidth = props.width;
-        this.roomHeight = props.height;
-
-        this.state = {
-            x: props.x,
-            y: props.y
-        };
-    }
-
-    render() {
-        return (
-            <g>
-                <rect x={this.state.x} y={this.state.y} width={this.roomWidth} height={this.roomHeight} style={{fill: "rgba(0,0,0,0)", strokeWidth: "2", stroke: "black"}} />
-                <svg x={this.state.x} y={this.state.y} width={this.roomWidth} height={this.roomHeight} xmlns="http://www.w3.org/2000/svg">
-                    <text x="50%" y="40%" textAnchor="middle" alignmentBaseline="central" fontFamily="Verdana" fontSize="9" fill="black">{this.roomModel.name}</text>
-                </svg>
-            </g>
-        );
-    }
-
+    return (
+        <g>
+            <rect x={x.current} y={y.current} width={roomWidth.current} height={roomHeight.current} style={{fill: "rgba(0,0,0,0)", strokeWidth: "2", stroke: "black"}} />
+            <svg x={x.current} y={y.current} width={roomWidth.current} height={roomHeight.current} xmlns="http://www.w3.org/2000/svg">
+                <text x="50%" y="40%" textAnchor="middle" alignmentBaseline="central" fontFamily="Verdana" fontSize="9" fill="black">{roomModel.current.name}</text>
+            </svg>
+        </g>
+    );
 }

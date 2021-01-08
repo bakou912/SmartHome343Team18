@@ -1,47 +1,42 @@
-import React from "react";
+import React, {useCallback, useRef} from "react";
 
-export default class RoomItem extends React.Component {
+export default function RoomItem(props) {
 
-    roomWidth = undefined;
-    roomHeight = undefined;
+    const roomWidth = useRef(props.roomWidth);
+    const roomHeight = useRef(props.roomHeight);
 
-    static dimension = 15;
+    const createPosition = useCallback((direction) => {
 
-    constructor(props) {
-        super(props);
-
-        this.roomWidth = props.roomWidth;
-        this.roomHeight = props.roomHeight;
-
-        const { x, y } = this.createPosition(props.direction);
-
-        this.state = {
-            x: x,
-            y: y,
-            state: props.state
-        };
-    }
-
-    createPosition(direction) {
-        let x = "0", y = "0";
+        let newX = "0", newY = "0";
 
         if (direction === "NORTH" || direction === "SOUTH") {
-            x = this.roomWidth / 2;
+            newX = roomWidth.current / 2;
 
             if (direction === "SOUTH") {
-                y = this.roomHeight;
+                newY = roomHeight.current;
             }
         }
 
         if (direction === "WEST" || direction === "EAST") {
-            y = this.roomHeight / 2;
+            newY = roomHeight.current / 2;
 
             if (direction === "EAST") {
-                x = this.roomWidth;
+                newX = roomWidth.current;
             }
         }
 
-        return { x, y };
-    }
+        return { x: newX, y: newY };
+    }, [roomHeight, roomWidth]);
 
+    const position = useRef(createPosition(props.direction));
+
+    return (
+        <image
+            x={position.current.x}
+            y={position.current.y}
+            width={props.dimension}
+            height={props.dimension}
+            href={props.imagePath}
+        />
+    );
 }
